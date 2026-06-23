@@ -63,6 +63,8 @@ Temas que cruzan todas las opciones anteriores y que conviene entender antes de 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 11 | [Autenticación y estado web](Autenticacion-y-Estado-Web.md) | Cómo sabe la app quién eres y cómo recuerda algo, pese a que HTTP no tiene memoria. |
+| 12 | [Entity Framework Core](Entity-Framework-Core.md) | El acceso a datos: persistir en una base de datos lo que en WPF te bastaba con tener en memoria. |
+| 13 | [SignalR](SignalR.md) | Tiempo real: el servidor empuja datos al navegador, como los eventos del escritorio pero por la red. |
 
 ---
 
