@@ -39,6 +39,17 @@ Conceptos transversales que usarás sea cual sea la herramienta.
 | 7 | [Secrets y variables de entorno](Secrets-y-Variables.md) | Cómo manejar contraseñas y tokens sin meterlos en el repositorio. Seguridad básica imprescindible. |
 | 8 | [Estrategias de despliegue](Estrategias-de-Despliegue.md) | Las distintas formas de poner una versión en producción sin cortes y con vuelta atrás. |
 
+### 4. Técnicas que verás en pipelines reales
+
+Patrones concretos que aparecen al montar el CI/CD de un proyecto de verdad. Requieren los bloques anteriores.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 9 | [Git hooks (validación local)](Git-Hooks.md) | La primera línea de defensa: validar en tu máquina antes de gastar un minuto de CI. |
+| 10 | [Monorepo y path-filters](Monorepo-y-Path-Filters.md) | Cómo evitar que un repo con varias áreas lo recompile todo en cada cambio. |
+| 11 | [Entornos efímeros en CI](Entornos-Efimeros-en-CI.md) | Probar la aplicación completa sin mantener un servidor de pruebas permanente. |
+| 12 | [Release por tag](Release-por-Tag.md) | Separar "integrar código" de "publicar producto": el deploy como decisión explícita. |
+
 ---
 
 > ¿Quieres ver cómo encaja esto con el resto del stack? Echa un vistazo a las guías de [tecnologías backend y frontend](../technologies/) de esta misma colección de aprendizaje.
