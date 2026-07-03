@@ -75,4 +75,12 @@ Si la palabra aparece cerca de *hash*, *contraseña* o *KDF* → es la **sal**. 
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Sembrar contraseñas hasheadas no es determinista** — como la KDF genera una sal nueva en cada llamada, hashear la misma contraseña en cada arranque produce un blob distinto: un seed que compare el valor almacenado para decidir si "hay cambios" re-escribirá la fila eternamente. La idempotencia debe apoyarse en la clave natural (el email), y la contraseña de la cuenta admin sembrada debe llegar por variable de entorno o gestor de secretos — un hash hardcodeado en la migración es una contraseña publicada en el repositorio.
+- **Hay una cuarta prima: la pepper** — un secreto de servidor que se mezcla con la contraseña *además* de la sal, guardado fuera de la base de datos (variable de entorno, KMS). Al contrario que la sal, sí es secreta y es común a todas las cuentas: protege los hashes en el caso típico de que solo se filtre la BD.
+- **En tests, seed aleatoria nueva en cada ejecución... pero logueada** — fijar siempre `new Random(42)` esconde los bugs que solo aparecen con otros datos; la aleatoriedad pura hace irreproducibles los fallos. El hábito experto es el punto medio: generar una seed distinta por ejecución, imprimirla en la salida del test, y cuando algo falle repetir exactamente esa ejecución pasándole la misma seed.
+
+---
+
 *En resumen: la sal es aleatoriedad única que se mezcla con cada contraseña antes de hashear; el seed de datos es lo que plantas en una base de datos vacía para que arranque; y la seed aleatoria hace repetible a un generador — tres "semillas" que solo comparten el nombre.*

@@ -66,6 +66,14 @@ $argon2id$v=19$m=19456,t=2,p=1$C7RPZ4qRolZ5...$5d6P0PU3q2kX...
 - **No sustituye al control de intentos online** — el rate-limiting del login y el bloqueo de cuenta siguen haciendo falta; la KDF protege sobre todo cuando la base de datos ya se ha filtrado.
 - **No sirve para datos que no sean secretos adivinables** — hashear un fichero o un token de 256 bits con Argon2 solo desperdicia CPU y memoria.
 
+## Buenas prácticas avanzadas
+
+- **Calibra en el hardware de producción y trata el login como vector de DoS** — el coste que en tu portátil da 50 ms puede dar 400 ms en el contenedor pequeño de producción. Y una KDF cara convierte el endpoint de login en un objetivo: unas decenas de peticiones simultáneas con contraseñas inventadas bastan para saturar la CPU. Además del rate-limiting por IP y cuenta, limita cuántas verificaciones se ejecutan a la vez (una cola o un semáforo).
+- **Pepper: el secreto que la sal no es** — sobre la sal (pública, en la BD) puedes añadir un HMAC con una clave secreta guardada *fuera* de la base de datos (variable de entorno, KMS) antes de pasar por la KDF. En el escenario típico de filtración — inyección SQL, backup perdido — el atacante tiene los hashes pero no el pepper, y no puede probar ni una sola contraseña. A cambio, asumes gestionar y rotar esa clave.
+- **Pre-hashear para esquivar el límite de bcrypt tiene trampa** — el apaño `bcrypt(sha256(contraseña))` para superar los 72 bytes introduce dos fallos sutiles: el digest binario puede contener bytes nulos que bcrypt trunca, y habilita el *password shucking* — si el atacante tiene SHA-256 filtrados de otra brecha, los prueba directamente como "contraseñas" contra tus bcrypt. Si pre-hasheas, codifica el resultado en Base64 y usa HMAC con clave, no un hash a pelo.
+- **Migra hashes legacy envolviéndolos, no esperando logins** — si heredas una tabla con MD5 o SHA-1, no esperes a que cada usuaria vuelva a entrar para re-hashear: aplica ya `argon2id(hash_viejo)` a todos los registros y anota el esquema en el formato. La base queda protegida hoy mismo, y en el siguiente login de cada cuenta sustituyes por el Argon2id de la contraseña original.
+- **De las tres variantes de Argon2, siempre la id** — Argon2d resiste mejor las GPUs pero es vulnerable a ataques de canal lateral; Argon2i, al revés. Argon2**id** combina ambas y es la única que recomiendan OWASP y el RFC 9106 para contraseñas: si una librería te ofrece las tres, no hay decisión que tomar.
+
 ---
 
 *En resumen: las contraseñas se protegen con funciones lentas a propósito — Argon2id como primera opción según OWASP — porque contra un ladrón de bases de datos la única defensa real es que cada intento le cueste caro.*

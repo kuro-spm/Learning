@@ -59,6 +59,14 @@ SHA-256 produce 256 bits (32 bytes, 64 caracteres en hexadecimal) sin importar s
 - **No garantiza autenticidad por sí solo** — cualquiera puede recalcular el hash de un dato alterado. Para autenticar hace falta combinarlo con un secreto (HMAC) o una firma digital.
 - **No oculta entradas predecibles** — si la entrada es "1234", un atacante la adivina probando hashes de entradas comunes. Por eso las contraseñas necesitan un tratamiento especial (ver ficha de derivación de claves).
 
+## Buenas prácticas avanzadas
+
+- **Hashea bytes, no conceptos: canonicaliza antes** — "el mismo dato" tiene mil representaciones: un JSON con las claves en otro orden, UTF-8 frente a UTF-16, finales de línea CRLF frente a LF. Si dos servicios hashean "lo mismo" sin acordar una serialización canónica exacta, los hashes no coincidirán y perseguirás fantasmas. Define los bytes exactos (codificación, orden de campos, separadores) como parte del contrato.
+- **Concatenar campos sin delimitar crea colisiones triviales** — `hash("ab" + "c")` y `hash("a" + "bc")` son idénticos. Si construyes la entrada juntando campos (usuaria + importe, ruta + query...), alguien puede desplazar la frontera entre campos y fabricar dos mensajes distintos con el mismo hash sin romper el algoritmo. Prefija cada campo con su longitud o usa un separador imposible en los datos.
+- **`SHA-256(secreto ∥ mensaje)` no es un MAC: ataque de extensión de longitud** — por su construcción interna, con SHA-256 quien conoce `hash(secreto ∥ mensaje)` puede calcular `hash(secreto ∥ mensaje ∥ extra)` **sin conocer el secreto**. Es el error clásico al firmar URLs o webhooks "a mano". HMAC existe precisamente para cerrar este agujero: úsalo siempre que haya un secreto de por medio.
+- **Compara hashes de secretos en tiempo constante** — un `==` normal devuelve en cuanto encuentra el primer byte distinto, y ese microtiming puede filtrar, byte a byte, cuánto se acerca un candidato al valor correcto. Al verificar HMACs o hashes de tokens, usa la comparación en tiempo constante de tu plataforma (en .NET, `CryptographicOperations.FixedTimeEquals`).
+- **Truncar un hash reduce la seguridad más de lo que parece** — la resistencia a colisiones es de n/2 bits (paradoja del cumpleaños): recortar SHA-256 a 8 caracteres hexadecimales (32 bits) hace esperables las colisiones a partir de ~65.000 elementos. Si derivas IDs cortos de un hash, calcula cuántos elementos llegarás a tener y deja margen de sobra.
+
 ---
 
 *En resumen: un hash criptográfico es una huella digital de tamaño fijo — determinista, irreversible, hipersensible a cambios y sin colisiones prácticas — que permite comparar y verificar datos sin exponerlos.*

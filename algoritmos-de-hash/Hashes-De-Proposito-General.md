@@ -60,6 +60,13 @@ Ambos tienen **colisiones fabricables**: un atacante puede crear dos contenidos 
 - **No autentican** — un hash sin secreto solo detecta corrupción accidental; contra un atacante que puede sustituir dato y hash a la vez hace falta HMAC o firma.
 - **No anonimizan datos predecibles** — hashear un DNI o un teléfono no lo protege: el espacio de entradas es tan pequeño que se revierte por fuerza bruta.
 
+## Buenas prácticas avanzadas
+
+- **La resistencia real a colisiones es la mitad de los bits** — por la paradoja del cumpleaños, SHA-256 ofrece ~128 bits contra colisiones, no 256. Importa sobre todo al truncar: usar los primeros 64 bits de un hash como clave de deduplicación empieza a dar colisiones esperables hacia los ~5.000 millones de elementos — lejísimos si deduplicas fotos, incómodamente cerca si troceas backups en bloques de 4 KB.
+- **SHA-2 sufre extensión de longitud; SHA-3 y BLAKE no** — con SHA-256, conocer `hash(secreto ∥ dato)` permite calcular hashes de mensajes extendidos sin saber el secreto, así que jamás sirve como MAC casero (para eso, HMAC). SHA-3 y BLAKE2/3 son inmunes por construcción, y BLAKE2/3 además traen modo *keyed* nativo: sustituye a HMAC con una sola llamada y más velocidad.
+- **En CPUs de 64 bits, SHA-512 suele ganar a SHA-256** — trabaja con palabras de 64 bits y procesa más datos por ronda. La variante **SHA-512/256** (SHA-512 truncado a 32 bytes de salida) combina ese rendimiento con inmunidad a la extensión de longitud. Eso sí: las instrucciones SHA-NI de los procesadores modernos aceleran SHA-256 por hardware e invierten la tortilla — mide en tu máquina de producción, no en la de desarrollo.
+- **Hashea en streaming, no cargando el fichero en memoria** — toda librería seria ofrece API incremental (init/update/final) que consume el dato a trozos con memoria constante; es la diferencia entre hashear un vídeo de 4 GB y tumbar el proceso. Y matiz sobre BLAKE3: su paralelismo interno solo luce con entradas grandes o varios hilos; para millones de entradas pequeñas la ventaja sobre BLAKE2 o un SHA-256 acelerado se difumina.
+
 ---
 
 *En resumen: SHA-256 como opción por defecto, BLAKE3 cuando la velocidad importa, SHA-3 como reserva estratégica — y MD5 y SHA-1 jubilados para cualquier uso con adversario.*

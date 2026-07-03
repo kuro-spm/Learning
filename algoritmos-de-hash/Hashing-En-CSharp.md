@@ -111,6 +111,14 @@ Nunca `new Random()` para secretos: es predecible.
 - **`SHA256` no vale para contraseñas** — está en la caja y es tentador, pero es un hash rápido (ver [funciones de derivación de claves](Funciones-De-Derivacion-De-Claves.md)).
 - **Los paquetes de terceros no se auditan solos** — fija versiones, revisa mantenimiento y licencia antes de añadirlos a producción.
 
+## Buenas prácticas avanzadas
+
+- **`GetHashCode()` no es un hash: es aleatorio por proceso** — desde .NET Core, `string.GetHashCode()` cambia en cada ejecución (aleatorización anti-DoS deliberada). Nunca lo persistas, lo uses para particionar datos ni lo compares entre procesos. Para huellas estables usa `SHA256.HashData`, o `XxHash64` del paquete `System.IO.Hashing` cuando no haya adversario y prime la velocidad.
+- **Compara secretos con `CryptographicOperations.FixedTimeEquals`** — `SequenceEqual` y `==` cortocircuitan en el primer byte distinto y filtran información por timing. Al comparar el hash de un token recibido con el almacenado, usa la comparación en tiempo constante. Su hermana `CryptographicOperations.ZeroMemory` borra de la memoria sales y claves en `byte[]` cuando terminas con ellas.
+- **Fija el coste de `PasswordHasher` por opciones y deja que el re-hash lo despliegue** — el `IterationCount` por defecto depende de la versión del runtime; decláralo explícito para no depender de él: `services.Configure<PasswordHasherOptions>(o => o.IterationCount = 600_000);`. Los hashes con el coste antiguo irán devolviendo `SuccessRehashNeeded` y la migración se hace sola, login a login, sin scripts.
+- **`IncrementalHash` para datos compuestos, y ojo con la thread-safety** — para hashear varios campos o un stream sin concatenar buffers gigantes: `IncrementalHash.CreateHash(HashAlgorithmName.SHA256)` y varias llamadas a `AppendData`. Las *instancias* de `SHA256` e `IncrementalHash` no son thread-safe; los métodos estáticos `HashData` sí pueden llamarse desde cualquier hilo, que es otro motivo para preferirlos.
+- **La contraseña en un `string` vive más de lo que crees** — los strings son inmutables: no puedes sobrescribirlos y permanecen en memoria (y en cualquier volcado del proceso) hasta que el GC decida. En ASP.NET no puedes evitarlo del todo (el model binding ya te la entrega como string), pero sí evitar copias extra: no la logues, no la interpoles en mensajes y pásala directa al hasher sin guardarla en más sitios.
+
 ---
 
 *En resumen: en .NET, `SHA256.HashData` para huellas e integridad, `PasswordHasher` (PBKDF2 first-party, con re-hash automático) para contraseñas sin salir de la caja, y BCrypt.Net-Next o un paquete Argon2 — mirando su licencia — si quieres ir más allá.*

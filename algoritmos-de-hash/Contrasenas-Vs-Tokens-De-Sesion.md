@@ -65,4 +65,12 @@ Dos algoritmos distintos en la misma feature, y ninguno es "mejor" que el otro: 
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Dale a cada tipo de token un prefijo identificable** — un token `sk_live_...` o `ghp_...` no es más seguro criptográficamente, pero cambia la operativa: el *secret scanning* (GitHub, herramientas de CI) lo detecta si acaba en un commit, los logs pueden depurarse por patrón y, en un incidente, sabes al instante qué tipo de credencial se ha expuesto y qué revocar.
+- **Verifica el hash del token en tiempo constante** — si recuperas la fila por otro criterio y luego comparas hashes en código, usa `CryptographicOperations.FixedTimeEquals`, nunca `==`: la comparación ordinaria termina en el primer byte distinto y filtra información por timing. Buscar directamente con `WHERE TokenHash = @hash` es aceptable justo porque SHA-256 impide al atacante controlar qué bytes se comparan.
+- **Rota el token en cada cambio de privilegio** — emite un token nuevo (invalidando el anterior) al iniciar sesión, al elevar permisos o al cambiar la contraseña. Corta de raíz la *session fixation*: un token que el atacante logró plantar o capturar antes de la autenticación deja de valer justo cuando la sesión empieza a tener valor.
+
+---
+
 *En resumen: la entropía del secreto elige el algoritmo — contraseña humana ⇒ KDF lenta con sal; token aleatorio de 256 bits ⇒ SHA-256 basta, porque contra 2^256 posibilidades no hay diccionario que valga.*
