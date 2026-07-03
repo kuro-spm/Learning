@@ -8,7 +8,7 @@ Cada archivo explica qué es un concepto, por qué existe, cuándo se usa y lo m
 
 ## Orden de lectura recomendado
 
-Sigue este orden si partes de cero. Primero la idea general y sus reglas; después las capas, de dentro hacia fuera.
+Sigue este orden si partes de cero. Primero la idea general y sus reglas; después las capas, de dentro hacia fuera; por último, cómo repartir el código cuando la aplicación se organiza en módulos.
 
 ### 1. La idea y sus reglas
 
@@ -30,6 +30,14 @@ Recorre las capas en el mismo orden en que conviene diseñarlas: del corazón es
 | 5 | [Casos de Uso](Casos-de-Uso.md) | Cómo se orquesta cada acción de la aplicación alrededor del dominio. |
 | 6 | [Puertos y Adaptadores](Puertos-y-Adaptadores.md) | El vocabulario de las fronteras: cómo entra y sale la información del centro. |
 | 7 | [Capa de Infraestructura](Capa-de-Infraestructura.md) | El borde técnico: base de datos, web y demás detalles reemplazables. |
+
+### 3. Organizar el código a lo grande
+
+Con las capas claras, queda la pregunta del día a día en un monolito modular: dónde va cada pieza nueva.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 8 | [Módulos vs Shared](Modulos-vs-Shared.md) | El criterio para decidir si el código nuevo va a un módulo propio o a los proyectos compartidos. |
 
 ---
 
