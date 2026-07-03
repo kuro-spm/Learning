@@ -72,6 +72,13 @@ Como el caso de uso depende de `IRepositorioPedidos` y no de SQL, puedes cambiar
 - **No sustituye al buen diseño** — puedes seguir la estructura al pie de la letra y aun así escribir mala lógica dentro de cada capa.
 - **No es siempre la mejor opción** — en proyectos pequeños su sobrecarga no compensa.
 
+## Buenas prácticas avanzadas
+
+- **Organiza las carpetas por negocio, no por tipo técnico** — una estructura que solo muestra `Controllers/`, `Services/` y `Repositories/` no dice nada de qué hace la aplicación. Quien domina la arquitectura agrupa por capacidad de negocio (`Pedidos/`, `Catalogo/`...) y aplica las capas dentro de cada una: al abrir el repositorio se ve *de qué va* el sistema, no con qué framework está hecho (es la idea de la *screaming architecture*).
+- **Vigila los paquetes, no solo los `using`** — el acoplamiento más sutil entra por NuGet/npm: basta con que el proyecto de dominio referencie el paquete del ORM para "decorar" una entidad con `[Table]` y el centro ya depende de la base de datos. El proyecto del dominio debería tener cero referencias a paquetes de infraestructura; idealmente, cero referencias externas.
+- **No repartas un CRUD en cuatro capas por disciplina** — pasar un dato por entidad + caso de uso + DTO + mapeo cuando no hay ninguna regla de negocio es coste sin beneficio. Los expertos aplican la separación donde hay lógica que proteger y dejan atajos deliberados (y documentados) donde solo hay lectura: por ejemplo, consultas que van directas a la base de datos para pintar un listado, sin pasar por el dominio.
+- **Acepta el mapeo entre capas como un coste, no lo "optimices" reutilizando modelos** — usar la misma clase como entidad de dominio, fila de base de datos y respuesta JSON ahorra mapeos hoy y suelda las capas para siempre: renombrar una columna pasa a romper el contrato público de la API. Duplicar DTOs en las fronteras es el precio de poder cambiar cada capa por separado, y es barato comparado con la alternativa.
+
 ---
 
 *En resumen: Clean Architecture pone las reglas de negocio en el centro y empuja todos los detalles técnicos al borde, para que lo importante de tu aplicación no dependa de las herramientas con las que está hecha.*

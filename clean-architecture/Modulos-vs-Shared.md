@@ -92,6 +92,13 @@ Mañana Suscripciones también cobra con esa pasarela (2.º consumidor real)
 - **La regla del 2 no prohíbe compartir** — solo pide que el segundo consumidor sea real, no imaginario. Cuando aparece, mover el contrato a shared es la jugada correcta.
 - **Esta división no decide el despliegue** — módulos y shared conviven en un único ejecutable (por eso es un *monolito* modular); es una frontera de código, no de servidores.
 
+## Buenas prácticas avanzadas
+
+- **Trata los contratos compartidos como una API pública** — cambiar la firma de `IUsuarioRepository` en SharedKernel obliga a tocar a la vez todos los módulos que lo consumen. Haz que los contratos evolucionen de forma aditiva (añadir métodos o campos opcionales, no renombrar ni cambiar firmas) y piensa dos veces antes de "refactorizar rápido" algo de shared: su onda expansiva es toda la aplicación.
+- **El acoplamiento también se cuela por la base de datos** — de nada sirve que Pedidos no referencie `Auth.Application` si su SQL hace `JOIN` contra la tabla de usuarios. Cada módulo debe ser dueño exclusivo de sus tablas (esquemas o prefijos separados ayudan a hacerlo visible) y pedir los datos ajenos por el contrato, no por debajo de la mesa.
+- **Duplicar es más barato que compartir mal** — que dos módulos tengan clases parecidas no viola DRY: DRY aplica al *conocimiento de negocio*, no al código que hoy se parece por casualidad. Si Envíos y Pedidos tienen cada uno su `Direccion` con reglas ligeramente distintas, unificarla en shared las condena a evolucionar juntas para siempre; la duplicación se corrige mañana, el acoplamiento no.
+- **Cuando el contrato síncrono acopla demasiado, pásate a eventos** — si Auth tiene que "avisar" de cada usuario bloqueado a tres módulos, acabará conociendo a todos sus consumidores. Publicar un evento (`UsuarioBloqueado`) invierte la relación: Auth no sabe quién escucha y cada módulo se suscribe solo a lo que le interesa. Es la evolución natural de los contratos cuando el número de consumidores crece.
+
 ---
 
 *En resumen: los módulos guardan lo que cambia con el negocio (casos de uso, tablas, ciclo de vida propio) y shared guarda solo lo estable y genérico que ya necesitan dos o más módulos — cuando dudes, déjalo en su módulo, que ascender a shared siempre estás a tiempo.*

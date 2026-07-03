@@ -59,4 +59,12 @@ Email, SMS o un adaptador falso para tests cumplen el mismo puerto `INotificador
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Nombra el puerto por la necesidad, no por la tecnología** — un puerto llamado `IEmailSender` en el centro ya es una decisión técnica colada de contrabando; `INotificador` deja abierta la puerta a email, SMS o push sin tocar nada. Si el nombre del puerto delata cuál es el adaptador, la frontera está cortada por el sitio equivocado.
+- **Pasa la misma suite de tests a todos los adaptadores de un puerto** — el adaptador SQL y el falso en memoria deben comportarse igual en los bordes (¿qué devuelve si el pedido no existe?, ¿qué pasa al guardar un duplicado?). Una suite de *contract tests* compartida que se ejecuta contra ambos evita el clásico "los tests pasan con el fake y producción falla con el real".
+- **La entrada también se adapta** — es fácil vigilar los puertos de salida y olvidar que un controlador REST es un adaptador: su único trabajo es traducir HTTP (rutas, códigos de estado, JSON) a llamadas al caso de uso. Si tipos del framework web cruzan hacia el centro, has roto la frontera por la puerta de entrada.
+
+---
+
 *En resumen: el puerto es el hueco con forma fija que define el centro, y el adaptador es la pieza intercambiable que lo conecta con la tecnología real — el mismo puerto, muchos adaptadores posibles.*

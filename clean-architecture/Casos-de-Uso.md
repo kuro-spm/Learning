@@ -67,6 +67,13 @@ public record DatosRegistro(string Nombre, string Email);
 - **No conoce la web ni la base de datos** — habla con el exterior solo a través de interfaces.
 - **No gestiona detalles de transporte** — códigos de estado HTTP, rutas o serialización JSON son trabajo de la capa de adaptadores, no suyo.
 
+## Buenas prácticas avanzadas
+
+- **El caso de uso es el dueño de la transacción** — "leer, confirmar, guardar" debe ser todo o nada. La unidad de trabajo se abre y se cierra en el caso de uso, no dentro de cada repositorio: si cada `Guardar` hace commit por su cuenta, un fallo a mitad deja el pedido cobrado pero sin registrar. Es el error de consistencia más caro y más común.
+- **Diseña para el doble clic: idempotencia** — todo caso de uso que llega por red acabará ejecutándose dos veces (reintentos, doble clic, timeouts con reenvío). `ConfirmarPedido` sobre un pedido ya confirmado no debería cobrar otra vez ni explotar: detecta la repetición y responde con un resultado claro. Quien no lo piensa se entera por un cobro duplicado en producción.
+- **No encadenes casos de uso entre sí** — cuando `ConfirmarPedido` llama a `EnviarConfirmacion` (otro caso de uso), nace un grafo de orquestadores llamándose unos a otros que nadie puede seguir. Si dos casos de uso comparten pasos, extrae esos pasos a un servicio del dominio; si uno debe "enterarse" de lo que hizo otro, plantéate publicar un evento.
+- **Centraliza lo transversal con decoradores** — logging, validación de la entrada, transacción y métricas repetidos a mano en cada caso de uso acaban desincronizados. Como todos los casos de uso tienen la misma forma (una clase, un método `Ejecutar`), puedes envolverlos con un decorador o un pipeline (los *behaviors* de MediatR son esto) y escribir cada preocupación transversal una sola vez.
+
 ---
 
 *En resumen: un caso de uso orquesta los pasos de una acción concreta de la aplicación, apoyándose en el dominio para las reglas y en interfaces para el mundo exterior — una acción, una clase.*

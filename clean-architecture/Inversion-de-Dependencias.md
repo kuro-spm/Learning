@@ -67,6 +67,13 @@ Cambiar de Stripe a PayPal es cambiar **esta línea**, sin tocar la lógica de n
 - **No requiere un contenedor de dependencias** — puedes pasar las implementaciones a mano; el contenedor solo lo automatiza.
 - **No significa "crear una interfaz para todo"** — solo tiene sentido en las fronteras entre capas, no en cada clase interna.
 
+## Buenas prácticas avanzadas
+
+- **Diseña la interfaz desde la necesidad del negocio, no calcando al proveedor** — si tu `IPasarelaPago` tiene un método `CreatePaymentIntent` y devuelve los objetos del SDK de Stripe, no has invertido nada: le has puesto a Stripe un disfraz. El contrato habla el idioma del centro (`Cobrar(importe, tarjeta)`); traducir eso a lo que pida el proveedor es trabajo de la implementación.
+- **Detecta las abstracciones con fugas por sus firmas** — una interfaz que expone `DbConnection`, `HttpResponseMessage` o excepciones del proveedor arrastra la tecnología hacia el centro por la puerta de atrás. Prueba del algodón: ¿podrías implementar el contrato con un diccionario en memoria sin cambiar su firma? Si no, tiene fugas.
+- **Interfaces pequeñas por rol, no espejos de la clase** — la interfaz de quince métodos que replica 1:1 su única implementación no abstrae, solo duplica. Corta por lo que cada consumidor necesita (quien solo lee pedidos no necesita ver `Guardar`): las interfaces pequeñas hacen los fakes de test triviales y los cambios, locales.
+- **Cuidado con los lifetimes del contenedor** — inyectar un servicio `Scoped` (por ejemplo, algo que arrastra el contexto de base de datos de la petición) dentro de un `Singleton` deja esa instancia "de petición" atrapada para toda la vida de la aplicación (*captive dependency*): funciona en la demo y en producción mezcla datos entre usuarios. Revisa los lifetimes al registrar, no cuando explote.
+
 ---
 
 *En resumen: la inversión de dependencias hace que el negocio dependa de un contrato que él mismo define, no de la tecnología que lo cumple — así la flecha de dependencia apunta hacia dentro y el centro queda libre de detalles técnicos.*

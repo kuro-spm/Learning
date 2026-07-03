@@ -67,6 +67,21 @@ Cuando un dato pasa de una capa a otra, viaja como un objeto sencillo (un DTO), 
 - **No elimina la necesidad de interfaces** — al contrario, las interfaces son la herramienta para cumplirla cuando lo interno necesita algo externo.
 - **No se comprueba sola** — ningún compilador la valida por defecto; la respetas tú al diseñar, o con reglas de análisis configuradas a propósito.
 
+## Buenas prácticas avanzadas
+
+- **Haz que el compilador la vigile: proyectos separados** — si dominio e infraestructura son carpetas dentro del mismo proyecto, cualquier `using` prohibido compila sin quejarse. Separarlos en proyectos/assemblies distintos, donde el centro no referencia a la infraestructura, convierte la violación en un error de compilación en vez de en un descuido silencioso.
+- **Añade tests de arquitectura** — la disciplina humana falla; herramientas como NetArchTest (C#) o ArchUnit (Java) permiten escribir un test que rompe la build si alguien añade una dependencia hacia fuera:
+
+```csharp
+var resultado = Types.InAssembly(typeof(Pedido).Assembly)
+    .Should().NotHaveDependencyOn("MiTienda.Infraestructura")
+    .GetResult();
+Assert.True(resultado.IsSuccessful);
+```
+
+- **Las violaciones sutiles no llevan `using` de base de datos** — la regla también se rompe cuando *tipos* del exterior se cuelan en las firmas del centro: un repositorio que devuelve `IQueryable` (con el ORM escondido debajo), una `SqlException` que cruza hasta el caso de uso, o un atributo de serialización del framework sobre un DTO interno. Revisa firmas y excepciones, no solo los imports.
+- **La regla habla de compilación, no de ejecución** — en tiempo de ejecución el flujo sigue yendo hacia fuera (el caso de uso acaba escribiendo en la base de datos); lo que apunta hacia dentro es el *grafo de dependencias del código*. Tener clara la diferencia evita discusiones estériles: la regla no prohíbe llamar a la base de datos, prohíbe *conocerla*.
+
 ---
 
 *En resumen: la regla de dependencia dice que las flechas del código solo van hacia dentro — el núcleo de negocio nunca debe saber nada del mundo exterior.*

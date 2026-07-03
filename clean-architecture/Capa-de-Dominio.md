@@ -76,6 +76,19 @@ public record Email
 - **No conoce la web ni la interfaz** — no sabe si lo llaman desde una API REST, una app de escritorio o un test.
 - **No orquesta acciones completas** — coordinar "validar, cobrar y guardar" es trabajo de los casos de uso, no de las entidades.
 
+## Buenas prácticas avanzadas
+
+- **Haz imposible el estado inválido desde el constructor** — validar en los métodos no basta si se puede hacer `new Pedido()` vacío y rellenarlo a medias: la invariante ya nació rota. Usa constructores o factorías estáticas que exijan todo lo imprescindible (`Pedido.Crear(clienteId, lineas)`) y deja, como mucho, un constructor privado sin lógica para el ORM.
+- **Distingue "regla de negocio incumplida" de "bug"** — que un pedido vacío no se pueda confirmar es un resultado *esperable* del negocio; devolverlo como un resultado explícito (patrón `Result`) permite a la capa de arriba reaccionar con normalidad. Reserva las excepciones para invariantes que nunca deberían romperse (si saltan, hay un bug). Usar excepciones para todo convierte el flujo normal de la aplicación en `try/catch` en cascada.
+- **Ids tipados contra la obsesión por los primitivos** — con `int pedidoId` e `int clienteId`, el compilador acepta feliz que los intercambies al llamar a un método. Un objeto de valor mínimo lo convierte en error de compilación:
+
+```csharp
+public record IdPedido(int Valor);
+public record IdCliente(int Valor); // ya no se pueden confundir
+```
+
+- **El reloj también es una dependencia** — un `DateTime.Now` dentro de una entidad hace la regla no determinista e imposible de probar ("el descuento caduca a medianoche"... ¿cómo lo testeas a las 10:00?). Pasa la fecha como parámetro (`pedido.Confirmar(fechaActual)`) o abstrae el reloj: el dominio no debería leer el mundo exterior ni para saber la hora.
+
 ---
 
 *En resumen: la capa de dominio es el corazón limpio de tu aplicación — entidades y reglas de negocio que se protegen a sí mismas y no dependen de ninguna tecnología.*

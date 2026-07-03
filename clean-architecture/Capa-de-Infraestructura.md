@@ -61,6 +61,13 @@ services.AddScoped<IRepositorioPedidos, RepositorioPedidosSql>();
 - **No es conocida por el centro** — el dominio y los casos de uso ignoran que esta capa existe; solo conocen las interfaces.
 - **No debería tomar decisiones de negocio** — si te ves escribiendo un `if` con una regla importante dentro de un repositorio, esa lógica está en el sitio equivocado.
 
+## Buenas prácticas avanzadas
+
+- **Traduce también las excepciones** — si una `SqlException` o una `HttpRequestException` escapa del repositorio, el caso de uso acaba con un `catch` de tipos de base de datos y la abstracción tiene una fuga. El adaptador captura los errores del proveedor en la frontera y los convierte en los del contrato: un resultado de fallo o una excepción propia y neutra (`ErrorDePersistencia`).
+- **La resiliencia vive aquí** — timeouts, reintentos con espera creciente y circuit breakers (por ejemplo, con Polly) son detalles de hablar con sistemas remotos: pertenecen al adaptador, no al caso de uso. Si el centro sabe cuántos reintentos hace la llamada a la pasarela de pago, el detalle técnico se ha filtrado hacia dentro.
+- **Prueba la infraestructura contra tecnología real** — es la única capa que no tiene sentido probar con dobles: mockear el ORM solo demuestra que llamas al mock. Un repositorio se prueba contra una base de datos de verdad (Testcontainers levanta una efímera en Docker por test), que es donde fallan las cosas que fallan en producción: mapeos, tipos de columna, restricciones, concurrencia.
+- **Configura el mapeo del ORM aquí, no anotando el dominio** — atributos como `[Table]` o `[Column]` sobre las entidades meten el ORM en el centro. EF Core y equivalentes permiten definir todo el mapeo por configuración externa (fluent API) dentro del proyecto de infraestructura, dejando las entidades de dominio sin una sola referencia técnica.
+
 ---
 
 *En resumen: la capa de infraestructura es el borde técnico que cumple, con tecnología real, las promesas que el centro define mediante interfaces — todo lo reemplazable vive aquí, y solo aquí.*
