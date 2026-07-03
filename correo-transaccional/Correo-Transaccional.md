@@ -135,6 +135,20 @@ Mandar un correo tarda y puede fallar. No bloquees la respuesta al usuario esper
 - **No deberías guardar las credenciales en el repositorio** — van en secretos, nunca en `appsettings.json` versionado.
 - **No bloquees la experiencia del usuario** — un fallo al enviar no debería tumbar el registro o el reset; trátalo aparte.
 
+## Buenas prácticas avanzadas
+
+- **Envía siempre `multipart/alternative` con versión en texto plano** — un correo solo-HTML puntúa peor en los filtros de spam y se ve roto en clientes que no renderizan HTML. Con MimeKit no montes el `TextPart` a mano: usa `BodyBuilder`, rellena `HtmlBody` **y** `TextBody`, y asigna `bodyBuilder.ToMessageBody()` al mensaje. Es una línea más y mejora la entregabilidad de forma medible.
+
+- **Los reintentos sin idempotencia duplican correos** — si encolas el envío y reintentas ante fallo, tarde o temprano un timeout hará que el correo se envíe dos veces (el SMTP lo aceptó pero tu app no recibió la respuesta). Guarda en base de datos un registro por envío con una clave única (por ejemplo `pedido-1234-confirmacion`) y márcalo como enviado; el patrón *outbox* resuelve esto y además evita el caso inverso: que la transacción de negocio haga rollback pero el correo ya haya salido.
+
+- **Procesa los bounces o tu reputación se hunde sola** — insistir en enviar a direcciones que rebotan (*hard bounces*) o que te han marcado como spam es lo que más rápido degrada la reputación del dominio. Todos los proveedores serios exponen webhooks de *bounce* y *complaint*: escúchalos y mantén tu propia **lista de supresión** para no volver a enviar a esas direcciones, aunque el usuario vuelva a pedir el correo.
+
+- **Usa un subdominio dedicado y entiende el *alignment* de DMARC** — envía el transaccional desde `mail.miapp.com` (o similar), separado del correo corporativo y del marketing: si una campaña quema la reputación, tu email de reset de contraseña no paga los platos rotos. Y un detalle que casi nadie sabe: cuando envías vía proveedor, el SPF suele validar el dominio *del proveedor* (el *envelope from*), no el tuyo, así que lo que de verdad alinea con tu `From` a ojos de DMARC es el **DKIM firmado con tu dominio**. Por eso el paso de "verificar dominio" del proveedor (los registros CNAME/TXT que te pide) no es opcional.
+
+- **El `SmtpClient` de MailKit no es thread-safe, pero sí reutilizable** — en un *background service* que despacha una cola, no conectes y desconectes por cada mensaje: una conexión autenticada admite varios `SendAsync` seguidos y el *handshake* TLS más la autenticación son la parte cara. Eso sí, nunca compartas una instancia entre hilos ni la registres como singleton en el contenedor de dependencias; crea una por lote o por worker.
+
+- **Trata los datos del usuario como hostiles también en el email** — si interpolas el nombre del usuario o el texto de un comentario en la plantilla HTML (como en el ejemplo del blog que avisa de comentarios nuevos), codifícalo con `HtmlEncoder` igual que harías en una vista web. Un atacante que se registra con el nombre `<a href="https://malo.com">Recupera tu cuenta aquí</a>` convierte tus correos legítimos en vehículo de phishing con tu remitente y tu reputación.
+
 ---
 
 *En resumen: el correo transaccional es el email automático que tu app manda a un usuario por una acción suya; en .NET se envía con MailKit hablando SMTP, pero la pieza que de verdad importa es tener un proveedor con buena reputación y el dominio bien configurado para que el correo llegue a la bandeja de entrada y no a spam.*
