@@ -3,7 +3,8 @@ name: crear-tutorial
 description: >-
   Crea colecciones de "tutoriales" o guías de tecnología siguiendo una metodología fija: una carpeta
   nueva en la raíz del proyecto con un README que hace de índice (con enlaces) y fichas en español,
-  autónomas y dirigidas a perfiles junior, legibles por cualquiera sin contexto de un proyecto concreto.
+  autónomas y dirigidas a perfiles fullstack junior-medio, legibles por cualquiera sin contexto de un
+  proyecto concreto.
   Usa esta skill siempre que la usuaria pida crear, añadir, escribir o documentar un tutorial, una guía,
   una ficha o una colección de guías sobre una librería, framework, lenguaje, herramienta o concepto,
   aunque no use literalmente la palabra "tutorial".
@@ -32,7 +33,7 @@ Los tutoriales son **autónomos y genéricos**: cualquier persona debe poder lee
 
 ## Antes de escribir nada
 
-Lee 2-3 documentos de `technologies/` para calibrar **estructura y tono** (no su contenido). Son la referencia de formato por encima de esta skill si hay discrepancias:
+Lee 2-3 documentos de `technologies/` para calibrar **estructura y tono** (no su contenido). Son la referencia de formato por encima de esta skill si hay discrepancias, **con una excepción**: la sección «Buenas prácticas avanzadas» es una incorporación posterior y las fichas antiguas no la tienen; inclúyela igualmente en las fichas nuevas.
 
 - `technologies/backend/Dapper.md` — ejemplo de **ficha completa**.
 - `technologies/frontend/clsx.md` — ejemplo de **ficha compacta**.
@@ -45,10 +46,10 @@ Lee 2-3 documentos de `technologies/` para calibrar **estructura y tono** (no su
 Estos pilares no se negocian:
 
 1. **Idioma: español.** La prosa va en español. Nombres de tecnologías, comandos, código y términos técnicos consolidados (*proxy*, *bundler*, *change tracking*) se mantienen en su idioma original.
-2. **Audiencia: perfiles junior en general.** El lector tiene nociones básicas de programación pero puede ser nuevo en la tecnología que documentas. No asumas experiencia con un stack concreto: define los términos antes de usarlos, explica desde lo esencial y no des por sabidos detalles avanzados.
-3. **Analogías y lenguaje sencillo.** Explica cada concepto comparándolo con ideas cotidianas o de programación general que un junior ya entienda ("un paquete es como una librería que instalas para no reinventar la rueda", "el estado es la memoria temporal del componente"). Una analogía con otra tecnología puede ir como apoyo *opcional* (`> Si ya conoces X, piensa en Y como...`), nunca como requisito para entender el texto.
+2. **Audiencia: perfil fullstack junior-medio.** El lector programa a diario y conoce los fundamentos de ambos lados del stack (HTTP, APIs REST, bases de datos, componentes de UI, npm/NuGet, Git...), pero puede ser nuevo en la tecnología concreta que documentas. No le expliques qué es una API o un bucle; sí define los términos propios de la tecnología antes de usarlos y no des por sabidos sus detalles internos.
+3. **Analogías y lenguaje claro.** Explica cada concepto nuevo anclándolo a algo que el lector ya domina. Con este perfil, las comparaciones con tecnologías fullstack comunes (SQL, React, fetch, middleware, Docker...) pueden ir en el cuerpo del texto como explicación principal; reserva el blockquote opcional (`> Si ya conoces X, piensa en Y como...`) para analogías con tecnologías menos universales, que nunca deben ser requisito para entender el texto.
 4. **Tutoriales autónomos, no atados a ningún proyecto.** El lector puede ser cualquiera, sin acceso a un código concreto. No menciones proyectos, módulos ni dominios privados. Para ilustrar "para qué se usa", emplea escenarios genéricos y reconocibles (una tienda online, un blog, una app de tareas, un formulario de registro...). La guía debe seguir teniendo sentido fuera de cualquier repositorio.
-5. **Brevedad introductoria.** Son guías de *introducción*, no documentación exhaustiva. El lector debe poder leerlas en pocos minutos y quedarse con "lo mínimo para no perderse".
+5. **Brevedad introductoria.** Son guías de *introducción*, no documentación exhaustiva. El lector debe poder leerlas en pocos minutos y quedarse con "lo mínimo para no perderse". La única sección que mira más allá de la introducción es «Buenas prácticas avanzadas», y aun así debe ser concisa: pocos puntos, muy escogidos.
 6. **Género del lector: libre pero coherente.** Puedes dirigirte al lector en femenino, masculino o neutro. Elige uno y mantenlo coherente dentro de cada colección.
 
 ## Convención de nombres de archivo
@@ -106,6 +107,16 @@ bloque de código corto y realista con nombres genéricos y reconocibles.
 - **No hace X** — explicación corta.
 - **No hace Y** — explicación corta.
 
+## Buenas prácticas avanzadas
+
+Lo que distingue a quien domina la tecnología de quien solo la usa. Entre 3 y 6
+puntos con título en negrita: hábitos de nivel experto, errores sutiles que casi
+todo el mundo comete, decisiones de diseño o rendimiento que marcan la diferencia
+en producción.
+
+- **<Práctica>** — en qué consiste, por qué la aplican los mejores y qué pasa si no.
+- **<Error sutil a evitar>** — por qué es fácil caer en él y cómo detectarlo.
+
 ---
 
 *En resumen: <una frase memorable que capture la esencia de la tecnología>.*
@@ -117,6 +128,7 @@ Para utilidades o conceptos menores. Modelo: `technologies/frontend/clsx.md`. Ig
 
 - Abre con `**¿Qué es?**` en negrita inline (no como encabezado `##`) seguido de la definición y un `---`.
 - El resto de secciones se mantienen, separadas por `---`.
+- «Buenas prácticas avanzadas» es *opcional* en esta variante: inclúyela (con 2-3 puntos) solo si el tema da para consejos de nivel experto que no quepan en «Lo mínimo»; en una utilidad trivial es mejor omitirla que rellenarla con obviedades.
 - Cierra igual: `*En resumen: ...*`.
 
 ### Reglas comunes a ambas variantes
@@ -124,6 +136,7 @@ Para utilidades o conceptos menores. Modelo: `technologies/frontend/clsx.md`. Ig
 - Bloques de código cortos y realistas con nombres genéricos y reconocibles (`User`, `productId`, `/api/products`, `Order`...), nunca `foo`/`bar` ni nombres de un proyecto privado.
 - El cierre en cursiva `*En resumen: ...*`, precedido de `---`, es obligatorio.
 - Lenguaje de los snippets coherente con la tecnología (`csharp`, `tsx`/`ts`, `python`, `bash`/`yaml`...).
+- En «Buenas prácticas avanzadas», cada punto debe ser accionable y específico de la tecnología (el criterio: ¿esto lo sabe solo el 1% que de verdad domina el tema?). Nada de consejos genéricos tipo "escribe tests" o "lee la documentación". Si un punto necesita código para entenderse, un snippet corto está permitido.
 
 ## Formato del README-índice
 
@@ -160,10 +173,11 @@ Cuando se pida crear uno o varios tutoriales:
 Antes de dar por terminado:
 
 - [ ] El contenido está en una carpeta nueva en la raíz del proyecto (no dentro de `technologies/`, salvo petición explícita).
-- [ ] Cada ficha está en español, dirigida a un perfil junior, sin asumir experiencia previa y con analogías sencillas.
+- [ ] Cada ficha está en español, dirigida a un perfil fullstack junior-medio: sin explicar fundamentos de programación, pero definiendo los términos propios de la tecnología.
 - [ ] Es autónoma: se entiende sin conocer ningún proyecto concreto (sin módulos ni dominios privados).
 - [ ] El género usado para el lector es coherente en toda la colección.
 - [ ] Cada ficha sigue una de las dos variantes de formato, sin secciones inventadas.
+- [ ] Toda ficha completa incluye «Buenas prácticas avanzadas» con puntos específicos y accionables (y las compactas, solo si el tema lo merece).
 - [ ] El código de ejemplo usa nombres genéricos y reconocibles, no `foo`/`bar` ni nombres de un proyecto privado.
 - [ ] Cada ficha cierra con `---` y la frase `*En resumen: ...*`.
 - [ ] La carpeta tiene un `README.md`-índice con enlaces a todas las fichas, y todos los enlaces funcionan.
