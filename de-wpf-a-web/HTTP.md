@@ -77,6 +77,14 @@ clase C# para mandarla por la red:
 - **No recuerda quién eres** por sí solo — el estado entre peticiones hay que gestionarlo explícitamente.
 - **No cifra nada por sí mismo** — eso lo añade **HTTPS** (HTTP sobre una capa segura), que es lo que se usa siempre en producción.
 
+## Buenas prácticas avanzadas
+
+- **Respeta el contrato de GET: leer sin efectos secundarios** — un GET nunca debe modificar datos. No es solo estética: los navegadores precargan enlaces, los proxies cachean GETs y las herramientas los reintentan sin preguntar, porque el protocolo les promete que un GET es inofensivo. Un `GET /pedidos/42/cancelar` puede acabar ejecutándose "solo" por una precarga del navegador. Todo lo que cambie estado va en POST, PUT o DELETE.
+- **Distingue qué verbos se pueden repetir sin miedo (idempotencia)** — PUT y DELETE aplicados dos veces dejan el mismo resultado; POST no (dos POST = dos pedidos). Esto importa cuando la red falla y hay que reintentar: un cliente puede repetir un PUT tranquilamente, pero repetir un POST exige protección extra (por ejemplo, que el servidor detecte duplicados). Diseñar sabiendo esto evita los clásicos pedidos dobles por doble clic.
+- **La caché HTTP es tu optimización más barata** — la petición más rápida es la que no se hace. Con las cabeceras `Cache-Control` y `ETag`, el servidor puede decirle al navegador "esto vale 1 hora" o responder `304 Not Modified` (sin cuerpo) cuando nada cambió. Casi nadie las configura a propósito y por eso tantas webs repiten descargas idénticas en cada visita.
+- **No devuelvas `200 OK` con un error dentro del cuerpo** — responder `200` con `{ "error": "no encontrado" }` rompe el contrato: caches, monitorización y clientes genéricos leen el código de estado, no tu JSON. Si algo falló, que el código lo diga (`404`, `400`, `500`) y el cuerpo lo detalle.
+- **En C#, no hagas `new HttpClient()` por petición** — cada instancia abre conexiones que tardan minutos en liberarse; bajo carga agota los *sockets* de la máquina (error real y difícil de diagnosticar). Reutiliza una instancia o, en ASP.NET Core, usa `IHttpClientFactory`, que gestiona el ciclo de vida por ti.
+
 ---
 
 *En resumen: HTTP es un protocolo de pregunta-respuesta sin memoria; cada interacción con el servidor es una petición independiente con su verbo, su URL y su código de estado.*

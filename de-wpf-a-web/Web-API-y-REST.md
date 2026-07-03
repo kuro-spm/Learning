@@ -93,6 +93,14 @@ probarlos. Es el equivalente a tener un "manual de uso" siempre actualizado de t
 - **No recuerda al cliente entre llamadas** — sigue siendo HTTP sin memoria; la identidad viaja en cada petición (ver [Autenticación y estado web](Autenticacion-y-Estado-Web.md)).
 - **No valida tu negocio por ti** — comprobar reglas y permisos sigue siendo responsabilidad de tu código en el servidor.
 
+## Buenas prácticas avanzadas
+
+- **Expón DTOs, nunca tus entidades de base de datos** — devolver la entidad de EF Core directamente parece cómodo, pero acopla tu contrato público al esquema de la base de datos (renombras una columna y rompes la app móvil), filtra campos que no querías exponer (hashes, flags internos) y provoca ciclos de serialización con las relaciones. Define clases pequeñas de entrada/salida (`ProductoDto`) y mapea; el día que cambies la base de datos sin romper a nadie, se habrá pagado solo.
+- **Ninguna colección sin paginar** — `GET /api/productos` que devuelve "todos" funciona con 50 productos de prueba y tumba el servidor (y al cliente) con 200.000 en producción. Pagina desde el primer día (`?page=2&pageSize=50`), con un tamaño máximo que el servidor impone aunque el cliente pida más. Es de los errores más caros de arreglar tarde, porque cambia el contrato.
+- **Versiona la API antes de necesitarlo** — a diferencia de una web, los clientes de una API no se actualizan cuando tú despliegas: esa app móvil vieja seguirá llamando con el formato antiguo durante meses. Un simple `/api/v1/productos` desde el principio te da la puerta de escape para introducir `v2` con cambios incompatibles sin romper a nadie. Añadirlo después, con clientes ya en producción, es mucho más doloroso.
+- **Errores con forma estándar: `ProblemDetails`** — cada endpoint inventándose su JSON de error (`{"error": ...}`, `{"mensaje": ...}`) obliga a cada cliente a adivinar. ASP.NET Core trae soporte del formato estándar *Problem Details* (RFC 7807): `return Problem(...)` o los `400` automáticos de `[ApiController]` ya lo usan. Un único formato de error para toda la API es de esas cosas que los consumidores agradecen sin saber por qué.
+- **Haz seguros los reintentos en operaciones críticas** — si la app del móvil envía `POST /api/pedidos`, pierde la conexión y reintenta, ¿hay dos pedidos? El patrón profesional es aceptar una clave de idempotencia (una cabecera `Idempotency-Key` que genera el cliente): si llega dos veces la misma clave, el servidor devuelve el resultado original en vez de crear otro pedido. En pagos y pedidos no es opcional.
+
 ---
 
 *En resumen: una Web API expone tus datos y reglas como recursos accesibles por HTTP en JSON, y REST es la convención de usar los verbos HTTP sobre esos recursos; es el backend cuando la interfaz la pone otra cosa.*

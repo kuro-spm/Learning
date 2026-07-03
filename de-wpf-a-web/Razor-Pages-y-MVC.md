@@ -113,6 +113,13 @@ bruto. El navegador solo tiene que dibujarlo.
 - **No sirve como backend para una app móvil** — para eso necesitas una [Web API](Web-API-y-REST.md) que devuelva datos, no HTML.
 - **No ejecuta C# en el navegador** — todo el C# de Razor corre en el servidor; al navegador solo llega HTML.
 
+## Buenas prácticas avanzadas
+
+- **Tras un POST con éxito, redirige siempre (patrón Post-Redirect-Get)** — ese `return RedirectToPage(...)` del ejemplo no es casual. Si `OnPost` devolviera la página directamente, pulsar F5 reenviaría el formulario y crearía el pedido dos veces (el navegador pregunta "¿reenviar datos?"). Redirigir convierte la última petición en un GET inocuo que se puede recargar sin miedo. Es de esos detalles que distinguen una app web bien hecha.
+- **No enlaces entidades de base de datos con `[BindProperty]`: usa modelos de vista** — si tu propiedad enlazada es la entidad `Usuario` completa, cualquiera puede añadir a mano un campo `EsAdmin=true` al formulario y el binding lo rellenará obedientemente (*overposting*). Define una clase pequeña solo con los campos que el formulario debe poder tocar, y copia tú los valores a la entidad.
+- **Cuando `ModelState` no es válido, la página debe volver a montarse entera** — el reflejo `if (!ModelState.IsValid) return Page();` tiene trampa: `OnPost` no vuelve a ejecutar `OnGet`, así que los desplegables, listas y datos auxiliares que cargaste allí llegan vacíos y la página revienta o se muestra rota. Extrae esa carga a un método y llámalo tanto en `OnGet` como antes de re-mostrar la página en `OnPost`.
+- **El *anti-forgery token* viene puesto: no lo desactives cuando estorbe** — Razor inyecta en cada `<form method="post">` un token oculto que impide que otra web envíe formularios en nombre de tu usuaria (ataque CSRF). Cuando un POST hecho "a mano" (desde JavaScript, por ejemplo) devuelve `400` sin explicación, suele ser que falta ese token; la solución es enviarlo, no apagar la validación con `IgnoreAntiforgeryToken`.
+
 ---
 
 *En resumen: Razor Pages y MVC generan el HTML en el servidor mezclando C# y plantillas Razor; es el camino más corto desde WPF a la web cuando cada acción implica navegar a otra página.*

@@ -99,6 +99,13 @@ mensajes; los detalles de transporte los gestiona la librería.
 - **No guarda los mensajes** — si necesitas un historial, lo persistes tú (por ejemplo con [EF Core](Entity-Framework-Core.md)).
 - **No garantiza una conexión eterna** — las conexiones pueden caerse; hay que contemplar reconexiones y que un cliente pueda perderse mensajes.
 
+## Buenas prácticas avanzadas
+
+- **El hub es efímero: no guardes estado en sus campos** — SignalR crea una instancia nueva del hub *para cada invocación* y la destruye al terminar, como si cada mensaje estrenara objeto. Un campo `private List<string> _conectados` se vacía entre llamada y llamada, y el fallo es traicionero porque a veces "parece" funcionar. El estado compartido va fuera del hub: en grupos de SignalR, en un servicio singleton o en un almacén externo.
+- **La reconexión no restaura los grupos** — `withAutomaticReconnect()` en el cliente es imprescindible (las conexiones se caen: wifi, proxies, suspensión del portátil), pero al reconectar el cliente recibe un `connectionId` **nuevo** y pierde sus membresías de grupo. Suscríbete al evento `onreconnected` y vuelve a pedirle al servidor que te meta en tus grupos; si no, tras el primer corte de red la usuaria deja de recibir avisos en silencio.
+- **Con más de un servidor necesitas un *backplane*** — cada servidor solo conoce **sus** conexiones: si el pedido entra por el servidor A y la pantalla de cocina está conectada al B, `Clients.All` del A no le llega. En cuanto haya balanceador y varias instancias, hace falta un *backplane* (Redis) o el servicio gestionado Azure SignalR para que los mensajes crucen entre servidores. Funciona perfecto en local con una instancia y "pierde mensajes" en producción: este es el motivo.
+- **Empuja avisos, no datos: "notifica y consulta"** — el patrón robusto es que SignalR envíe mensajes pequeños ("hay un pedido nuevo", con su id) y el cliente pida el detalle por la Web API de siempre. Así los mensajes perdidos importan menos (la próxima consulta trae la verdad), evitas mandar objetos gordos por el canal en tiempo real y toda la lógica de datos sigue en un único sitio: tu API.
+
 ---
 
 *En resumen: SignalR lleva el patrón de eventos del escritorio a la web —el servidor empuja datos a los navegadores conectados en tiempo real— resolviendo lo que HTTP por sí solo no puede: avisar sin que se lo pidan.*

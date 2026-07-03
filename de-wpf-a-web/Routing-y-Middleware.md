@@ -78,6 +78,13 @@ sin que tu código llegue a ejecutarse. Así centralizas reglas comunes en un so
 - **El middleware no es lógica de negocio** — es para temas transversales (seguridad, logs, errores), no para las reglas de tu dominio.
 - **El orden no es opcional** — colocar un middleware en el sitio equivocado puede romper la seguridad o el manejo de errores.
 
+## Buenas prácticas avanzadas
+
+- **Pon restricciones a los parámetros de ruta** — `app.MapGet("/productos/{id:int}", ...)` con `:int` hace que una petición a `/productos/abc` ni siquiera llegue a tu código: el routing responde `404` directamente. Sin la restricción, el *model binding* falla ya dentro del endpoint y devuelve un `400` (o un error feo) tras ejecutar parte de la tubería. Las restricciones (`:int`, `:guid`, `:minlength(3)`...) filtran basura en la puerta, que es donde más barato sale.
+- **Una vez empieza a enviarse la respuesta, no hay marcha atrás** — la respuesta HTTP se envía en *streaming*: cuando el primer byte sale hacia el cliente, ya no se pueden tocar el código de estado ni las cabeceras. Es la causa de la clásica excepción `StatusCode cannot be set because the response has already started`, que suele delatar a un middleware que intenta "arreglar" la respuesta demasiado tarde (por ejemplo, un manejador de errores mal colocado al final de la tubería en vez de al principio).
+- **El cuerpo de la petición solo se puede leer una vez** — `Request.Body` es un *stream* de un solo sentido: si un middleware lo lee (para loguearlo, por ejemplo), tu endpoint recibirá un cuerpo vacío y el binding fallará de forma desconcertante. Si de verdad necesitas leerlo antes de tiempo, llama primero a `Request.EnableBuffering()` y rebobina el stream al terminar. Que el JSON "llegue vacío" sin motivo aparente casi siempre es esto.
+- **Corta pronto lo que no necesita la tubería entera** — peticiones muy frecuentes y triviales, como un *health check* (`/health`) que el balanceador llama cada pocos segundos, no necesitan pasar por autenticación, sesión y compañía. Mapearlas al principio de la tubería (o en una rama aparte con `Map`) ahorra trabajo en cada una de esas miles de peticiones y mantiene los logs limpios de ruido.
+
 ---
 
 *En resumen: el routing traduce cada URL en una llamada a tu código, y el middleware es la tubería ordenada de pasos comunes por la que pasa toda petición —seguridad, logs y errores— antes y después de tu lógica.*

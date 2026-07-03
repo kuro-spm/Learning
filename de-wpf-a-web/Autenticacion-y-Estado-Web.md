@@ -87,4 +87,12 @@ memoria del proceso, porque el servidor puede reiniciarse o haber varias copias 
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Un JWT está firmado, no cifrado: cualquiera puede leerlo** — el contenido de un JWT es solo texto codificado en Base64; la firma garantiza que nadie lo ha *modificado*, no que nadie lo pueda *leer*. Pégalo en cualquier decodificador y verás su interior. Por eso jamás se meten datos sensibles en él (contraseñas, datos personales de más): solo la identidad y los permisos mínimos.
+- **Dónde guardas el token importa tanto como el token** — un JWT en `localStorage` es legible por cualquier JavaScript de la página: un solo script comprometido (un ataque XSS) y la identidad está robada. Una cookie con `HttpOnly` (invisible para JavaScript), `Secure` (solo por HTTPS) y `SameSite` (que frena el CSRF) es la opción más defendible para apps de navegador; el token "a mano" queda para clientes que no son un navegador.
+- **Los JWT no se pueden "cerrar sesión": planifica la expiración** — una cookie de sesión se puede invalidar en el servidor; un JWT firmado es válido hasta que caduca, lo revoques o no. Si emites tokens de 30 días y hay que expulsar a alguien, no puedes. El patrón profesional: tokens de acceso cortos (minutos) más un *refresh token* de larga vida que sí se puede revocar en el servidor.
+
+---
+
 *En resumen: como HTTP no recuerda nada, en web la identidad viaja adjunta a cada petición —por cookie o por token— y el estado importante vive en la base de datos, no en la memoria del servidor como hacías en WPF.*

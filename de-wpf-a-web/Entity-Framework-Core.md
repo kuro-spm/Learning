@@ -106,6 +106,14 @@ dotnet ef database update
 - **No esconde la base de datos del todo** — conviene entender qué SQL genera para evitar consultas accidentalmente pesadas.
 - **No valida tu negocio** — comprobar reglas y permisos sigue siendo responsabilidad de tu código.
 
+## Buenas prácticas avanzadas
+
+- **`AsNoTracking()` en toda consulta de solo lectura** — el *change tracking* que hace tan cómodo guardar tiene un coste: EF toma una "foto" de cada objeto que carga por si lo modificas. En una consulta que solo va a mostrarse (un listado, un informe), ese trabajo es puro desperdicio de memoria y CPU. `_context.Productos.AsNoTracking().Where(...)` es de las optimizaciones con mejor relación esfuerzo/beneficio que existen.
+- **Proyecta con `Select` en vez de cargar entidades enteras** — si la pantalla solo necesita nombre y precio, pedir la entidad completa (y peor, con `Include` de sus relaciones) trae columnas y tablas de más. `Select(p => new ProductoResumenDto(p.Nombre, p.Precio))` genera un SQL que trae exactamente eso. Además mata de raíz el problema **N+1**: recorrer una lista accediendo a `pedido.Cliente.Nombre` sin haberlo incluido dispara una consulta extra *por cada elemento*, invisible en desarrollo y letal en producción.
+- **Filtra y pagina en la base de datos, no en memoria** — la línea es sutil: sobre `IQueryable`, los `Where`/`Skip`/`Take` se traducen a SQL; pero en cuanto llamas a `ToList()` (o conviertes a `IEnumerable`), todo lo que encadenes después se ejecuta en memoria sobre lo ya descargado. Un `ToList()` colocado antes de tiempo trae la tabla entera para quedarse con 10 filas. Regla: materializa (`ToListAsync`) lo más tarde posible.
+- **El `DbContext` es de una petición y de un solo hilo** — está registrado como `Scoped` por una razón: no es *thread-safe* y acumula todo lo que trackea. Guardarlo en un singleton, compartirlo entre hilos o lanzarle dos consultas en paralelo (`Task.WhenAll` sobre el mismo contexto) produce errores intermitentes del tipo "A second operation was started on this context". Un contexto por petición, y en trabajos en segundo plano, uno por operación.
+- **Lee el SQL de tus migraciones antes de aplicarlas en producción** — `dotnet ef migrations script` genera el SQL que se va a ejecutar. Revisarlo te salva de sorpresas que la migración no ve venir: renombrar una propiedad puede traducirse en "borrar columna + crear columna nueva" (adiós datos), y un cambio de tipo puede bloquear una tabla grande varios minutos. La migración automática es comodísima; aplicarla a ciegas sobre datos reales, no.
+
 ---
 
 *En resumen: EF Core es el ORM de .NET que te deja trabajar con la base de datos como si fueran objetos C# y consultas LINQ; es la pieza que persiste el estado que en WPF te bastaba con tener en memoria.*

@@ -78,4 +78,17 @@ otro lenguaje de golpe.
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **JavaScript tiene un solo hilo, como la UI de WPF** — todo el código de la página corre en el mismo hilo que la dibuja: un bucle pesado congela la pantalla igual que un cálculo largo congelaba tu ventana de WPF. La diferencia es que aquí `async/await` no crea hilos: solo cede el turno mientras se espera (a la red, a un temporizador). Lo asíncrono no bloquea; lo intensivo en CPU, sí, aunque lo envuelvas en `async`.
+- **`fetch` no falla cuando el servidor devuelve un error** — un `404` o un `500` son, para `fetch`, respuestas perfectamente válidas: la promesa solo se rechaza si la red falla. El bug clásico es procesar como éxito un error del servidor. Comprueba siempre `response.ok` (o `response.status`) antes de leer el JSON:
+
+  ```javascript
+  const respuesta = await fetch("/api/productos");
+  if (!respuesta.ok) throw new Error(`Error ${respuesta.status}`);
+  ```
+- **Carga los scripts sin bloquear la página** — un `<script>` clásico en el `<head>` detiene el dibujado del HTML hasta descargarse y ejecutarse. Usa `<script type="module">` (o el atributo `defer`): el script se descarga en paralelo y se ejecuta cuando el HTML ya está listo, con lo que además puedes tocar el DOM sin esperas ni trucos.
+
+---
+
 *En resumen: JavaScript es el lenguaje del navegador y el responsable de la interactividad en el cliente; tu C# se queda en el servidor, y si no quieres salir de C# para el cliente, Blazor es tu puente.*

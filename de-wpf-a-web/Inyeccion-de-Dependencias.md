@@ -83,6 +83,20 @@ tests— sin tocar el código que la usa. Es la base de una [arquitectura limpia
 - **No gestiona estado de usuaria** — sirve dependencias, no guarda quién está conectado.
 - **No sustituye al diseño** — inyectar bien depende de que hayas separado responsabilidades en interfaces.
 
+## Buenas prácticas avanzadas
+
+- **Vigila la "dependencia cautiva": un singleton no debe recibir un scoped** — si un servicio `Singleton` recibe en su constructor algo registrado como `Scoped` (un `DbContext`, por ejemplo), esa instancia queda atrapada para siempre dentro del singleton y se comparte entre todas las peticiones: datos mezclados entre usuarias y errores de concurrencia intermitentes. En el entorno `Development`, el contenedor valida esto y explota al arrancar (`ValidateScopes`); si ves ese error, no lo "arregles" cambiando el tiempo de vida al azar: entiende quién debe vivir cuánto.
+- **Fuera de una petición HTTP no hay *scope*: créalo tú** — en un `BackgroundService` o un trabajo programado no existe la petición que normalmente delimita los `Scoped`. Inyecta `IServiceScopeFactory` y crea el ámbito a mano:
+
+  ```csharp
+  using var scope = _scopeFactory.CreateScope();
+  var repo = scope.ServiceProvider.GetRequiredService<IProductoRepository>();
+  ```
+
+  Sin esto, o no puedes resolver el servicio, o acabas con una dependencia cautiva.
+- **No inyectes `IServiceProvider` para ir pidiendo cosas sueltas** — pedir servicios con `GetService<T>()` desde cualquier parte (el antipatrón *Service Locator*) esconde las dependencias reales de la clase: ya no basta mirar el constructor para saber qué necesita, y los tests dejan de avisarte cuando falta algo. El constructor es el contrato; mantenlo honesto.
+- **Un constructor con siete dependencias es un aviso, no un trámite** — la DI hace tan fácil añadir "una dependencia más" que las clases engordan sin fricción. Cuando el constructor no cabe en una línea de vista, la clase casi seguro tiene demasiadas responsabilidades; el arreglo es dividirla o agrupar dependencias que siempre van juntas, no acostumbrarse a la lista.
+
 ---
 
 *En resumen: la inyección de dependencias hace que tus clases pidan lo que necesitan en lugar de crearlo; ASP.NET Core trae el contenedor integrado y tú solo registras qué implementación entregar y cuánto debe vivir.*

@@ -109,6 +109,13 @@ sin ella, esas herramientas son magia incomprensible.
 - **CSS no cambia el contenido** — solo el aspecto y la posición; no añade ni quita texto.
 - **No reaccionan solos a eventos** — el "click" que hacía algo en tu code-behind de WPF aquí lo gestiona JavaScript, el servidor o Blazor, no el HTML por sí mismo.
 
+## Buenas prácticas avanzadas
+
+- **Usa la etiqueta semántica correcta, no un `<div>` con estilos** — un `<div onclick="...">` disfrazado de botón *parece* un botón, pero no se puede pulsar con el teclado, no lo anuncian los lectores de pantalla y no dispara el envío de formularios. `<button>`, `<a>`, `<nav>`, `<form>` o `<label>` traen gratis accesibilidad y comportamiento que tendrías que reimplementar a mano. Es la diferencia entre una web usable por todo el mundo y una que solo funciona con ratón.
+- **Entiende la especificidad antes de pelearte con ella** — cuando un estilo "no se aplica", casi siempre es que otro selector más específico gana (un id pesa más que una clase; una clase más que una etiqueta). La reacción refleja es añadir `!important`, que solo escala la guerra. La práctica experta es al revés: selectores planos (una sola clase), nada de ids para estilar, y el inspector del navegador para ver qué regla está ganando y por qué.
+- **Diseña fluido: la web no tiene tamaño de ventana** — en WPF controlabas el tamaño mínimo de tu ventana; en la web tu interfaz se verá en un móvil de 360px y en un monitor de 32". Evita anchos fijos en píxeles: usa `max-width`, porcentajes, `rem` para tamaños de texto y *media queries* para adaptar el layout. Una interfaz que solo se ve bien a un tamaño es una interfaz rota para media audiencia.
+- **Anima `transform` y `opacity`, no `width` ni `top`** — cambiar el tamaño o la posición "real" de un elemento obliga al navegador a recalcular el layout de la página en cada fotograma (y se nota: animaciones a trompicones). `transform` y `opacity` se animan en la GPU sin tocar el layout. Es la razón por la que dos animaciones aparentemente iguales rinden tan distinto.
+
 ---
 
 *En resumen: HTML y CSS son el XAML de la web —uno describe la estructura, el otro el aspecto— y son el formato final de cualquier interfaz, la genere quien la genere.*

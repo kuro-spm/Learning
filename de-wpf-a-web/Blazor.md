@@ -112,6 +112,13 @@ no encaje, aunque no escribas JavaScript a diario.
 - **No es siempre la mejor opción** — para sitios muy públicos o SEO-críticos, a veces conviene HTML renderizado en servidor o un framework JS.
 - **Blazor Server no funciona sin conexión** — depende de una conexión viva con el servidor; si la quieres offline, ese es el caso de WebAssembly.
 
+## Buenas prácticas avanzadas
+
+- **Usa `@key` cuando pintes listas que cambian** — al renderizar una lista con `@foreach`, Blazor reutiliza los componentes por posición: si insertas o reordenas elementos, el estado interno de un componente puede acabar "pegado" al producto equivocado (el clásico input que conserva el texto de otra fila). Añadir `<TarjetaProducto @key="producto.Id" ... />` le dice a Blazor qué componente corresponde a qué dato, como hacía el contenedor de items de WPF con sus `DataTemplate`.
+- **Cuenta con que `OnInitializedAsync` puede ejecutarse dos veces** — con el *prerendering* activado (el modo por defecto en las plantillas modernas), el componente se renderiza primero en el servidor para enviar HTML rápido y luego otra vez al volverse interactivo: tu carga de datos se dispara dos veces. Si eso duele (llamadas caras, efectos secundarios), cachea el resultado entre ambos renders con `PersistentComponentState` o desactiva el prerender para ese componente.
+- **Desde un hilo de fondo, la UI se toca con `InvokeAsync`** — los eventos de UI (`@onclick`, `@bind`) ya re-renderizan solos, pero si el cambio viene de un `Timer`, un evento de SignalR o cualquier hilo externo, hay que envolverlo: `await InvokeAsync(StateHasChanged)`. Es el equivalente exacto al `Dispatcher.Invoke` de WPF, y olvidarlo produce el mismo síntoma: la pantalla no se entera del cambio (o Blazor lanza una excepción de hilo).
+- **Los componentes también tienen fugas: implementa `IDisposable`** — un componente que se suscribe a un evento de un servicio singleton o arranca un `Timer` y no se desuscribe queda retenido en memoria aunque la usuaria navegue a otra página. En Blazor Server, multiplicado por cada circuito abierto, tumba el servidor con el tiempo. Es la misma fuga por eventos de WPF, con el agravante de que ahora hay miles de "ventanas" a la vez: `@implements IDisposable` y limpia en `Dispose`.
+
 ---
 
 *En resumen: Blazor te deja construir interfaces web interactivas con componentes, binding y eventos en C# —el puente más natural desde WPF— evitando tener que aprender JavaScript para empezar.*

@@ -65,6 +65,14 @@ aspecto). Tu servidor genera o sirve ese HTML para que el navegador lo dibuje.
 - **No garantiza que el cliente se comporte bien** — la seguridad real está en el servidor.
 - **No mantiene una conexión abierta permanente** por defecto — cada petición es independiente (ver [HTTP](HTTP.md)).
 
+## Buenas prácticas avanzadas
+
+- **Diseña asumiendo que la red fallará** — en WPF una llamada a un método o funcionaba o lanzaba excepción; en la red hay un tercer estado: no saber qué pasó (enviaste la petición y nunca llegó respuesta). Los diseños que aguantan en producción ponen *timeouts* a toda llamada remota y piensan qué ocurre si el cliente reintenta: ¿se crearía el pedido dos veces? Ese "¿y si se repite?" debe responderse en el servidor, no confiarse a que la red siempre funcione.
+- **Trata cada viaje de ida y vuelta como un coste de diseño** — entre cliente y servidor hay decenas o cientos de milisegundos por viaje, y no se optimizan con mejor código sino con *menos viajes*. El error típico es trasladar el estilo de escritorio (muchas llamadas pequeñas, como quien lee propiedades en memoria) a la web: una pantalla que hace 15 peticiones para pintarse será lenta aunque cada una tarde poco. Agrupa: una petición que traiga todo lo que la pantalla necesita.
+- **Valida dos veces, confía una** — la validación en el cliente existe solo para la experiencia de uso (avisar al instante); la del servidor es la única real, porque cualquiera puede fabricar peticiones a mano saltándose tu interfaz. Quien domina la web duplica las validaciones sin sentirse culpable: son dos responsabilidades distintas, no código repetido.
+- **El "estado global" cambia de casa: de variables a base de datos o caché** — en producción suele haber varias copias del servidor detrás de un balanceador, y dos peticiones de la misma persona pueden caer en máquinas distintas. Cualquier dato guardado en una variable estática o en memoria del proceso desaparece o se desincroniza. Si un dato debe sobrevivir a la petición, vive en una base de datos o una caché compartida, nunca "en la app".
+- **Protege al servidor de sus clientes** — un servidor atiende a desconocidos: pon límites a lo que aceptas (tamaño de peticiones, ritmo de llamadas, valores de entrada) igual que un local pone aforo. En escritorio el peor cliente eras tú misma; en la web puede ser un script malicioso haciendo mil peticiones por segundo.
+
 ---
 
 *En resumen: en la web tu programa deja de ser una sola pieza en un ordenador y pasa a ser dos mitades —navegador y servidor— que se hablan por la red; el servidor es quien guarda los datos y pone las reglas.*
