@@ -63,4 +63,12 @@ El cliente no puede enviar datos por este canal; si necesita hablar con el servi
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Usa `id:` en cada evento para reanudar sin huecos** — si el servidor envía un `id:` con cada mensaje, el navegador lo recuerda y, al reconectar tras una caída, manda la cabecera `Last-Event-ID` automáticamente. Si tu servidor la usa para reenviar lo ocurrido desde ese punto, la reconexión no pierde eventos; si la ignoras, cada microcorte deja huecos silenciosos en el flujo.
+- **El enemigo en producción es el *buffering* intermedio** — el clásico "en local llegan al instante y en producción a golpes de 30 segundos": un proxy (nginx) o la compresión están acumulando la respuesta antes de reenviarla. Desactiva el buffering para estas rutas (`X-Accel-Buffering: no`, sin gzip en el stream) y envía un comentario `: ping` periódico para que nada dé la conexión por muerta.
+- **El límite de conexiones se esfuma con HTTP/2** — el tope de ~6 conexiones SSE por dominio es por *conexión* HTTP/1.1; sobre HTTP/2 los streams se multiplexan y el problema prácticamente desaparece. Si tu app abre varias pestañas o varios flujos, servir SSE sobre HTTP/2 (o compartir un único `EventSource` entre pestañas) marca la diferencia.
+
+---
+
 *En resumen: SSE es una emisora de radio del servidor al cliente —flujo continuo, una sola dirección, sobre HTTP normal— perfecta para notificaciones y progreso sin la complejidad de WebSockets.*

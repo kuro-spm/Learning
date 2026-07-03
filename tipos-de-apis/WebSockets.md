@@ -70,6 +70,14 @@ Una conexión abierta consume recursos. Hay que gestionar reconexiones si se cae
 - **No cachea ni se beneficia de la infraestructura HTTP** — al ser un canal persistente y propio, pierde las ventajas de caché y proxies del HTTP normal.
 - **No garantiza la entrega por sí solo** — si la conexión se cae, los mensajes en vuelo pueden perderse; la lógica de reintento es cosa tuya.
 
+## Buenas prácticas avanzadas
+
+- **Reconectar no basta: hay que resincronizar** — el error sutil clásico es reconectar tras una caída y seguir como si nada, ignorando que durante esos segundos se perdieron mensajes. Un chat que reconecta sin pedir "¿qué me he perdido?" muestra conversaciones con agujeros. Numera los mensajes (o sella el último recibido) y, al reconectar, pide lo pendiente desde ese punto o un *snapshot* completo del estado.
+- **Reconexión con *backoff* exponencial y *jitter*** — si el servidor se cae y 10.000 clientes reintentan a la vez cada segundo, tu propia recuperación se convierte en un ataque de denegación de servicio contra ti. Espacia los reintentos (1s, 2s, 4s, 8s...) y añade un componente aleatorio (*jitter*) para que los clientes no vuelvan todos en la misma oleada.
+- **Heartbeats propios: TCP no te avisará** — una conexión puede quedarse "zombi" (el cable se desenchufó, el móvil cambió de red) sin que ningún lado reciba error: simplemente, el silencio. Envía *pings* periódicos a nivel de aplicación y da por muerta la conexión si no llega el *pong*; si no, el servidor acumula conexiones fantasma y el cliente cree estar conectado mientras no recibe nada.
+- **Define un protocolo de mensajes desde el día uno** — WebSockets solo te da un tubo de texto; sin disciplina, acabas con `socket.send("algo")` indescifrables por toda la app. Establece un sobre mínimo, por ejemplo `{ "type": "chat.message", "payload": {...} }`, y enruta por `type`. Es la diferencia entre un canal mantenible y un cajón de strings mágicos.
+- **Para escalar a varios servidores necesitas un plan** — a diferencia de REST (sin estado), cada conexión vive atada a *un* servidor concreto. Si el usuario A está conectado al nodo 1 y el B al nodo 2, el mensaje de A no llega a B sin ayuda: hace falta un canal entre nodos (un pub/sub como Redis) que reparta los mensajes. Descubrirlo el día que pasas de 1 a 2 servidores duele.
+
 ---
 
 *En resumen: WebSockets es una línea de teléfono siempre abierta entre cliente y servidor —ambos hablan cuando quieren— ideal para chats, juegos y cualquier dato en tiempo real bidireccional.*

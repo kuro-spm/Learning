@@ -66,4 +66,12 @@ Una API REST puede ser pública, privada o de socios. La categoría no cambia *c
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Si tu frontend la llama desde el navegador, ya no es privada** — el error conceptual más común: la API "interna" que consume tu propia web es visible para cualquiera que abra las herramientas de desarrollador, y será llamada con parámetros que tu frontend jamás enviaría. "Privada" de verdad es la que vive en una red interna entre servidores; la que llega al navegador debe protegerse (autenticación, validación, *rate limiting*) exactamente como una pública.
+- **Credenciales por socio, nunca una clave compartida** — dar la misma *API key* a tres socios funciona hasta que hay que retirarle el acceso a uno o averiguar quién causó el pico de tráfico de anoche. Cada socio necesita credenciales propias, con permisos limitados a lo suyo (*scopes*) y que se puedan rotar o revocar individualmente sin afectar al resto.
+- **Diseña la interna como si fuera a hacerse pública** — es el destino natural: la API que hoy usa solo tu equipo mañana la pide un socio y pasado se abre al mundo. Las internas diseñadas "rápido y sucio" (sin versionado, con datos de más en las respuestas) se convierten en deuda imposible de abrir sin reescribir. La disciplina del contrato no depende de la audiencia; los controles de acceso, sí.
+
+---
+
 *En resumen: clasificar APIs por audiencia es mirar quién entra por la puerta —todos (pública), solo empleados (privada) o aliados concretos (socios)— una decisión de acceso y seguridad, no de tecnología.*

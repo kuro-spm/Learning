@@ -72,6 +72,13 @@ A diferencia de REST, RPC no aprovecha `GET`/`PUT`/`DELETE` para dar significado
 - **No es un único estándar** — "RPC" es un estilo; JSON-RPC, XML-RPC, gRPC y SOAP son encarnaciones distintas con reglas propias.
 - **No oculta del todo que la llamada es remota** — aunque lo parezca, sigue habiendo red de por medio: puede fallar, tardar o cortarse.
 
+## Buenas prácticas avanzadas
+
+- **No te creas la ilusión de "llamada local"** — es la trampa fundacional de RPC: como `orderService.CreateOrderAsync(...)` *parece* una función normal, se olvida que puede tardar 30 segundos, fallar a medias o no responder nunca. Toda llamada RPC necesita un *timeout* explícito y una decisión consciente sobre qué hacer al fallar. El código que trata lo remoto como local funciona perfecto... hasta el primer día de red inestable.
+- **Diseña cada método pensando "¿qué pasa si se ejecuta dos veces?"** — cuando un RPC agota el tiempo de espera, no sabes si la función llegó a ejecutarse. Si el cliente reintenta `createOrder`, puedes acabar con dos pedidos. Los métodos de escritura deben aceptar un identificador de operación (`requestId`) que el servidor recuerde para responder lo mismo sin repetir el efecto, o diseñarse para que repetirlos sea inocuo.
+- **Separa los errores de transporte de los errores de negocio** — "no pude contactar con el servidor" y "el cupón está caducado" son cosas distintas: la primera quizá se reintenta, la segunda jamás. JSON-RPC lo formaliza con rangos de códigos (los `-32xxx` reservados para el protocolo, el resto para tu aplicación); respétalo en vez de devolver todo como un error genérico, o el cliente no podrá decidir cuándo reintentar.
+- **Huye del método comodín `execute(action, params)`** — cuando añadir métodos da pereza, aparece el RPC "genérico" que recibe el nombre de la operación como dato. Con eso pierdes todo lo bueno del estilo: el tipado, la documentación implícita del contrato y la posibilidad de evolucionar cada operación por separado. Si tu API tiene tres métodos y uno se llama `doAction`, tiene en realidad un número desconocido de métodos sin contrato.
+
 ---
 
 *En resumen: RPC es llamar a una función que vive en otra máquina como si fuera local —piensas en acciones, no en recursos— y es la raíz de estilos modernos como gRPC.*

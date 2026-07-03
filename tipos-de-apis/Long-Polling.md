@@ -56,4 +56,12 @@ La sensación de "tiempo real" surge de repetir el ciclo: pregunto → espero �
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Cierra el hueco entre respuesta y re-petición con un cursor** — entre que el servidor responde y el cliente vuelve a preguntar hay unos milisegundos sin nadie escuchando: lo que ocurra ahí se pierde. Es el bug sutil por excelencia de long polling. La solución es que cada petición lleve la posición del último dato recibido (`/api/updates?since=1042`) y el servidor devuelva todo lo posterior, no solo "lo que llegue a partir de ahora".
+- **Tu timeout debe ser menor que el de la infraestructura** — balanceadores y proxies cortan conexiones inactivas (típicamente a los 60 segundos). Si tu servidor retiene la respuesta más tiempo, el cliente recibe un corte seco indistinguible de un fallo real. Responde vacío antes de ese límite (por ejemplo, a los 25-30 segundos): así "sin novedades" es una respuesta limpia y solo los errores de verdad parecen errores.
+- **Cada petición en espera no puede costar un hilo** — con un servidor que bloquea un hilo por petición, 5.000 clientes esperando son 5.000 hilos ocupados en no hacer nada: el pool se agota y la app entera deja de responder. Long polling solo escala con manejo asíncrono de las peticiones (async/await, event loop), donde una espera no retiene ningún hilo.
+
+---
+
 *En resumen: long polling es el truco de pedir y que el servidor no cuelgue hasta tener algo que decir —casi-tiempo-real con HTTP normal, útil como respaldo cuando WebSockets o SSE no están disponibles.*

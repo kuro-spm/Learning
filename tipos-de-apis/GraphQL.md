@@ -92,6 +92,14 @@ POST /graphql
 - **No protege solo contra consultas abusivas** — un cliente puede pedir datos anidados muy pesados; hay que poner límites de complejidad.
 - **No siempre compensa** — para una API CRUD sencilla, REST suele ser más simple y directo.
 
+## Buenas prácticas avanzadas
+
+- **Vigila el problema N+1 en los resolvers** — es el bache en el que cae casi toda implementación: una consulta pide 50 productos con sus reseñas y el servidor, resolviendo campo a campo, lanza 1 consulta para los productos y 50 más para las reseñas (una por producto). La solución estándar es el patrón *DataLoader*: agrupa (en *batch*) todas las peticiones de reseñas de un mismo ciclo y las resuelve con una única consulta `WHERE product_id IN (...)`. Sin esto, GraphQL puede ser más lento que el REST al que sustituye.
+- **Usa la no-nulabilidad (`!`) con mucho cuidado** — parece buena idea marcarlo todo como `String!`, pero si un campo non-null falla al resolverse, GraphQL anula en cascada el objeto entero que lo contiene (y sube hasta encontrar algo nullable). Un fallo puntual en `reviews` puede tirar toda la pantalla de producto. Regla práctica: `!` solo en campos que *jamás* pueden faltar; deja nullable lo que dependa de otro servicio que pueda caerse.
+- **Pon límites de profundidad y coste a las consultas** — el esquema permite pedir `user { orders { products { reviews { author { orders { ... } } } } } }` hasta el infinito, y alguien lo hará (por error o por ataque). En producción se limita la profundidad máxima y se asigna un "coste" a cada campo, rechazando consultas que se pasen. Muchas APIs públicas van más allá con *persisted queries*: solo aceptan consultas pre-registradas por hash.
+- **Devuelve los errores de negocio dentro del esquema, no en `errors`** — el campo `errors` de GraphQL es para fallos del sistema. Que "el cupón está caducado" viaje ahí obliga al cliente a parsear strings. El patrón experto es tiparlos en la mutación: `createOrder` devuelve un payload con `order` *o* una lista `userErrors { field, message }`, de modo que el cliente los trata con tipos y autocompletado.
+- **Pagina las listas con *connections* (cursores) desde el principio** — un campo `orders: [Order!]!` sin argumentos es una promesa de devolverlo *todo*. La convención asentada (spec Relay) usa `orders(first: 20, after: $cursor)` con `edges` y `pageInfo`. Cambiar un campo-lista simple a *connection* después es un cambio que rompe todas las consultas existentes.
+
 ---
 
 *En resumen: GraphQL es un bufé de datos donde el cliente pide en una sola consulta exactamente los campos que necesita —ideal cuando la información está muy interconectada y hay clientes con necesidades distintas.*

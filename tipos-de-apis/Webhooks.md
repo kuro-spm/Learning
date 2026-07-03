@@ -72,6 +72,13 @@ Si tu servidor no responde `200`, el proveedor suele reintentar. Eso significa q
 - **No sirve si tu servidor no es accesible** — el proveedor necesita poder alcanzar tu URL pública por internet.
 - **No es para tiempo real continuo** — es para eventos puntuales; para un flujo constante usa [WebSockets](WebSockets.md) o [SSE](Server-Sent-Events.md).
 
+## Buenas prácticas avanzadas
+
+- **Verifica el *timestamp* además de la firma** — una firma válida no basta: un atacante que capture un webhook legítimo puede reenviarlo idéntico días después (*replay attack*) y la firma seguirá cuadrando. Los proveedores serios incluyen la marca de tiempo dentro de lo firmado; rechaza avisos con más de unos minutos de antigüedad.
+- **No confíes en el orden: consulta el estado real** — los reintentos y el paralelismo hacen que `payment.succeeded` pueda llegarte *antes* que `payment.created`. Si tu lógica asume la secuencia, tendrás bugs fantasma imposibles de reproducir. El patrón robusto es tratar el webhook como un timbre, no como la verdad: al recibirlo, consulta a la API del proveedor el estado actual del recurso y actúa sobre eso.
+- **Ten una reconciliación de respaldo** — algún webhook se perderá (caída tuya justo cuando el proveedor agotó sus reintentos, un despliegue en mal momento). Un proceso periódico que compare tu estado con el del proveedor ("pedidos que sigo teniendo como *pendientes de pago* desde hace más de una hora") convierte una pérdida silenciosa de dinero en un retraso de minutos.
+- **Guarda los *payloads* reales y reprodúcelos en tests** — los cuerpos que envía el proveedor nunca coinciden del todo con su documentación (campos extra, nulos inesperados, formatos de fecha). Almacena los webhooks crudos recibidos (con datos sensibles enmascarados) y úsalos como casos de test de tu endpoint; en desarrollo, un túnel tipo ngrok te permite recibir los de verdad en tu máquina.
+
 ---
 
 *En resumen: un webhook es una API al revés —das tu número y el servicio te llama cuando ocurre el evento— ideal para enterarte de pagos, envíos o cambios sin estar preguntando todo el rato.*

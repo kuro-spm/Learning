@@ -66,6 +66,13 @@ var product = await client.GetProductAsync(productId: 42);
 - **No aprovecha HTTP como REST** — ignora verbos y códigos de estado; el resultado viaja dentro del XML.
 - **No suele ser la elección para proyectos nuevos** — salvo que un sistema con el que integras lo imponga.
 
+## Buenas prácticas avanzadas
+
+- **Congela el WSDL en tu repositorio, no lo consumas en remoto** — generar el cliente apuntando a la URL viva del WSDL significa que tu compilación depende de un servidor ajeno y que un cambio silencioso del proveedor te rompe el build (o peor: te cambia el contrato sin enterarte). Descarga el WSDL (y sus XSD importados), versiónalo junto a tu código y regenera el cliente solo de forma deliberada, comparando diferencias.
+- **Los bugs más desquiciantes son de *namespaces*** — dos sobres XML idénticos a ojo pueden ser distintos para el servidor si un elemento está en el espacio de nombres equivocado (o sin él). Es la causa número uno del misterioso "elemento `productId` no encontrado" cuando el elemento *está ahí*. Al depurar, compara siempre los prefijos y los `xmlns` contra un ejemplo que funcione, no solo los nombres de las etiquetas.
+- **Captura el XML crudo que viaja, no solo los objetos** — cuando una integración SOAP falla, el proveedor te pedirá "el sobre exacto que enviaste", y los objetos tipados de tu código no te lo dan. Activa la traza del mensaje en bruto (petición y respuesta) desde el primer día, con los datos sensibles enmascarados: es la diferencia entre resolver el problema en una hora o en una semana de correos.
+- **Trata los SOAP Faults como errores tipados** — el estándar permite que el `Fault` lleve un `detail` con errores estructurados definidos en el WSDL (saldo insuficiente, cliente inexistente...). Las herramientas los convierten en excepciones tipadas: captúralas por tipo en lugar de hacer un `catch` genérico y buscar palabras en el `faultstring`, que cambia de idioma y de redacción entre versiones del servicio.
+
 ---
 
 *En resumen: SOAP es el contrato notarial de las APIs —XML estricto, WSDL formal y seguridad de fábrica— pesado pero firme, todavía imprescindible al integrar con banca, seguros y sistemas heredados.*

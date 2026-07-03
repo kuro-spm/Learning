@@ -63,6 +63,14 @@ El productor no espera respuesta. Esto hace el sistema más resistente (un consu
 - **No es gratis en complejidad** — añade una pieza nueva (el broker) que hay que operar, monitorizar y entender al depurar.
 - **No es lo mismo que un webhook** — el [webhook](Webhooks.md) es una llamada HTTP directa entre dos partes; aquí hay un intermediario que desacopla a muchos.
 
+## Buenas prácticas avanzadas
+
+- **El *dual write* es el bug silencioso número uno: usa el patrón *outbox*** — guardar el pedido en la base de datos y *después* publicar `OrderPlaced` son dos escrituras separadas: si el proceso muere entre ambas, tienes un pedido del que nadie se enteró (o al revés). El patrón **transactional outbox** lo resuelve: en la misma transacción que guarda el pedido, insertas el evento en una tabla `outbox`; un proceso aparte lee esa tabla y publica al broker. O pasan las dos cosas, o ninguna.
+- **Un evento publicado es un contrato tan público como una API** — quitar un campo de `OrderPlaced` rompe consumidores que ni sabes que existen (esa es justo la gracia del desacoplamiento... y su peligro). Trata el esquema de cada evento con la misma disciplina que un endpoint: solo cambios compatibles (añadir campos opcionales) y, para lo demás, versiones (`OrderPlaced.v2`) o un *schema registry* que valide la compatibilidad al publicar.
+- **Configura una *dead-letter queue* antes de necesitarla** — siempre habrá algún mensaje "veneno" que hace fallar al consumidor una y otra vez (un dato corrupto, un caso no previsto). Sin plan, ese mensaje bloquea la cola o se reintenta para siempre quemando CPU. Tras N intentos fallidos debe apartarse a una cola de mensajes muertos que alguien monitorice: el evento no se pierde y el resto de la cola sigue fluyendo.
+- **Decide conscientemente entre eventos "finos" y "gordos"** — `OrderPlaced { orderId: 87 }` (notificación fina) obliga a cada consumidor a llamar de vuelta al servicio de pedidos, reintroduciendo el acoplamiento que querías evitar; incluir todos los datos (*event-carried state transfer*) evita esas llamadas pero convierte cada campo en contrato y puede viajar desactualizado. No hay respuesta universal: elegir sin pensarlo es como se acaba con lo peor de ambos.
+- **Monitoriza el *lag* del consumidor, no solo los errores** — un consumidor puede estar "sano" (sin excepciones) y aun así procesar más despacio de lo que se publica: la cola crece y las facturas se generan cada vez más tarde, sin que salte ninguna alarma de error. La métrica clave de un sistema de eventos es cuántos mensajes esperan y cuánto retraso llevan, con alertas sobre ella.
+
 ---
 
 *En resumen: las APIs dirigidas por eventos son un tablón de anuncios entre sistemas —uno publica "ha pasado X" y los interesados reaccionan por su cuenta— logrando bajo acoplamiento y resistencia a cambio de inmediatez.*

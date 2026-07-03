@@ -68,6 +68,14 @@ Si no hay SDK para tu lenguaje, llamas a la API directamente. El SDK es comodida
 - **No es universal** — cada SDK sirve para un lenguaje; cambiar de lenguaje implica otro SDK.
 - **No siempre está actualizado** — a veces la API estrena funciones antes de que el SDK las incorpore.
 
+## Buenas prácticas avanzadas
+
+- **No dejes que los tipos del SDK invadan tu código** — si `PaymentClient` y sus clases aparecen por toda tu aplicación, cambiar de proveedor (o testear sin llamar a la API real) se vuelve una reescritura. Envuelve el SDK tras una interfaz tuya (`IPaymentGateway` con *tus* tipos) y que solo el adaptador conozca al proveedor. Es el clásico patrón *adapter*, y con SDKs de terceros se paga solo.
+- **Configura timeouts y reintentos explícitamente: los defaults no son para ti** — cada SDK trae valores por defecto pensados para el caso genérico: algunos no tienen timeout, otros reintentan agresivamente operaciones que en tu dominio no son seguras de repetir (¡un cobro!). Averigua qué hace el tuyo *antes* del primer incidente y fija valores conscientes, incluyendo si los reintentos automáticos aplican a operaciones de escritura.
+- **Un cliente compartido, no uno por operación** — los clientes de SDK suelen mantener por debajo un *pool* de conexiones HTTP. Crear `new PaymentClient(...)` en cada petición tira ese pool a la basura y puede agotar los sockets del sistema (el famoso *socket exhaustion* de `HttpClient` en .NET). Crea el cliente una vez (singleton o inyección de dependencias) y reutilízalo: casi todos son *thread-safe* justo para eso.
+- **Fija la versión y lee el *changelog* antes de actualizar** — los SDKs cambian comportamientos sutiles entre versiones (defaults de reintento, serialización de fechas, nombres de campos) sin que tu código deje de compilar. Ancla la versión exacta en tu fichero de dependencias y trata cada actualización como un cambio funcional, no como un trámite.
+- **Aprende a mirar debajo del capó** — cuando el SDK falla con un error opaco, la verdad está en la petición HTTP que construyó. Casi todos traen un modo de log/debug que muestra la petición y la respuesta crudas; actívalo y compáralas con la documentación de la API. Quien domina un SDK conoce la API que envuelve; quien solo usa el SDK se queda ciego en el primer error raro.
+
 ---
 
 *En resumen: un SDK no es un tipo de API, sino el "coche completo" construido alrededor de una —librerías y herramientas que envuelven el contrato crudo para que lo uses cómodamente desde tu lenguaje.*

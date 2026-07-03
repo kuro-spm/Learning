@@ -72,6 +72,14 @@ La palabra API también describe las funciones que una librería ofrece a tu có
 - **No expone el funcionamiento interno** — ese es justo su objetivo: ocultar la cocina y ofrecer solo la carta.
 - **No garantiza seguridad por sí sola** — proteger la puerta (autenticación, permisos) es trabajo aparte.
 
+## Buenas prácticas avanzadas
+
+- **Trata cada campo publicado como una promesa eterna** — en cuanto una API se usa, alguien depende de *todo* lo observable: campos, formatos, incluso el orden o los errores exactos. Renombrar un campo "que nadie usa" rompe clientes en producción. Los que dominan el tema añaden campos sin quitar los viejos y versionan antes de romper nada.
+- **Diseña el contrato desde fuera hacia dentro** — el error clásico es exponer las tablas de la base de datos tal cual como respuesta JSON. El contrato debe hablar el idioma de quien consume (un `product` con `price` formateado y claro), no el de tu esquema interno; si no, cada cambio de base de datos se convierte en un cambio de API.
+- **Los errores también son contrato** — una API madura devuelve errores con estructura estable (código propio, mensaje, detalle) que el cliente puede tratar programáticamente. Si tus errores son strings sueltos que cambian entre versiones, los clientes acaban haciendo `if (mensaje.Contains("not found"))` y se rompen con cualquier retoque.
+- **Sé un "lector tolerante" al consumir** — ignora los campos que no reconozcas y no valides más estructura de la que usas. Así, cuando el proveedor añada campos nuevos (algo legítimo), tu integración no se cae. Deserializar con validación estricta de "no puede haber campos extra" es una bomba de relojería.
+- **Asume que la red falla, siempre** — toda llamada remota necesita un *timeout* explícito (los valores por defecto suelen ser eternos) y un plan para el fallo: reintentar solo operaciones seguras de repetir, y decidir qué hace tu app si la otra API no responde. La diferencia entre una llamada local y una API es justamente esa: la red de en medio.
+
 ---
 
 *En resumen: una API es el camarero entre dos programas —un contrato que dice qué puedes pedir y qué recibirás, sin que tengas que entrar en la cocina.*
