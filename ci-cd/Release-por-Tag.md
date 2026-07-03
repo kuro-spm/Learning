@@ -63,6 +63,14 @@ git push origin v1.1.9 --force-with-lease   # o relanzar el workflow del tag v1.
 - **No impide tags equivocados** — cualquiera con permisos puede etiquetar; suele protegerse limitando quién puede crear tags `v*`.
 - **No decide la numeración** — elegir si es `1.3.0` o `2.0.0` (¿rompe compatibilidad?) sigue siendo criterio humano o de herramientas de *semantic release*.
 
+## Buenas prácticas avanzadas
+
+- **Usa tags anotados, no ligeros** — `git tag v1.2.0` crea un tag "ligero": un simple puntero sin autor, fecha ni mensaje. `git tag -a v1.2.0 -m "Checkout con nueva pasarela de pago"` crea un objeto completo con metadatos, que es lo que esperan las herramientas de release (`git describe`, por ejemplo, ignora los ligeros por defecto). Para una versión publicada, el anotado es el correcto siempre.
+- **Un tag publicado no se mueve jamás** — técnicamente puedes borrar `v1.2.0` y volver a crearlo sobre otro commit (`git tag -f`), pero entonces existen dos artefactos distintos que dicen ser la misma versión: la imagen que alguien ya descargó y la nueva. Registros, cachés y máquinas de compañeros quedan mintiendo. Si el release salió mal, publica `v1.2.1`; nunca reescribas una versión que ya vio el mundo.
+- **Protege el patrón `v*` en la plataforma** — el tag es el botón de producción, así que configúralo como *protected tag* (GitLab) o con *rulesets* (GitHub) para que solo ciertos roles puedan crearlo. Sin esto, cualquier persona con permiso de push puede desplegar a producción sin querer con un simple `git push --tags`.
+- **Que el workflow del tag verifique, no confíe** — como el tag no valida nada, un buen pipeline de release comprueba antes de desplegar que el commit etiquetado pasó los checks de CI (o relanza la suite completa). Cuesta unos minutos y elimina la clase entera de accidentes "etiqueté la rama equivocada".
+- **Etiqueta la imagen también con el SHA del commit** — además de `tienda-backend:v1.2.0`, publica `tienda-backend:sha-8f4b7f8`. La versión es para humanos; el SHA responde sin ambigüedad la pregunta que llega tarde o temprano: "¿qué código exacto está corriendo ahora mismo en producción?".
+
 ---
 
 *En resumen: release por tag separa "integrar código" de "publicar producto" — el deploy deja de ser un efecto secundario y vuelve a ser una decisión.*

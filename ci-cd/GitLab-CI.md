@@ -88,6 +88,20 @@ script:
 - **No usa varios archivos por defecto** — toda la configuración parte de `.gitlab-ci.yml` (aunque puede incluir otros).
 - **No te da runners infinitos gratis** — los runners compartidos tienen cuota de minutos según el plan.
 
+## Buenas prácticas avanzadas
+
+- **Usa `rules:` en lugar de `only`/`except`** — `only`/`except` (el que ves en muchos tutoriales, incluido el ejemplo de arriba) está en desuso y no se puede combinar con condiciones complejas. `rules:` lo sustituye y permite decidir por rama, por archivos cambiados o por variables, e incluso cambiar el comportamiento (`when: manual`) según la condición.
+
+  ```yaml
+  desplegar:
+    rules:
+      - if: $CI_COMMIT_BRANCH == "main"
+        when: manual   # en main existe, pero lo lanza una persona
+  ```
+- **Rompe la rigidez de los stages con `needs:`** — por defecto, ningún job de `deploy` arranca hasta que *todos* los de `test` terminan, aunque no tengan relación. Con `needs:` declaras dependencias reales entre jobs y GitLab construye un grafo (DAG): cada job arranca en cuanto lo que de verdad necesita está listo. En pipelines con varias áreas, el ahorro de tiempo es enorme.
+- **No confundas `cache` con `artifacts`** — es el error conceptual más común: `artifacts` es el mecanismo garantizado para pasar resultados de un job al siguiente; `cache` es un acelerador *sin garantías* (puede no estar, es local al runner) pensado para dependencias reutilizables como `node_modules`. Si tu pipeline "a veces falla porque falta un archivo", casi seguro estás pasando resultados por `cache`.
+- **Marca las variables sensibles como *protected* y *masked*** — una variable *masked* aparece como `[MASKED]` en los logs; una *protected* solo existe en ramas y tags protegidos. Este segundo detalle es clave y sorprende a mucha gente en ambos sentidos: evita que cualquiera exfiltre el token de producción desde una rama cualquiera... y también explica por qué "la variable no llega" cuando pruebas desde una rama sin proteger.
+
 ---
 
 *En resumen: GitLab CI/CD es el motor de pipelines nativo de GitLab — un único `.gitlab-ci.yml` describe fases y trabajos que se ejecutan solos ante cada cambio.*

@@ -71,6 +71,14 @@ artifacts:
 - **No decide la lógica de negocio** — solo ejecuta órdenes; lo que hace cada orden lo defines tú.
 - **No se ejecuta solo** — necesita un disparador (un `push`, una pull request, una hora programada...).
 
+## Buenas prácticas avanzadas
+
+- **El YAML orquesta; los scripts hacen** — si la lógica de build vive incrustada en el YAML del pipeline, solo puedes probarla subiendo commits y esperando al robot. Los equipos expertos ponen la chicha en scripts del repositorio (`./scripts/build.sh`, un Makefile, comandos de npm) y el pipeline se limita a llamarlos: así puedes ejecutar y depurar cada paso en tu máquina, y cambiar de herramienta de CI sin reescribirlo todo.
+- **Fija versiones de todo lo que ejecuta el pipeline** — `image: node:20.11`, actions ancladas a versión concreta, herramientas instaladas con número exacto. Un pipeline que usa `latest` es una bomba de relojería: un día falla sin que nadie haya tocado nada, porque "nada" cambió excepto medio entorno. La reproducibilidad del pipeline vale tanto como la del código.
+- **Compila una vez y pasa el artefacto entre fases** — es tentador que cada job compile lo que necesita, pero entonces el binario que despliegas no es el que probaste (y pagas la compilación varias veces). Genera el artefacto en la fase de build y muévelo a las siguientes con el mecanismo de artefactos, no recompilando.
+- **Cachea dependencias con una clave que dependa del lockfile** — descargar `node_modules` o paquetes NuGet en cada ejecución tira minutos. La caché correcta usa como clave el hash de `package-lock.json` (o equivalente): si el lockfile no cambió, restaura; si cambió, reconstruye. Una caché con clave fija es peor que ninguna: sirve dependencias viejas y produce builds "verdes" que mienten.
+- **Ponle timeout explícito a cada job** — un test colgado o un servicio que no responde puede dejar el job vivo durante horas, consumiendo minutos de pago y bloqueando la cola. Un `timeout` razonable (el doble de lo que tarda normalmente) convierte un cuelgue silencioso en un fallo visible en minutos.
+
 ---
 
 *En resumen: el pipeline es la receta paso a paso de tu CI/CD — un archivo versionado que describe cómo tu código pasa de un commit a estar en producción.*

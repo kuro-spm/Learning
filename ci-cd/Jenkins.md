@@ -69,4 +69,12 @@ Jenkins puede repartir el trabajo entre varias máquinas (*agentes*), por ejempl
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Nada configurado a golpe de clic** — un Jenkins montado desde la interfaz web es irreproducible: si el servidor muere, nadie recuerda qué casillas estaban marcadas. Los equipos expertos definen los pipelines solo en el `Jenkinsfile` y la configuración del propio servidor con *Configuration as Code* (plugin JCasC), de modo que todo Jenkins se puede reconstruir desde archivos versionados.
+- **El controller no ejecuta builds** — la máquina principal de Jenkins debe tener sus *executors* a 0 y delegar todo el trabajo en agentes. Si los builds corren en el controller, cualquier pipeline puede leer credenciales y archivos del propio servidor, y un build pesado puede tumbar la interfaz para todo el equipo.
+- **Cada plugin es una deuda, no un regalo** — el catálogo enorme es la mayor fortaleza de Jenkins y su mayor fuente de roturas: los plugins se actualizan a ritmos distintos y una actualización puede romper otro plugin o el propio servidor. Instala los mínimos imprescindibles y prueba las actualizaciones en una instancia de ensayo antes de tocar la real.
+
+---
+
 *En resumen: Jenkins es el veterano del CI/CD — un servidor propio, infinitamente extensible con plugins, que da control total a cambio de tener que instalarlo y mantenerlo.*

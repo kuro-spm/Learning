@@ -59,4 +59,11 @@ jobs:
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Path-filters y *required checks* se llevan mal** — si marcas "backend-ci" como check obligatorio de la PR y el filtro de paths hace que ese workflow ni se ejecute (porque solo tocaste `frontend/`), la PR se queda esperando un check que nunca llegará. La solución en GitHub Actions es conocida por pocos: un segundo workflow con el **mismo nombre de job** y los paths invertidos (`paths-ignore`) que termina en verde al instante, o mover el filtrado dentro del workflow con una action como `dorny/paths-filter`.
+- **Incluye en los paths el propio workflow y lo compartido** — un filtro `paths: ['backend/**']` tiene dos agujeros: cambiar `.github/workflows/backend-ci.yml` no dispara el pipeline que acabas de modificar, y tocar una carpeta común (`shared/`, contratos, configuración raíz) tampoco. Añade siempre esas rutas al filtro; si no, el CI valida todo *excepto* los cambios más peligrosos.
+
+---
+
 *En resumen: en un monorepo, los path-filters le dan a cada carpeta su propio timbre — solo se despierta el pipeline del área que realmente cambió.*

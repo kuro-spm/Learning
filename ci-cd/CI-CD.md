@@ -71,6 +71,14 @@ La clave de CI/CD es enterarse pronto. Si rompes algo, te avisa en minutos (con 
 - **No garantiza que el código sea bueno** — garantiza que pasa los controles que tú hayas definido.
 - **No sustituye las decisiones humanas** — alguien tiene que decidir qué se prueba, cuándo se despliega y qué hacer si falla.
 
+## Buenas prácticas avanzadas
+
+- **Integrar a menudo es la práctica; el pipeline es solo la herramienta** — un equipo con ramas que viven semanas no hace Integración Continua aunque tenga el mejor pipeline del mundo: los conflictos y las sorpresas se acumulan igual. La señal de que hay CI de verdad es que los cambios llegan a la rama común cada pocos días como mucho.
+- **Build once, deploy many** — el artefacto que pasa los tests debe ser *exactamente* el que llega a producción. Si recompilas para cada entorno (uno para staging, otro para producción), estás desplegando algo que nunca se probó: cualquier diferencia de versión de compilador o dependencia se cuela sin que ningún test la vea. Compila una vez y promociona el mismo binario/imagen entre entornos.
+- **Ordena el pipeline para fallar pronto** — coloca primero lo barato y lo que más veces falla (lint, compilación, tests unitarios) y al final lo caro (E2E, builds de Docker). Fallar en el segundo 30 en vez de en el minuto 20 multiplica los ciclos de trabajo que caben en un día.
+- **Trata los tests intermitentes (flaky) como averías, no como ruido** — cuando un test falla "a veces" y la costumbre es relanzar hasta que sale verde, el equipo deja de creerse los rojos... y el día que el rojo es real, se ignora. Pon los tests flaky en cuarentena y arréglalos o bórralos: un test en el que no confías es peor que no tenerlo.
+- **Vigila la duración total como una métrica de producto** — si el pipeline tarda más de ~10 minutos, la gente agrupa cambios grandes para "no esperar dos veces", y eso destruye justo lo que CI/CD quiere conseguir: cambios pequeños y frecuentes. Cuando el pipeline engorda, invertir en acelerarlo (paralelizar, cachear) es trabajo de primera clase, no una tarea de relleno.
+
 ---
 
 *En resumen: CI/CD es una cadena de montaje automática para tu código — integra, prueba y despliega siempre de la misma forma, para que entregar software deje de dar miedo.*

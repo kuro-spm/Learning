@@ -59,4 +59,12 @@ El compañero imprescindible de todas: poder **volver a la versión anterior** r
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Diseña para que dos versiones convivan** — en rolling y canary, la versión vieja y la nueva atienden tráfico *a la vez* contra la misma base de datos. Eso obliga a que los cambios de esquema sean compatibles hacia atrás: primero añades la columna nueva sin quitar la vieja (*expand*), despliegas, y solo cuando ya nadie usa la vieja la eliminas (*contract*). Renombrar una columna en el mismo deploy que el código que la usa es la forma clásica de tumbar producción "con una estrategia sin cortes".
+- **Un rollback que nunca se ha ensayado no es un plan** — casi todos los equipos tienen rollback "en teoría", y descubren durante un incidente que la versión anterior ya no arranca (falta una variable nueva, la migración de datos no es reversible). Los equipos que dominan esto ensayan la vuelta atrás en un entorno de prueba de vez en cuando, igual que se ensaya un simulacro de incendio.
+- **Un canary sin métricas es teatro** — mandar el 5% del tráfico a la versión nueva solo sirve si algo *compara* automáticamente sus errores y latencia con los de la versión estable y aborta si empeoran. Si nadie mira los números, el canario es solo un rolling lento con mejor nombre.
+
+---
+
 *En resumen: las estrategias de despliegue son las distintas maneras de cambiar la versión en producción sin que se note — desde el simple apagón hasta el canary que prueba con unos pocos antes de soltarlo a todos.*

@@ -69,4 +69,18 @@ En el servidor de destino, desplegar es simplemente descargar la imagen y arranc
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Copia el lockfile antes que el código** — Docker cachea cada instrucción del `Dockerfile` por capas, y un `COPY . .` temprano invalida la caché con *cualquier* cambio, forzando a reinstalar todas las dependencias en cada build. El orden experto: copiar solo el manifiesto, instalar y luego copiar el resto.
+
+  ```dockerfile
+  COPY package*.json ./
+  RUN npm ci              # esta capa solo se rehace si cambió el lockfile
+  COPY . .                # el código cambia a diario; las dependencias, no
+  ```
+- **Multi-stage: que el SDK no viaje a producción** — compila en una etapa con todas las herramientas (`FROM node:20 AS build`) y copia solo el resultado a una imagen final mínima (`FROM node:20-slim`). La imagen que despliegas pesa una fracción y no lleva compiladores ni dependencias de desarrollo que agranden la superficie de ataque.
+- **`latest` no es una versión** — desplegar `miapp:latest` hace imposible saber qué corre en producción o volver a la versión anterior con precisión. Publica cada imagen con un tag inmutable (la versión o el SHA del commit) y, para las imágenes base críticas, considera anclarlas por *digest* (`node:20@sha256:...`), que es lo único que garantiza bytes idénticos.
+
+---
+
 *En resumen: Docker da a tu pipeline un entorno idéntico de principio a fin — empaqueta la app con todas sus dependencias para que "en mi máquina funcionaba" deje de ser un problema.*

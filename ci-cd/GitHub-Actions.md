@@ -102,6 +102,20 @@ Las contraseñas y tokens nunca se escriben en el YAML. Se guardan en los *Secre
 - **No es ilimitado gratis** — los minutos de ejecución tienen una cuota según el plan (los repos públicos suelen tener mucho margen).
 - **No adivina tu proceso** — tú escribes cada paso del workflow.
 
+## Buenas prácticas avanzadas
+
+- **Ancla las actions de terceros a un commit SHA, no a un tag** — `actions/checkout@v4` parece fijo, pero un tag de Git se puede mover: si comprometen la cuenta del autor, `v4` puede pasar a apuntar a código malicioso que corre con acceso a tus secrets. Anclar al hash completo (`uses: actions/checkout@8f4b7f8...`) hace el paso inmutable. Es el ataque de cadena de suministro clásico en Actions, y la mayoría no se protege.
+- **Recorta los permisos del `GITHUB_TOKEN`** — cada workflow recibe un token automático que, según la configuración del repo, puede tener permiso de escritura sobre casi todo. Declara arriba del workflow el mínimo necesario (`permissions: { contents: read }`) y amplía solo en el job que lo necesite: si un paso comprometido roba el token, el daño queda acotado.
+- **Cancela ejecuciones obsoletas con `concurrency`** — sin esto, cada push a una pull request encola un workflow nuevo mientras los anteriores siguen corriendo, quemando minutos en validar código que ya nadie va a fusionar.
+
+  ```yaml
+  concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+  ```
+- **Trata `pull_request_target` como material radiactivo** — a diferencia de `pull_request`, este disparador ejecuta con acceso a los secrets del repositorio... sobre eventos que puede provocar cualquiera desde un fork. Si además haces checkout del código del fork, un desconocido puede exfiltrar tus secrets con solo abrir una PR. Úsalo solo si entiendes exactamente por qué lo necesitas, y nunca ejecutes código del fork dentro de él.
+- **No copies YAML entre repositorios: usa `workflow_call`** — cuando el mismo pipeline se repite en varios repos, conviértelo en un *reusable workflow* que los demás invocan con `uses:`. Los workflows clonados divergen en silencio y arreglar un fallo pasa a ser una cacería por N repositorios.
+
 ---
 
 *En resumen: GitHub Actions es CI/CD que ya vive dentro de tu repositorio de GitHub — defines workflows en YAML y se ejecutan solos ante cada cambio.*

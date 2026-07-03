@@ -63,4 +63,12 @@ Si algo es una contraseña, un token o una clave, **nunca** va en un archivo del
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Un secret filtrado se rota, no se borra** — si un token llegó a un commit, sigue en el historial de Git para siempre aunque lo elimines del archivo: la única respuesta correcta es invalidarlo y generar uno nuevo. Por eso los equipos expertos eligen credenciales fáciles de rotar (tokens revocables, claves por servicio) en lugar de una contraseña maestra que da pánico cambiar.
+- **El enmascarado es cosmético, no una barrera** — la plataforma oculta el valor exacto en los logs, pero cualquier transformación se le escapa: un `echo $TOKEN | base64` lo imprime a la vista. Y un secret pasado como argumento de línea de comandos puede acabar en la lista de procesos o en mensajes de error; pásalo siempre como variable de entorno o por fichero.
+- **Delimita cada secret a su entorno y sus ramas** — el token de producción no debe existir en los pipelines que cualquiera dispara desde una rama o un fork: usa los mecanismos de la plataforma (*environments* en GitHub, variables *protected* en GitLab) para que solo los workflows de despliegue real puedan leerlo. Un secret visible desde cualquier PR es un secret público con pasos intermedios.
+
+---
+
 *En resumen: los secrets y las variables de entorno son la caja fuerte del pipeline — le dan acceso a contraseñas y tokens sin que esos datos lleguen jamás a quedar escritos en tu repositorio.*

@@ -62,4 +62,17 @@ Cada ejecución siembra sus propios datos de prueba. Si un test necesita un usua
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Clava las versiones a las de producción** — el valor del entorno efímero es que se parezca al real: si producción corre `postgres:16.3`, el contenedor de test debe ser `postgres:16.3`, no `postgres:latest`. Con `latest`, el día que la imagen salta de versión mayor tus tests validan una base de datos que no es la tuya — y encima el fallo aparece "sin que nadie haya cambiado nada".
+- **Vuelca los logs del stack cuando falle** — el entorno se destruye al terminar, así que un E2E rojo sin más información es indepurable: el error real suele estar en los logs de la API o de la BD, que ya no existen. Añade un paso condicionado al fallo que los publique antes del `down`.
+
+  ```yaml
+  - run: docker compose logs --timestamps
+    if: failure()          # solo si algo falló; se guarda antes de destruir
+  ```
+- **El runner nace vacío: trae la caché de fuera** — como cada ejecución parte de una máquina limpia, el `docker compose up --build` reconstruye todas las capas desde cero y los minutos se disparan. Usa `--cache-from` apuntando a la última imagen publicada en el registro (o la caché de imágenes de tu plataforma de CI) para que solo se reconstruyan las capas que de verdad cambiaron.
+
+---
+
 *En resumen: un entorno efímero cambia "mantener un servidor de pruebas siempre a medio morir" por "construir un mundo limpio, probarlo y tirarlo" — la reproducibilidad se consigue no dejando nada vivo entre ejecuciones.*

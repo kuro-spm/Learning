@@ -65,4 +65,12 @@ git commit --no-verify   # omite el hook; útil en emergencias, peligroso como c
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **El hook valida tu carpeta de trabajo, no lo que vas a commitear** — sutileza que casi nadie conoce: `npm test` en el hook corre sobre los archivos tal y como están en disco, incluidos cambios *sin* stagear. Puedes commitear código roto que "pasó el hook" porque un cambio no incluido en el commit lo arreglaba en tu máquina. Herramientas como *lint-staged* (que operan solo sobre lo stageado) o un `git stash --keep-index` antes de validar cierran ese agujero.
+- **Reparte el coste: `pre-commit` para lo instantáneo, `pre-push` para lo pesado** — lint y formateo aguantan bien en cada commit; una suite de tests de 40 segundos, no (la gente acaba usando `--no-verify` por sistema, y ahí muere el hook). El hook `pre-push` corre solo al subir, así que tolera validaciones más caras sin castigar cada commit local.
+- **El hook debe funcionar sin red y sin sorpresas** — nada de `npm install` ni llamadas a servicios externos dentro del script: un hook que falla porque no hay wifi o porque una API no responde entrena al equipo a saltárselo. Todo lo que ejecute debe estar ya en la máquina y ser determinista.
+
+---
+
 *En resumen: el hook pre-commit atrapa los errores en el momento más barato — tu máquina, antes del commit — y deja el CI de pago para lo que de verdad necesita un árbitro central.*
