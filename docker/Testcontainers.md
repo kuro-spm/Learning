@@ -75,4 +75,12 @@ Usa la misma versión que producción (`postgres:16-alpine`, `postgres:17`...) �
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Un contenedor por suite, no por test — y limpia los datos con Respawn** — el error de rendimiento clásico es arrancar un PostgreSQL nuevo por cada clase de tests: la suite pasa de segundos a minutos. Comparte un único contenedor con una *collection fixture* de xUnit (`ICollectionFixture<T>`) y, entre tests, en vez de recrearlo, borra las filas con una librería como **Respawn** (hace TRUNCATE respetando las foreign keys en milisegundos). Aislamiento igual, coste mínimo.
+- **`WithReuse(true)` para no pagar el arranque en cada ejecución local** — con `new PostgreSqlBuilder(...).WithReuse(true)` el contenedor sobrevive al final de la suite y la siguiente ejecución lo reutiliza en lugar de arrancar uno nuevo; en el ciclo "toco código, lanzo tests" se nota muchísimo. Requiere activar `testcontainers.reuse.enable=true` en `~/.testcontainers.properties` y no tiene sentido en CI (el runner es desechable) — por eso es opt-in dos veces.
+- **Para imágenes sin módulo oficial, define la *wait strategy* tú** — los builders como `PostgreSqlBuilder` ya saben esperar a que la BD acepte conexiones, pero si dockerizas algo a mano con `ContainerBuilder`, Testcontainers solo espera a que el contenedor *arranque*, no a que el servicio esté listo: la causa nº 1 de tests intermitentes con "connection refused". Declara la condición real con `WithWaitStrategy(Wait.ForUnixContainer().UntilMessageIsLogged(...))` o `UntilHttpRequestIsSucceeded(...)`.
+
+---
+
 *En resumen: Testcontainers convierte "necesito una base de datos para este test" en una línea de código — un PostgreSQL real, limpio y desechable por cada ejecución.*

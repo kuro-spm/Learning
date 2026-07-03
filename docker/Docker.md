@@ -190,6 +190,14 @@ Por último, Claude escribe el archivo con comentarios en los bloques no obvios 
 - **No gestiona múltiples máquinas** — eso es Kubernetes. Docker y Docker Compose trabajan en una sola máquina.
 - **No garantiza seguridad automática** — un contenedor mal configurado puede exponer la red del host o escalar privilegios; la configuración hay que revisarla.
 
+## Buenas prácticas avanzadas
+
+- **Fija la versión exacta de la imagen base, nunca `latest`** — `FROM node:latest` (o incluso `node:20`) apunta a imágenes distintas según el día en que construyas, así que dos builds del mismo Dockerfile pueden producir resultados diferentes. Usa etiquetas concretas (`node:20.11-alpine`) y, para despliegues críticos, el digest inmutable (`node:20.11-alpine@sha256:...`), que no puede cambiar aunque alguien re-publique la etiqueta.
+- **El `.dockerignore` importa tanto como el Dockerfile** — sin él, `COPY . .` arrastra `node_modules`, `.git`, artefactos de build y hasta archivos `.env` con secretos al contexto de build. No solo engorda la imagen: cualquier archivo tocado invalida la caché de esa capa, y un `.env` copiado por accidente queda incrustado para siempre en las capas de la imagen, aunque luego lo borres con otro `RUN`.
+- **Usa siempre la forma *exec* en `ENTRYPOINT`/`CMD`** — `ENTRYPOINT dotnet MiApi.dll` (forma *shell*) envuelve el proceso en `/bin/sh -c`, y ese `sh` se convierte en PID 1: tu aplicación nunca recibe el `SIGTERM` de `docker stop`, así que no cierra conexiones ni termina peticiones en curso; Docker espera 10 segundos y la mata a la fuerza. La forma *exec* (`ENTRYPOINT ["dotnet", "MiApi.dll"]`) hace que la app sea PID 1 y reciba las señales directamente.
+- **No ejecutes como root dentro del contenedor** — casi todas las imágenes oficiales arrancan como root por defecto. Si alguien explota una vulnerabilidad de tu app, es root dentro del contenedor, y cualquier volumen montado o descuido de configuración convierte eso en un problema del host. Crea un usuario sin privilegios en el Dockerfile y actívalo con `USER` antes del `ENTRYPOINT` (las imágenes de .NET 8+ ya traen uno preparado: `USER app`).
+- **`depends_on` no espera a que el servicio esté listo, solo a que arranque** — el error clásico en Compose: la API arranca antes de que PostgreSQL acepte conexiones y falla al conectar. La solución es declarar un `healthcheck` en el servicio de la base de datos y usar la forma larga `depends_on: { db: { condition: service_healthy } }`, que sí espera al chequeo real.
+
 ---
 
 *En resumen: Docker empaqueta tu aplicación y todo lo que necesita en una caja estandarizada que se ejecuta igual en cualquier sitio — y cuando Claude crea esa caja por ti, lee tu proyecto, elige las piezas correctas y ordena las instrucciones para que la construcción sea lo más rápida y ligera posible.*

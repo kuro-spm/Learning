@@ -68,6 +68,14 @@ Las imágenes aparecen en la pestaña **Packages** del perfil u organización de
 - **No garantiza inmutabilidad de etiquetas** — una etiqueta puede re-publicarse apuntando a otra imagen; por convención las de versión (`v1.2.0`) no se reutilizan nunca (las móviles tipo `latest` sí se mueven).
 - **No es solo para Docker** — admite cualquier artefacto OCI (charts de Helm, por ejemplo), aunque su uso típico son imágenes de contenedor.
 
+## Buenas prácticas avanzadas
+
+- **En producción, despliega por digest, no por etiqueta** — como las etiquetas son mutables, `v1.2.0` podría re-publicarse (por error o por un atacante con acceso al registro) y tu servidor descargaría otra cosa sin enterarse. El digest (`ghcr.io/mi-organizacion/tienda-backend@sha256:...`) identifica el contenido exacto y es inmutable por construcción; `docker/build-push-action` lo expone como output del step, listo para pasarlo al despliegue.
+- **Genera las etiquetas con `docker/metadata-action`, no a mano** — esta action deriva automáticamente el juego completo de etiquetas desde el evento de Git: de un tag `v1.2.0` saca `v1.2.0`, `v1.2`, `v1` y `latest`, y de un push a rama saca `sha-<commit>`. Así quien consume la imagen elige su nivel de riesgo (fijarse a `v1.2.0` o seguir `v1`) sin que tú mantengas lógica de etiquetado en el workflow.
+- **Añade el label `org.opencontainers.image.source` al Dockerfile** — `LABEL org.opencontainers.image.source=https://github.com/mi-organizacion/tienda-backend` vincula el paquete al repositorio automáticamente en el primer push: hereda sus permisos, aparece en su barra lateral y muestra el README. Sin él, el paquete queda "huérfano" y hay que vincularlo a mano en la web (y los permisos no se sincronizan).
+- **Vigila las versiones sin etiqueta: se acumulan y, en paquetes privados, se facturan** — cada push que reutiliza una etiqueta deja la imagen anterior como versión *untagged*, y los builds multi-arquitectura generan además manifiestos intermedios sin etiqueta. Programa una limpieza periódica (p. ej. la action `actions/delete-package-versions`), pero con cuidado en multi-arch: borrar manifiestos sin etiqueta a ciegas puede romper la imagen etiquetada que los referencia.
+- **Usa ghcr.io también como caché de capas del CI** — los runners de GitHub Actions arrancan vacíos, así que sin caché cada build reconstruye todas las capas. Con `cache-from`/`cache-to` de tipo `registry` (o `gha`), el build reutiliza las capas del build anterior publicadas en el propio registro y un cambio solo de código tarda segundos en lugar de minutos.
+
 ---
 
 *En resumen: ghcr.io es el almacén de imágenes que ya viene con tu cuenta de GitHub — publicas versiones etiquetadas desde CI con el token automático, y tus servidores las descargan por nombre exacto.*
