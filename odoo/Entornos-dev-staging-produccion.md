@@ -52,6 +52,14 @@ Si usas la versión alojada por Odoo (**Odoo.sh**), crear un entorno de staging 
 - **Staging no sustituye a las copias de seguridad** — es para ensayar, no para recuperar datos perdidos (eso son los [backups](Backups-y-Restauracion.md)).
 - **Tener staging no te exime de cuidado en producción** — sigue siendo el único sitio con datos reales.
 
+## Buenas prácticas avanzadas
+
+- **Paridad exacta o el ensayo no vale** — staging debe correr la misma versión de Odoo (rama y revisión), los mismos módulos en las mismas versiones y, a ser posible, las mismas versiones de PostgreSQL y Python que producción. Un ensayo sobre un staging "parecido" da una falsa seguridad: el fallo aparecerá justo en la diferencia que no replicaste.
+- **Refresca staging antes de cada ensayo importante** — un staging clonado hace meses ya no se parece a producción: datos y configuración han divergido. El hábito experto es re-clonar producción justo antes de ensayar algo serio, no reutilizar un staging viejo "porque ya está montado".
+- **Ojo con lo que la copia sigue compartiendo con producción** — al clonar, parámetros como `web.base.url` siguen apuntando a la URL real, y las credenciales de servicios externos son las mismas. Si staging usa la misma API key que producción para un transportista o una pasarela de pago, tus pruebas pueden tocar datos reales aunque la base de datos sea una copia: usa credenciales *sandbox* en staging.
+- **Convierte el ensayo en un guion** — mientras pruebas en staging, anota cada paso, su orden y cuánto tarda. Ese guion (*runbook*) es lo que ejecutarás en producción: el día del cambio real no se improvisa, se repite lo ensayado.
+- **Staging tiene datos reales: protégelo como a producción** — la copia neutralizada no envía correos, pero sigue conteniendo nombres, correos y facturas de clientes de verdad. Restringe quién accede y no lo dejes en una URL pública sin autenticación; a efectos de privacidad (RGPD), staging es tan sensible como producción.
+
 ---
 
 *En resumen: separar desarrollo, staging y producción te da un lugar donde equivocarte sin consecuencias; los cambios suben hacia producción y los datos bajan (neutralizados) hacia staging, de modo que nunca ensayas por primera vez sobre los datos reales.*

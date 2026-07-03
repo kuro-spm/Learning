@@ -63,6 +63,14 @@ clientes = models.execute_kw(db, uid, password,
 - **No se personaliza tocando PostgreSQL** — los cambios se hacen desde la interfaz o desarrollando módulos, nunca con `UPDATE` directos a las tablas.
 - **No es "instalar y olvidarse"** — cada versión anual puede cambiar cosas, y actualizar de una a otra requiere planificación.
 
+## Buenas prácticas avanzadas
+
+- **Archiva en vez de borrar** — casi todos los registros de Odoo tienen un campo `active`; desactivarlo (archivar) los oculta de vistas y búsquedas sin romper el historial que los referencia (pedidos antiguos, apuntes contables...). Quien domina Odoo casi nunca borra: archiva, y sabe que un registro "desaparecido" suele estar solo archivado (se recupera añadiendo el filtro *Archivado* a la búsqueda).
+- **En la API, pide siempre `fields` y pagina** — un `search_read` sin `fields` devuelve todos los campos del modelo, incluidos los calculados, que se computan registro a registro. En modelos grandes eso convierte una consulta de milisegundos en una de minutos. Especifica los campos que necesitas y usa `limit`/`offset` para trocear.
+- **Usa External IDs para que las importaciones sean idempotentes** — si al importar datos incluyes una columna `id` con un identificador externo estable (`import_web.cliente_00042`), reimportar el mismo fichero actualiza los registros en lugar de duplicarlos. Es la diferencia entre una importación repetible y una que crea clientes duplicados a cada intento.
+- **La configuración por defecto del servidor es de desarrollo, no de producción** — sin `workers` en `odoo.conf`, Odoo corre en un solo proceso y una petición lenta bloquea a todos los usuarios. En producción se configuran `workers` (multiproceso), `proxy_mode = True` detrás del proxy inverso y los límites `limit_time_cpu`/`limit_time_real`.
+- **Trata la versión como una decisión estratégica** — Odoo solo mantiene las tres últimas versiones anuales, y los módulos de terceros no siempre se migran a la siguiente. Antes de depender de un módulo, comprueba que existe para tu rama exacta (17.0, 18.0...); quedarse dos o tres versiones atrás convierte la actualización en un proyecto de migración.
+
 ---
 
 *En resumen: Odoo es una caja de aplicaciones de gestión que comparten una misma base de datos, de modo que la información fluye sola entre ventas, almacén, contabilidad y todo lo demás.*

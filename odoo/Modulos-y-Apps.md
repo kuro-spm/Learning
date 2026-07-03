@@ -54,4 +54,12 @@ Instalar o actualizar un módulo modifica la base de datos (crea tablas, columna
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Hereda, no edites el módulo original** — para cambiar algo de un módulo estándar se crea un módulo propio que lo extiende (`_inherit` en los modelos, vistas heredadas en el XML). Si editas los ficheros del módulo original, la siguiente actualización de Odoo pisará tus cambios sin avisar.
+- **Ensaya también la desinstalación** — antes de llevar un módulo a producción, prueba en la copia no solo instalarlo, sino quitarlo, y mira qué datos desaparecen. Así sabes si "desinstalar" es una marcha atrás real o si tu única salida sería restaurar un backup.
+- **Un módulo de terceros te compromete a su mantenimiento** — cada rama de Odoo (16.0, 17.0...) necesita su propia versión del módulo. Antes de adoptarlo, comprueba que su autor lo migra activamente a las versiones nuevas; si lo abandona, portar ese código te tocará a ti o bloqueará tu actualización de Odoo.
+
+---
+
 *En resumen: los módulos son las piezas de Lego con las que se arma un Odoo a medida; instalarlos o quitarlos toca la base de datos, así que siempre se prueban antes en una copia.*

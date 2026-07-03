@@ -56,4 +56,12 @@ Una copia que nunca has probado a restaurar es una copia en la que no puedes con
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **No hace falta parar Odoo para hacer backup** — `pg_dump` toma una foto consistente de la base de datos aunque haya gente trabajando, gracias al aislamiento transaccional de PostgreSQL. Lo que sí conviene es copiar el filestore justo después, para que las dos mitades del backup queden lo más sincronizadas posible.
+- **El gestor web no escala: para bases grandes, línea de comandos** — el botón *Backup* de `/web/database/manager` genera el zip en el propio servidor y, con bases de datos de varios GB, acaba en *timeout*. En cuanto la base crece, el backup serio se automatiza con `pg_dump` más la copia del filestore, programado y sin depender de que alguien pulse un botón.
+- **Un backup es tan sensible como producción** — contiene todos los datos de clientes y, además, secretos en claro: claves de API y tokens guardados en los parámetros del sistema (`ir.config_parameter`). Cífralo, restringe quién puede leerlo y no lo dejes en carpetas compartidas: robar un backup es robar la empresa entera.
+
+---
+
 *En resumen: un backup es tu punto de guardado antes de cualquier cambio arriesgado; incluye base de datos y filestore, se prueba de vez en cuando restaurándolo, y convierte cualquier error en algo reversible.*

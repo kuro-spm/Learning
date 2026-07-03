@@ -56,6 +56,13 @@ Antes de empezar, ten claro cómo deshacer: qué backup restaurar, cómo desinst
 - **No sustituye a entender lo que haces** — la prudencia no arregla un cambio que no comprendes.
 - **No es opcional "porque tengo prisa"** — saltarse el backup o la copia es justo cuando ocurren los desastres.
 
+## Buenas prácticas avanzadas
+
+- **Desinstalar no es el "deshacer" de instalar** — quitar un módulo borra sus columnas y sus datos, así que puede empeorar el problema en vez de arreglarlo. El plan de vuelta atrás real de una instalación fallida es restaurar el backup, no pulsar *Uninstall*: da por hecho que, una vez instalado en producción, el módulo solo se quita restaurando.
+- **Cronometra la restauración: es tu verdadera ventana de riesgo** — de nada sirve un plan de vuelta atrás que tarda tres horas si tu ventana de mantenimiento dura una. Restaura el backup en una copia y mide cuánto tarda (base de datos + filestore); ese tiempo, más el trabajo que se perdería desde la copia, es el coste real de "volver atrás", y hay que conocerlo antes de empezar.
+- **Congela los crons durante la ventana de cambio** — una tarea programada que se dispara a mitad de una actualización puede pillar el sistema a medio migrar (una facturación recurrente sobre datos inconsistentes, por ejemplo). Desactiva temporalmente las acciones planificadas delicadas antes del cambio y reactívalas solo cuando hayas validado que todo está bien.
+- **Valida como un usuario normal, no solo como administrador** — el administrador se salta la mayoría de reglas de acceso, así que "a mí me funciona" no demuestra nada. Después de un cambio, recorre el flujo con un usuario que tenga los permisos reales de quien lo usará a diario: los fallos de grupos y *record rules* solo aparecen ahí.
+
 ---
 
 *En resumen: prueba siempre en una copia neutralizada, haz backup antes de tocar producción, aplica cambios pequeños y reversibles en horas tranquilas, y no empieces nada sin saber cómo deshacerlo.*

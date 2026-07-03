@@ -50,4 +50,12 @@ En un sistema real, úsalo solo para consultar o para cambios que sabes que son 
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Hay más de un modo: `?debug=assets`** — esta variante sirve el JavaScript y el CSS sin minificar, imprescindible para depurar errores de interfaz con las herramientas del navegador: los *stack traces* pasan a señalar ficheros legibles en lugar de un *bundle* comprimido.
+- **Es un ajuste por sesión, no del sistema** — activarlo solo te afecta a ti: no "enciendes" nada para el resto de usuarios ni puedes apagárselo a otra persona desde tu sesión. Cuidado con las extensiones de navegador que lo mantienen siempre activo: normalizan trabajar en producción con las tijeras afiladas en la mano.
+- **El superusuario es para diagnosticar permisos, no para trabajar** — con el modo desarrollador puedes convertirte en superusuario (*Become Superuser*), que ignora todas las reglas de acceso. Es la forma rápida de distinguir "es un bug" de "es un problema de permisos": si como superusuario funciona, el problema son los permisos. Pero todo lo que edites así se salta las protecciones normales, así que vuelve a tu usuario en cuanto termines.
+
+---
+
 *En resumen: el modo desarrollador enciende la luz sobre la capa técnica de Odoo; no cambia nada solo, pero te da tijeras afiladas, así que en producción se usa con guantes y se apaga al acabar.*

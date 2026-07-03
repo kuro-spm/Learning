@@ -65,6 +65,13 @@ Antes de tocar nada, verifica que el correo saliente no apunta a un servidor rea
 - **No actualiza sola la copia** — es una foto del momento; los datos nuevos de producción no aparecen ahí.
 - **No sustituye al backup** — es para probar, no para recuperar; y una copia no neutralizada no debe convivir con producción.
 
+## Buenas prácticas avanzadas
+
+- **Neutraliza antes de que Odoo llegue a arrancar sobre la copia** — si restauras y arrancas el servidor "solo para ver que funciona", los *crons* y el correo siguen vivos durante esos minutos y pueden disparar envíos reales. El orden correcto es restaurar → `neutralize` → arrancar; nunca al revés.
+- **Nunca compartas el filestore entre dos bases de datos** — dale a la copia su propia carpeta de filestore, no un enlace a la de producción. Odoo tiene una limpieza automática de adjuntos huérfanos: si dos bases de datos apuntan al mismo directorio, la limpieza de una puede borrar ficheros que la otra todavía usa... incluida producción.
+- **La neutralización estándar no conoce tus integraciones a medida** — `neutralize` apaga lo que Odoo trae de serie (correo, crons, pagos), pero no una sincronización a medida con un sistema externo. Desde Odoo 16, un módulo propio puede incluir su propio script `neutralize.sql` que se ejecuta junto con el comando; si tienes integraciones custom, añádelo o desactívalas a mano y deja documentado cuáles son.
+- **La copia conserva la identidad de producción** — parámetros como `web.base.url` y el UUID de la base de datos viajan con la copia: los enlaces que genere apuntarán al dominio real y, en la edición Enterprise, dos bases con el mismo UUID hacen que Odoo detecte un duplicado y muestre avisos de expiración. Revisa esos parámetros del sistema (*Ajustes técnicos ▸ Parámetros del sistema*) después de duplicar.
+
 ---
 
 *En resumen: duplicar te da datos realistas para probar y neutralizar corta todos los hilos con el mundo real; juntas, convierten una copia de producción en un simulador seguro donde nada de lo que hagas escapa al exterior.*
