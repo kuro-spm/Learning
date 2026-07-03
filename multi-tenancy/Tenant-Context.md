@@ -72,4 +72,12 @@ services.AddScoped<ITenantContext, TenantContext>();
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **No inyectes `ITenantContext` en un singleton** — es la *captive dependency* clásica: el singleton captura el contexto de la primera petición que lo crea y servirá **ese** tenant para siempre, a todos los clientes. El contenedor no siempre avisa. En un singleton, inyecta `IServiceScopeFactory` y resuelve el contexto dentro de un scope en cada uso.
+- **Que `Current` falle a gritos, no devuelva `null`** — haz que el getter lance una excepción si el middleware aún no lo ha fijado. Un `null` silencioso se propaga hasta convertirse en una consulta que filtra por `Guid.Empty` (cero resultados, bug confuso) o, peor, que no filtra; una excepción en el primer acceso señala el punto exacto donde falta el contexto.
+- **Separa quién lo escribe de quién lo lee** — si `Current` tiene un `set` público en la interfaz, cualquier servicio puede cambiar el tenant a mitad de petición. Expón `ITenantContext` de solo lectura al resto del código y deja la escritura en una interfaz aparte (`ITenantContextSetter`) que solo conozca el middleware.
+
+---
+
 *En resumen: el tenant context es la "memoria" de quién es el tenant durante una petición, accesible para todas las capas sin pasarlo a mano —y siempre por petición, nunca global.*

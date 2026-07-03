@@ -75,6 +75,13 @@ Migrar miles de bases lleva tiempo y alguna puede fallar. Conviene registrar qu�
 - **Borrar un tenant no es borrar un registro** — hay que eliminar (o archivar) todos sus datos, respetando obligaciones legales de retención.
 - **No improvises en producción** — provisioning y migraciones deben ser procesos repetibles y automatizados, no comandos manuales sueltos.
 
+## Buenas prácticas avanzadas
+
+- **Provisioning idempotente y con estado explícito** — un alta que falla a mitad (base creada, semillas no) deja un tenant zombi que ni funciona ni se puede repetir. Diseña cada paso para poder reejecutarse sin duplicar nada (las semillas como *upsert*, la creación como "crear si no existe") y modela el estado del tenant (`Provisioning` → `Active` → `Suspended`): la aplicación solo deja entrar cuando está `Active`, y un alta fallida simplemente se relanza.
+- **Migra con el patrón *expand/contract*** — con muchos tenants, la migración no es instantánea: durante horas convivirán código nuevo y esquema viejo (o al revés). Nunca hagas un cambio destructivo en un paso; primero *expande* (añade la columna nueva, tolerada por el código viejo), despliega código que funcione con ambas versiones, rellena datos, y solo al final *contrae* (elimina lo antiguo). Renombrar una columna "de golpe" funciona en local y rompe en producción multi-tenant.
+- **Ensaya cada migración con tenants canario** — antes de recorrer miles de bases, aplica la migración a los tenants internos o de demo, después a un porcentaje pequeño de clientes reales, y solo entonces al resto. Una migración que corrompe datos aplicada a *todos* los tenants a la vez es el peor día posible de un SaaS; aplicada a tres canarios, es un susto.
+- **Paraleliza el recorrido, pero con techo y con registro por tenant** — migrar en serie miles de bases tarda una eternidad; en paralelo sin límite, tumba el servidor de base de datos. Procesa por lotes con un grado de paralelismo fijo y guarda la versión de esquema alcanzada por cada tenant: eso convierte "¿por dónde iba?" tras un fallo en una consulta, y los reintentos en algo trivial.
+
 ---
 
 *En resumen: aprovisionar es montarle la tienda a cada cliente nuevo y migrar es reformar todas las tiendas a la vez sin cerrar —cuanto más aislada la estrategia, más trabajo por cliente.*

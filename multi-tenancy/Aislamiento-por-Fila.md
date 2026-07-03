@@ -79,6 +79,20 @@ No te fíes de una sola capa. El filtro del ORM evita el 99 % de los errores; RL
 - **No protege contra un `TenantId` mal asignado** — si guardas una fila con el tenant equivocado, el filtro la "esconderá" del dueño real; el problema está en la escritura, no en la lectura.
 - **RLS no es gratis** — añade una pequeña sobrecarga y requiere configurar la variable de sesión en cada conexión.
 
+## Buenas prácticas avanzadas
+
+- **Claves foráneas compuestas para impedir referencias cruzadas** — el query filter evita *leer* filas ajenas, pero no impide que un pedido de Acme apunte a un cliente de Globex vía `CustomerId`. Si la FK incluye el tenant, la propia base lo hace imposible:
+
+  ```sql
+  ALTER TABLE Orders ADD CONSTRAINT FK_Orders_Customers
+      FOREIGN KEY (TenantId, CustomerId) REFERENCES Customers (TenantId, Id);
+  ```
+
+- **Haz que el filtro "falle cerrado"** — si el tenant context está vacío (un job en segundo plano, un test mal montado), el filtro no debe degradarse a "sin filtro": debe devolver cero filas o lanzar una excepción. Un `_tenantContext.Current?.Id` que se evalúa a `null` y deja pasar todo es la fuga más silenciosa que existe; que la ausencia de tenant duela pronto y a gritos.
+- **Trata `IgnoreQueryFilters()` como material radiactivo** — es la puerta de atrás oficial del ORM y siempre acaba usándose "solo para este informe". Limita su uso a un módulo administrativo concreto y añade un chequeo en la CI (un simple *grep* del repositorio) que obligue a justificar cada aparición nueva en revisión de código.
+- **Con RLS, bloquea también la escritura** — un `FILTER PREDICATE` (como el del ejemplo) solo oculta filas al *leer*; sin un `BLOCK PREDICATE`, una consulta con bug aún puede insertar o actualizar filas con el `TenantId` de otro cliente. La política completa lleva ambos; es el detalle que casi todo el mundo descubre tarde.
+- **`TenantId` primero en los índices** — todas tus consultas llevan el filtro por tenant, explícito o inyectado; si los índices no empiezan por `TenantId`, el motor recorre filas de todos los clientes para quedarse con las de uno. Es el motivo nº 1 de "la app iba bien con 10 tenants y se arrastra con 500".
+
 ---
 
 *En resumen: aislar por fila es marcar cada dato con su dueño y poner un guardia automático —en el ORM y en la base de datos— que tape lo que no es tuyo, para que el aislamiento no dependa de recordar un `WHERE`.*

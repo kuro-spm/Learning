@@ -74,6 +74,14 @@ Un patrón habitual es el **modelo híbrido**: la mayoría de tenants en base co
 - **La compartida no aísla por sí sola** — sin un filtro automático por `TenantId`, los datos se mezclan a la primera.
 - **Cambiar de estrategia más tarde no es trivial** — migrar de base compartida a base por tenant (o al revés) es un proyecto en sí mismo; conviene decidir pronto.
 
+## Buenas prácticas avanzadas
+
+- **Diseña para el híbrido aunque empieces con una sola estrategia** — esconde la decisión detrás de una abstracción que, dado un tenant, devuelva su ubicación (cadena de conexión, esquema o nada si es compartida). Si la estrategia está cableada por todo el código, el día que un cliente *enterprise* exija base dedicada tendrás una reescritura; si está abstraída, es un cambio de configuración por tenant.
+- **Con *database-per-tenant*, vigila los pools de conexiones** — cada cadena de conexión distinta crea su propio pool en la aplicación. Con cientos de tenants activos, la suma de pools puede agotar el máximo de conexiones del servidor de base de datos sin que ninguna consulta sea culpable. Ajusta el tamaño máximo por pool a la baja y valora un *pooler* externo (PgBouncer en PostgreSQL) desde antes de necesitarlo.
+- **En *shared schema*, el `TenantId` va el primero en los índices** — como toda consulta filtra por tenant, un índice `(TenantId, CreatedAt)` deja al motor saltar directo a las filas del tenant; uno que empiece por `CreatedAt` le obliga a rastrear filas de todos los clientes. Revisa los planes de ejecución con datos de *muchos* tenants: con pocos, cualquier índice parece funcionar.
+- **El coste oculto de *schema-per-tenant* es el tooling** — sobre el papel es el punto medio ideal, pero migraciones, ORMs y herramientas de BI asumen un esquema fijo, y miles de schemas hinchan el catálogo del motor y disparan los tiempos de migración. Suele ser la opción más cara operativamente pese a parecer la intermedia; elígela solo si tu equipo puede mantener el tooling a medida que exige.
+- **La elección también es legal y comercial** — hay clientes que exigen sus datos en una región concreta (*data residency*, GDPR) o auditar "su" base de datos. Solo el aislamiento físico permite mapear tenant → región o entregar copias por cliente. Pregunta a negocio qué contratos se esperan *antes* de elegir: es más barato que descubrirlo con el primer cliente grande en la mesa.
+
 ---
 
 *En resumen: aislar tenants es elegir dónde poner la pared —entre bases de datos, entre esquemas o entre filas— sabiendo que más aislamiento cuesta más dinero y más trabajo.*

@@ -58,6 +58,14 @@ El mayor riesgo de una app multi-tenant es la **fuga de datos entre tenants** (q
 - **No garantiza el aislamiento por sí sola** — el aislamiento lo consigues tú con el diseño; un descuido y los datos se mezclan.
 - **No resuelve la personalización por cliente** — que cada tenant tenga su logo o su configuración es un problema aparte (ver [Retos Avanzados](Retos-Avanzados.md)).
 
+## Buenas prácticas avanzadas
+
+- **Modela el tenant desde el primer día, aunque solo tengas un cliente** — convertir en multi-tenant una aplicación que nació single-tenant es un proyecto de meses: hay que tocar cada tabla, cada consulta y cada caché. Si existe la más mínima posibilidad de un segundo cliente, mete el `TenantId` en el modelo desde el principio; con un solo tenant apenas cuesta nada y te ahorra la reescritura.
+- **El aislamiento va mucho más allá de la base de datos** — los ficheros subidos, las colas de mensajes, los índices de búsqueda (Elasticsearch...), el correo saliente y hasta los logs también contienen datos de tenants. Audita cada almacén con la misma pregunta: "¿qué impide aquí que un tenant vea lo de otro?". Las fugas reales suelen salir por estos canales secundarios, no por la tabla principal.
+- **Nunca autorices con un `TenantId` que envía el cliente** — un endpoint que acepta `?tenantId=...` en la query o en el body y lo usa para filtrar es una fuga esperando a ocurrir: basta cambiar el valor para leer datos ajenos. El tenant válido es siempre el resuelto por el servidor (token firmado, contexto de la petición); cualquier ID que llegue del cliente se contrasta contra él, jamás se usa directamente.
+- **Prueba siempre con dos tenants como mínimo** — una suite de tests con un único tenant no puede detectar fugas: todo lo que devuelva será "correcto" por definición. Crea datos para dos tenants (Acme y Globex) en los tests de integración y comprueba explícitamente que las consultas de uno no devuelven filas del otro y que acceder por ID a un recurso ajeno responde 404.
+- **Decide pronto la relación usuario–tenant** — modelar el usuario con un único `TenantId` es el error de diseño más común: tarde o temprano un consultor externo o un empleado de dos filiales necesitará pertenecer a varias organizaciones con el mismo email. Plantéate desde el inicio si la relación es 1‑a‑1 o muchos‑a‑muchos (tabla de pertenencia con rol por tenant); cambiarlo después arrastra a la autenticación entera.
+
 ---
 
 *En resumen: multi-tenancy es servir a muchos clientes desde una sola aplicación, dándole a cada uno su propio compartimento estanco de datos.*

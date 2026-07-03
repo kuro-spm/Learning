@@ -81,6 +81,13 @@ app.Use(async (context, next) =>
 - **No confíes en datos que el cliente controla** — un subdominio o una cabecera son manipulables; cruza siempre la identidad del tenant con lo que diga el token autenticado.
 - **No debe hacerse a mitad del flujo** — si lo resuelves tarde, parte del código ya habrá corrido "sin tenant"; resuélvelo al principio.
 
+## Buenas prácticas avanzadas
+
+- **Reserva los subdominios peligrosos antes de abrir el registro** — si cualquier cliente puede elegir su subdominio, alguien acabará registrando `www`, `api`, `admin`, `mail` o `staging`, chocando con tu infraestructura o habilitando *phishing* ("entra en `admin.miapp.com`..."). Mantén una lista de nombres reservados y valídala en el alta; añadirla después, con tenants ya registrados, es mucho más incómodo.
+- **Cachea la resolución, pero con caducidad corta e invalidación al desactivar** — resolver subdominio → tenant contra la base de datos en cada petición no escala, así que la caché es obligatoria; el peligro es el otro lado: un tenant suspendido por impago (o comprometido) debe dejar de resolver *ya*, no cuando expire la caché. Usa un TTL de segundos o invalida la entrada en el momento de desactivarlo.
+- **Si un usuario puede pertenecer a varios tenants, el cambio de organización pasa por reemitir el token** — el `tenant_id` viaja firmado en el JWT, así que "cambiar de organización" no puede ser un parámetro extra que se manda junto al token viejo (sería falsificable). Diseña el selector de organización como una reemisión: el usuario elige tenant y el servidor emite un token nuevo con el claim correcto.
+- **Detrás de un proxy, no te fíes del `Host` a ciegas** — la resolución por subdominio depende de la cabecera `Host` (o `X-Forwarded-Host`), y un proxy inverso mal configurado permite al cliente inyectarlas. Configura el proxy para que las fije él y la aplicación para aceptar solo los dominios esperados; si no, la "identidad" del tenant descansa en una cabecera manipulable.
+
 ---
 
 *En resumen: identificar el tenant es la recepción de la aplicación —decide de quién es cada petición antes de dejarla pasar—, y lo más fiable es leerlo del token firmado, no de lo que el cliente diga.*
