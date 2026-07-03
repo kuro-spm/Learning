@@ -53,6 +53,13 @@ Puedes configurar que **todo** tu tráfico de internet pase por la VPN (más pri
 - **No sustituye a las contraseñas** — abre la puerta a la red, pero cada servicio interno sigue pidiendo su propio usuario y contraseña.
 - **No acelera tu conexión** — al cifrar y dar un rodeo, puede incluso ralentizarla un poco; su objetivo es la seguridad y el acceso, no la velocidad.
 
+## Buenas prácticas avanzadas
+
+- **Evita que las redes se solapen** — el fallo clásico: tu casa usa `192.168.1.x` y la oficina también, así que al conectar la VPN tu equipo no sabe si `192.168.1.50` está a tu lado o al otro lado del túnel, y las conexiones fallan de forma intermitente. Quien monta un servidor VPN elige a propósito un rango poco común para la red interna (p. ej. `10.83.24.0/24`), precisamente para no chocar con las redes domésticas típicas.
+- **El DNS forma parte del túnel** — si conectas la VPN pero sigues usando el DNS de tu casa, los nombres internos (`nas-oficina`, `intranet`) no resolverán aunque el túnel funcione y las IPs respondan. La configuración de la VPN debe empujar también el servidor DNS interno; cuando "la VPN va pero no encuentro nada por nombre", este es el sospechoso número uno.
+- **La VPN te mete en la red, pero no debería darte toda la red** — un portátil doméstico comprometido conectado a una VPN con acceso total es una autopista hacia dentro. En una configuración cuidada, cada perfil de VPN solo alcanza las IPs y puertos que necesita: quien administra los servidores llega a los servidores, no a las carpetas de contabilidad.
+- **WireGuard es la opción moderna por algo más que la velocidad** — su servidor no responde nada en absoluto a paquetes no autenticados, así que un escáner de internet ni siquiera detecta que hay una VPN escuchando; y su configuración cabe en veinte líneas, lo que deja mucho menos margen de error que un OpenVPN mal afinado.
+
 ---
 
 *En resumen: una VPN te mete dentro de una red remota a través de un túnel cifrado, para usar sus recursos con seguridad como si estuvieras físicamente allí.*

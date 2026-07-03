@@ -68,4 +68,11 @@ A veces puedes usar el **nombre** del equipo en vez de su IP (`miservidor`, `nas
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Que el ping falle no significa que el equipo esté caído** — muchos cortafuegos bloquean el ping pero dejan pasar los servicios. La prueba fiable es contra el puerto concreto: `Test-NetConnection 192.168.1.50 -Port 3389` en Windows, o `nc -zv 192.168.1.50 22` en Linux.
+- **Reserva las IPs en el router, no en el equipo** — para que un equipo tenga siempre la misma IP, mejor que configurarla a mano en el propio equipo es crear una *reserva DHCP* en el router (asociando su dirección MAC a una IP concreta). Así toda la asignación vive en un único sitio y evitas el clásico conflicto de dos equipos peleándose por la misma dirección.
+
+---
+
 *En resumen: una IP es la dirección de un equipo en la red y el puerto el servicio concreto dentro de él; toda conexión empieza por saber a qué IP y a qué puerto vas.*

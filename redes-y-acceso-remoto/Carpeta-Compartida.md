@@ -58,6 +58,13 @@ SMB usa el puerto **445**. Es un dato útil cuando algo no conecta y hay que rev
 - **No es seguro exponerlo a internet** — SMB está pensado para la red local; para acceder desde fuera se hace a través de una [VPN](VPN.md).
 - **No controla versiones** — si alguien sobrescribe un archivo, no hay historial salvo que lo aporte una copia de seguridad aparte.
 
+## Buenas prácticas avanzadas
+
+- **Hay dos capas de permisos, y gana la más restrictiva** — en Windows, una carpeta compartida combina los permisos *del recurso compartido* con los permisos NTFS *del sistema de archivos*. El patrón profesional es dar al recurso compartido permisos amplios (p. ej. "Usuarios autenticados: control total") y afinar el acceso real solo con NTFS: así los permisos se gestionan en un único sitio y desaparecen los bloqueos misteriosos por capas contradictorias.
+- **Desactiva SMBv1 y plantéate el cifrado de SMB3** — SMBv1 es el protocolo por el que se propagó WannaCry y aún sigue habilitado en equipos antiguos; comprueba que está fuera con `Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol`. En SMB3 puedes además activar cifrado por recurso compartido, interesante cuando por la red viajan datos sensibles.
+- **Un `$` al final oculta el recurso** — `\\servidor\backups$` no aparece al explorar el servidor: solo entra quien conoce la ruta exacta. Windows crea además recursos administrativos ocultos (`C$`, `ADMIN$`) para cada disco; saber que existen explica más de un hallazgo en revisiones de seguridad.
+- **Windows solo admite un juego de credenciales por servidor** — si ya tienes una conexión abierta como `juan` e intentas entrar en otra carpeta del mismo servidor como `admin`, obtendrás un error confuso de "múltiples conexiones". La salida: cerrar las conexiones con `net use \\servidor /delete`, o conectar por IP en vez de por nombre para que Windows lo trate como otro servidor.
+
 ---
 
 *En resumen: una carpeta compartida pone archivos en un punto común de la red para que varios equipos trabajen sobre ellos sin copias sueltas ni pendrives.*

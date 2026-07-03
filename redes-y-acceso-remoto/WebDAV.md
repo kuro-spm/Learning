@@ -50,4 +50,11 @@ WebDAV puede ir por HTTP (sin cifrar) o por **HTTPS** (cifrado). Igual que en cu
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **El cliente integrado de Windows tiene trampas conocidas** — el mapeo WebDAV del explorador depende del servicio *WebClient*, rechaza a propósito la autenticación básica sobre HTTP (otro motivo para el HTTPS) y corta las descargas grandes por un límite del registro (`FileSizeLimitInBytes`, 50 MB por defecto). Cuando "Windows no monta la unidad", el problema suele ser uno de estos tres, no el servidor.
+- **Para trabajo serio, usa un cliente dedicado** — herramientas como Cyberduck, WinSCP o `rclone` rinden mucho mejor que el explorador contra WebDAV; en particular, `rclone sync` y `rclone mount` son el estándar de facto para sincronizar o montar un Nextcloud desde cualquier sistema operativo.
+
+---
+
 *En resumen: WebDAV es la carpeta compartida que viaja por la web — monta archivos remotos como una unidad de tu equipo usando el mismo protocolo (y la misma seguridad) que tu navegador.*

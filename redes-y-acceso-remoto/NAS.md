@@ -49,6 +49,13 @@ Como un servidor, distingue usuarios: cada persona entra con su cuenta y ve solo
 - **No es magia infinita** — tiene una capacidad limitada por sus discos; cuando se llena, hay que ampliar o liberar espacio.
 - **No es seguro abrirlo a internet sin cuidado** — exponer un NAS al exterior sin protección es un riesgo; el acceso remoto debe configurarse con cabeza (contraseñas fuertes, [VPN](VPN.md)...).
 
+## Buenas prácticas avanzadas
+
+- **Activa los snapshots: son tu seguro contra el ransomware** — una copia de seguridad guardada en una carpeta a la que el equipo infectado puede escribir también acaba cifrada. Los *snapshots* (instantáneas de solo lectura que el propio NAS toma cada pocas horas) no son alcanzables desde los equipos, así que puedes volver al estado de ayer aunque un ransomware haya arrasado la carpeta compartida.
+- **Retira la cuenta `admin` de fábrica y no publiques el panel** — los NAS son objetivo predilecto de campañas automatizadas que prueban credenciales por defecto y fallos del panel web. Crea tu propio usuario administrador con otro nombre, activa la verificación en dos pasos, mantén el firmware al día y, para el acceso desde fuera, prefiere una [VPN](VPN.md) antes que una [redirección de puertos](Redireccion-de-Puertos.md) hacia el panel.
+- **Programa el mantenimiento de los discos** — el RAID solo te salva si detectas el primer disco averiado antes de que falle el segundo. Activa los tests **S.M.A.R.T.** periódicos y el *scrubbing* (verificación de datos) mensual, y configura avisos por correo: un RAID degradado en silencio durante meses es la forma clásica de perderlo todo.
+- **Conéctalo a un SAI** — un corte de luz a mitad de escritura puede corromper el sistema de archivos o el RAID. Casi todos los NAS saben hablar con un SAI por USB para apagarse de forma ordenada cuando queda poca batería: es el accesorio menos glamuroso y el que más disgustos evita.
+
 ---
 
 *En resumen: un NAS es un disco duro dedicado y siempre encendido que vive en la red para que todos tus equipos guarden y compartan archivos en un único sitio seguro.*

@@ -66,6 +66,23 @@ ssh usuario@192.168.1.50 "df -h"    # ejecuta el comando y devuelve el resultado
 - **No funciona si el servidor no tiene SSH activado** — el equipo destino debe ejecutar un servicio SSH escuchando.
 - **No protege de contraseñas débiles** — el canal es seguro, pero una contraseña fácil sigue siendo un agujero; por eso se recomiendan las claves.
 
+## Buenas prácticas avanzadas
+
+- **Usa `~/.ssh/config` en vez de memorizar comandos** — puedes definir un alias por servidor con todos sus parámetros y conectarte simplemente con `ssh nas`:
+
+  ```text
+  Host nas
+      HostName 192.168.1.50
+      User juan
+      Port 2222
+      IdentityFile ~/.ssh/id_ed25519
+  ```
+
+- **Verifica la huella del servidor la primera vez** — ese aviso de *fingerprint* que casi todo el mundo acepta sin mirar es la única defensa contra un impostor interpuesto (*man-in-the-middle*): compárala con la real, que te puede dar el administrador o puedes ver en el propio servidor con `ssh-keygen -lf`. Y si un día SSH avisa de que la clave del host **ha cambiado**, no borres la línea de `known_hosts` por reflejo: averigua antes si fue una reinstalación legítima o una suplantación.
+- **Una vez con claves, cierra la puerta a las contraseñas** — instala tu clave pública y desactiva en el servidor `PasswordAuthentication` (y `PermitRootLogin`) en `/etc/ssh/sshd_config`. Un servidor SSH que solo acepta claves convierte la fuerza bruta en inútil, por débiles que sean las contraseñas de sus usuarios.
+- **Cuidado con `ForwardAgent`** — reenviar tu agente de claves es cómodo para saltar de un servidor a otro, pero cualquiera con root en la máquina intermedia puede usar tus claves mientras estés conectado. Actívalo solo hacia servidores de máxima confianza, nunca como opción global.
+- **Los túneles son la navaja suiza de SSH** — con `-L` conviertes un servicio remoto no expuesto en uno local: `ssh -L 8080:localhost:80 usuario@servidor` te deja abrir en `http://localhost:8080` la web interna del servidor. Quien domina SSH resuelve así medio catálogo de problemas de acceso sin abrir un solo puerto nuevo.
+
 ---
 
 *En resumen: SSH es la puerta segura por la que entras a la terminal de otro equipo para darle órdenes sin que nadie pueda espiar la conexión.*

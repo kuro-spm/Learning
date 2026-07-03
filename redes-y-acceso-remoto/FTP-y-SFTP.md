@@ -56,4 +56,12 @@ Mismo manejo que FTP, pero cifrado. Salvo que un sistema antiguo te obligue a us
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Si FTP conecta pero el listado se queda colgado, es el modo activo** — FTP usa dos conexiones (una de órdenes y otra de datos) y en modo *activo* es el servidor quien intenta conectar de vuelta hacia ti, cosa que tu cortafuegos o el NAT del router suelen bloquear. Cambiar el cliente a modo **pasivo** (la opción "passive mode" de FileZilla) resuelve la gran mayoría de estos cuelgues.
+- **SFTP y FTPS no son lo mismo** — SFTP viaja dentro de SSH (puerto 22); FTPS es el FTP clásico con TLS por encima (puertos 21/990) y arrastra la complejidad de las dos conexiones. Al contratar un hosting o abrir puertos en un cortafuegos, confundirlos cuesta horas de depuración: comprueba siempre cuál de los dos te están ofreciendo.
+- **Enjaula a los usuarios de SFTP en su carpeta** — por defecto, un usuario de SFTP puede pasearse por todo el sistema de archivos que sus permisos le dejen ver. En el servidor, la directiva `ChrootDirectory` (junto a `ForceCommand internal-sftp` en `sshd_config`) lo limita a su directorio: imprescindible cuando das acceso a terceros para que suban archivos.
+
+---
+
 *En resumen: FTP/SFTP es la ventanilla de subida y bajada de archivos contra un servidor — y entre los dos, SFTP es el que va cifrado y deberías preferir.*

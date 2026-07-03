@@ -55,4 +55,11 @@ Muchas son gratis para uso personal pero de pago para empresas. Conviene revisar
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Tu cuenta del servicio es la llave maestra: protégela con 2FA** — si configuras *acceso desatendido* a tus equipos, quien entre en tu cuenta de TeamViewer o AnyDesk entra en todos ellos a la vez. Activa la verificación en dos pasos en la cuenta y usa una contraseña de acceso desatendido distinta por equipo, nunca la misma reciclada.
+- **Activa la lista blanca de IDs** — casi todas estas herramientas permiten restringir las conexiones entrantes a una lista de IDs o cuentas concretas. Con eso, la contraseña deja de ser la única barrera: aunque alguien la consiga, su ID no está autorizado. Y échale un ojo de vez en cuando al registro de conexiones entrantes que guarda la propia aplicación: ahí se ve quién ha entrado y cuándo.
+
+---
+
 *En resumen: TeamViewer, AnyDesk y similares son el control remoto "sin configuración", que conecta dos equipos por internet a través de un servidor puente a cambio de algo de privacidad y dependencia de un tercero.*

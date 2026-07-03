@@ -48,4 +48,12 @@ VNC por sí solo manda la imagen sin cifrar fuerte. Lo habitual es protegerlo me
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **Ata el servidor VNC a `localhost` y entra por túnel SSH** — la configuración experta no expone el 5900 ni siquiera en la red local: el servidor solo escucha en `localhost` y el túnel se crea al conectar, `ssh -L 5900:localhost:5900 usuario@equipo`; en el visor abres `localhost:5900`. Conexión cifrada y ningún puerto VNC a la vista.
+- **La contraseña "de VNC" clásica no es una contraseña de verdad** — el protocolo tradicional la trunca a 8 caracteres y la protege con un cifrado (DES) trivial de romper. Trátala como un simple pestillo y pon la seguridad real en el túnel SSH/VPN o en una implementación moderna con autenticación propia.
+- **Los puertos van por "displays"** — en Linux, cada sesión VNC es un *display*: `:1` escucha en el puerto 5901, `:2` en el 5902... Cuando el visor no conecta "al 5900", casi siempre es que el servidor está sirviendo el display `:1` y hay que apuntar al 5901.
+
+---
+
 *En resumen: VNC es el "escritorio remoto universal" que conecta cualquier sistema operativo con cualquier otro compartiendo la pantalla real del equipo.*
