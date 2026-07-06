@@ -14,3 +14,9 @@ Cómo se describe un pipeline y qué herramientas y técnicas llevan el código 
 
 ### [Docker](docker/README.md)
 Cómo funciona la contenedorización y cómo escribir y entender un `Dockerfile`.
+
+### [Observabilidad](observabilidad/README.md)
+Los tres pilares para entender qué pasa dentro de un sistema en producción: logs, métricas y trazas, y el estándar (OpenTelemetry) que los unifica.
+
+### [Mensajería asíncrona](mensajeria-asincrona/README.md)
+Cómo desacoplar servicios con colas y eventos en vez de llamadas directas, con RabbitMQ y Azure Service Bus como piezas concretas.
