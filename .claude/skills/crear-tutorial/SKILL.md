@@ -16,6 +16,8 @@ Esta skill genera **colecciones de guías de tecnología** replicando una metodo
 
 Los tutoriales son **autónomos y genéricos**: cualquier persona debe poder leerlos sin conocer ningún proyecto concreto. Explican la tecnología en sí (qué es, por qué existe, cómo se usa), no cómo se aplica en un código privado.
 
+> **Autorización permanente de commit y push.** La usuaria ha autorizado de antemano, como parte de esta skill, que al terminar y verificar un trabajo se haga `git add` + `git commit` + `git push` sin pedir confirmación adicional (ver «Flujo de trabajo», paso 7). Esta autorización cubre específicamente el contenido creado por esta skill; no autoriza a subir cambios ajenos que estuvieran ya presentes en el working tree antes de empezar la tarea (esos se dejan tal cual, sin stagear).
+
 ## Dónde se crea el contenido
 
 El proyecto agrupa las colecciones de tutoriales en **carpetas de categoría** en la raíz. Cada tema vive dentro de la categoría a la que pertenece:
@@ -175,13 +177,13 @@ Cuando se pida crear uno o varios tutoriales:
 4. **Escribe las fichas** respetando el formato, con ejemplos genéricos y autónomos.
 5. **Crea o actualiza el `README.md`-índice** de la carpeta: añade cada ficha a la tabla de orden de lectura (en su posición temática, renumerando `#` si hace falta) y, si procede, al índice colapsable. Si el tema es nuevo, enlázalo también desde el `README.md` de su categoría y, si la categoría es nueva, desde el `README.md` raíz.
 6. **Verifica los enlaces.** Toda ruta relativa debe resolver (nombre de archivo exacto, mayúsculas incluidas). Ten en cuenta la profundidad: un enlace a un tema de otra categoría necesita `../../`, no `../`.
-7. **Haz commit y push si la sesión ha sido satisfactoria.** Cuando el trabajo esté terminado y verificado (todas las fichas creadas, el índice actualizado y los enlaces comprobados), haz `git add` de lo nuevo, un `git commit` con un mensaje descriptivo en español (p. ej. `Añade guía de <tema>`) y un `git push`. Si algo quedó incompleto, falló o la usuaria no está conforme, **no** hagas commit ni push: deja los cambios en el working tree y coméntalo.
+7. **Haz commit y push directamente, sin pedir confirmación, si la sesión ha sido satisfactoria.** Cuando el trabajo esté terminado y verificado (todas las fichas creadas, el índice actualizado y los enlaces comprobados), haz `git add` **solo de los ficheros y carpetas que ha tocado esta skill** (nunca `git add -A` ni `git add .`, para no arrastrar cambios ajenos que ya estuvieran en el working tree), un `git commit` con un mensaje descriptivo en español (p. ej. `Añade guía de <tema>`) y un `git push`. Esta es una instrucción permanente de la usuaria: no hace falta preguntar "¿hago commit y push?" cada vez, el paso 7 ya lo autoriza. Si algo quedó incompleto, falló, la usuaria no está conforme, o el trabajo se hizo en varios subagentes en paralelo y conviene una revisión de conjunto antes de subir, **no** hagas commit ni push: deja los cambios en el working tree y coméntalo explicando por qué.
 
 ## Checklist final
 
 Antes de dar por terminado:
 
-- [ ] El contenido está en una carpeta de tema dentro de la categoría que le corresponde (no dentro de `technologies/`, salvo petición explícita).
+- [ ] El contenido está en una carpeta de tema dentro de la categoría que le corresponde.
 - [ ] Cada ficha está en español, dirigida a un perfil fullstack junior-medio: sin explicar fundamentos de programación, pero definiendo los términos propios de la tecnología.
 - [ ] Es autónoma: se entiende sin conocer ningún proyecto concreto (sin módulos ni dominios privados).
 - [ ] El género usado para el lector es coherente en toda la colección.
@@ -190,4 +192,4 @@ Antes de dar por terminado:
 - [ ] El código de ejemplo usa nombres genéricos y reconocibles, no `foo`/`bar` ni nombres de un proyecto privado.
 - [ ] Cada ficha cierra con `---` y la frase `*En resumen: ...*`.
 - [ ] La carpeta tiene un `README.md`-índice con enlaces a todas las fichas, y todos los enlaces funcionan.
-- [ ] Si la sesión ha sido satisfactoria, se ha hecho `commit` y `push` de los cambios (y, si no lo ha sido, los cambios se han dejado sin subir y se ha avisado).
+- [ ] Si la sesión ha sido satisfactoria, se ha hecho `commit` y `push` de los cambios **sin pedir confirmación previa** (staging selectivo, solo lo tocado por esta skill), y si no lo ha sido, los cambios se han dejado sin subir y se ha avisado explicando por qué.
