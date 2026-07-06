@@ -18,36 +18,40 @@ Los tutoriales son **autónomos y genéricos**: cualquier persona debe poder lee
 
 ## Dónde se crea el contenido
 
-**La skill crea una carpeta nueva en la raíz del proyecto** (el directorio de trabajo desde donde se invoca, p. ej. `C:\Users\Usuario\Learning`). Esa carpeta es el contenedor de la colección:
+El proyecto agrupa las colecciones de tutoriales en **carpetas de categoría** en la raíz. Cada tema vive dentro de la categoría a la que pertenece:
 
 ```
 <raíz>/
-└── <tema>/                 ← carpeta nueva (kebab-case: "git-basico", "docker", "patrones-async")
-    ├── README.md           ← índice: orden de lectura + enlaces a cada ficha
-    └── <Concepto>.md       ← una ficha por tecnología o concepto
+└── <categoria>/             ← carpeta de categoría existente (kebab-case: "devops", "seguridad"...)
+    └── <tema>/               ← carpeta nueva (kebab-case: "git-basico", "docker", "patrones-async")
+        ├── README.md         ← índice: orden de lectura + enlaces a cada ficha
+        └── <Concepto>.md     ← una ficha por tecnología o concepto
 ```
 
-- El nombre de la carpeta describe el tema en kebab-case. Si no está claro, **pregúntalo**.
-- Si la colección es grande y conviene agrupar, puedes crear subcarpetas temáticas, cada una con su propio `README.md` índice (igual que hace `technologies/` con `backend/`, `frontend/`...).
-- **No** asumas que hay que escribir dentro de `technologies/`. Esa carpeta es solo un **ejemplo de referencia** (ver abajo), no el destino por defecto. Solo escribe ahí si la usuaria lo pide explícitamente.
+Categorías existentes: `arquitectura-de-software/`, `desarrollo-web/`, `lenguajes/`, `bases-de-datos/`, `testing/`, `devops/`, `seguridad/`, `redes/`, `herramientas/`.
+
+- Antes de crear la carpeta del tema, **decide en qué categoría encaja** mirando las categorías existentes (y las colecciones que ya contienen, para calibrar). Si el tema encaja en varias o en ninguna, **pregúntalo** a la usuaria en vez de asumir.
+- Si el tema justifica una categoría nueva, créala igual que las demás (kebab-case) y añádele su propio `README.md` índice.
+- El nombre de la carpeta del tema describe el tema en kebab-case. Si no está claro, **pregúntalo**.
+- Si la colección de un tema es grande y conviene agrupar sus propias fichas, puedes crear subcarpetas dentro de ella, cada una con su propio `README.md` índice.
+- Tras crear o mover una carpeta de tema, actualiza el `README.md` de su categoría (añade el enlace) y el `README.md` raíz si la categoría es nueva.
+- Si te piden documentar el stack de un proyecto concreto (no un tutorial genérico), **pregunta primero** dónde debe vivir: por defecto no tiene cabida en este repositorio de tutoriales autónomos (ver principio 4).
 
 ## Antes de escribir nada
 
-Lee 2-3 documentos de `technologies/` para calibrar **estructura y tono** (no su contenido). Son la referencia de formato por encima de esta skill si hay discrepancias, **con una excepción**: la sección «Buenas prácticas avanzadas» es una incorporación posterior y las fichas antiguas no la tienen; inclúyela igualmente en las fichas nuevas.
+Lee 2-3 documentos ya existentes en el repositorio para calibrar **estructura y tono** (no su contenido). Son la referencia de formato por encima de esta skill si hay discrepancias, **con una excepción**: la sección «Buenas prácticas avanzadas» es una incorporación posterior y algunas fichas antiguas no la tienen; inclúyela igualmente en las fichas nuevas.
 
-- `technologies/backend/Dapper.md` — ejemplo de **ficha completa**.
-- `technologies/frontend/clsx.md` — ejemplo de **ficha compacta**.
-- `technologies/frontend/README.md` — ejemplo de **README-índice**.
-
-> Fíjate en el patrón, no en el texto. Algunas fichas de `technologies/` mencionan un proyecto concreto; las tuyas no deben hacerlo (ver principio 4).
+- `bases-de-datos/acceso-a-datos-dotnet/Dapper.md` — ejemplo de **ficha completa**.
+- `desarrollo-web/frontend-react/clsx.md` — ejemplo de **ficha compacta**.
+- `desarrollo-web/frontend-react/README.md` — ejemplo de **README-índice**.
 
 ## Principios fundamentales
 
 Estos pilares no se negocian:
 
 1. **Idioma: español.** La prosa va en español. Nombres de tecnologías, comandos, código y términos técnicos consolidados (*proxy*, *bundler*, *change tracking*) se mantienen en su idioma original.
-2. **Audiencia: perfil fullstack junior-medio.** El lector programa a diario y conoce los fundamentos de ambos lados del stack (HTTP, APIs REST, bases de datos, componentes de UI, npm/NuGet, Git...), pero puede ser nuevo en la tecnología concreta que documentas. No le expliques qué es una API o un bucle; sí define los términos propios de la tecnología antes de usarlos y no des por sabidos sus detalles internos.
-3. **Analogías y lenguaje claro.** Explica cada concepto nuevo anclándolo a algo que el lector ya domina. Con este perfil, las comparaciones con tecnologías fullstack comunes (SQL, React, fetch, middleware, Docker...) pueden ir en el cuerpo del texto como explicación principal; reserva el blockquote opcional (`> Si ya conoces X, piensa en Y como...`) para analogías con tecnologías menos universales, que nunca deben ser requisito para entender el texto.
+2. **Audiencia: perfil backend junior-medio.** El lector programa a diario y puede conocer algunas partes del stack(HTTP, APIs REST, bases de datos, componentes de UI, npm/NuGet, Git...), pero puede ser nuevo en la tecnología concreta que documentas. No le expliques qué es una API o un bucle; sí define los términos propios de la tecnología antes de usarlos y no des por sabidos sus detalles internos.
+3. **Analogías y lenguaje claro.** Explica cada concepto nuevo anclándolo a algo que el lector ya domina. Con este perfil, las comparaciones con tecnologías fullstack comunes (SQL, C#, java, html, css, Docker...) pueden ir en el cuerpo del texto como explicación principal; reserva el blockquote opcional (`> Si ya conoces X, piensa en Y como...`) para analogías con tecnologías menos universales, que nunca deben ser requisito para entender el texto.
 4. **Tutoriales autónomos, no atados a ningún proyecto.** El lector puede ser cualquiera, sin acceso a un código concreto. No menciones proyectos, módulos ni dominios privados. Para ilustrar "para qué se usa", emplea escenarios genéricos y reconocibles (una tienda online, un blog, una app de tareas, un formulario de registro...). La guía debe seguir teniendo sentido fuera de cualquier repositorio.
 5. **Brevedad introductoria.** Son guías de *introducción*, no documentación exhaustiva. El lector debe poder leerlas en pocos minutos y quedarse con "lo mínimo para no perderse". La única sección que mira más allá de la introducción es «Buenas prácticas avanzadas», y aun así debe ser concisa: pocos puntos, muy escogidos.
 6. **Género del lector: libre pero coherente.** Puedes dirigirte al lector en femenino, masculino o neutro. Elige uno y mantenlo coherente dentro de cada colección.
@@ -117,6 +121,11 @@ en producción.
 - **<Práctica>** — en qué consiste, por qué la aplican los mejores y qué pasa si no.
 - **<Error sutil a evitar>** — por qué es fácil caer en él y cómo detectarlo.
 
+## Recursos didácticos divertidos
+
+Recursos para que el usuario pueda interactuar de manera divertida, si existen. Por ejemplo: para explicar los códigos de error HTTP, mencionar https://http.cat/.
+
+
 ---
 
 *En resumen: <una frase memorable que capture la esencia de la tecnología>.*
@@ -161,18 +170,18 @@ El `README.md` de la carpeta hace de índice. Modelo: `technologies/frontend/REA
 Cuando se pida crear uno o varios tutoriales:
 
 1. **Lee los ejemplos** de `technologies/` para calibrar formato y tono.
-2. **Determina el tema y crea la carpeta** en la raíz del proyecto (kebab-case). Si el nombre o el alcance no están claros, pregunta.
+2. **Determina la categoría y el tema, y crea la carpeta** dentro de la categoría correspondiente (kebab-case). Si la categoría, el nombre o el alcance no están claros, pregunta.
 3. **Elige la variante** de cada ficha (completa o compacta) según su importancia.
 4. **Escribe las fichas** respetando el formato, con ejemplos genéricos y autónomos.
-5. **Crea o actualiza el `README.md`-índice** de la carpeta: añade cada ficha a la tabla de orden de lectura (en su posición temática, renumerando `#` si hace falta) y, si procede, al índice colapsable.
-6. **Verifica los enlaces.** Toda ruta relativa debe resolver (nombre de archivo exacto, mayúsculas incluidas).
+5. **Crea o actualiza el `README.md`-índice** de la carpeta: añade cada ficha a la tabla de orden de lectura (en su posición temática, renumerando `#` si hace falta) y, si procede, al índice colapsable. Si el tema es nuevo, enlázalo también desde el `README.md` de su categoría y, si la categoría es nueva, desde el `README.md` raíz.
+6. **Verifica los enlaces.** Toda ruta relativa debe resolver (nombre de archivo exacto, mayúsculas incluidas). Ten en cuenta la profundidad: un enlace a un tema de otra categoría necesita `../../`, no `../`.
 7. **Haz commit y push si la sesión ha sido satisfactoria.** Cuando el trabajo esté terminado y verificado (todas las fichas creadas, el índice actualizado y los enlaces comprobados), haz `git add` de lo nuevo, un `git commit` con un mensaje descriptivo en español (p. ej. `Añade guía de <tema>`) y un `git push`. Si algo quedó incompleto, falló o la usuaria no está conforme, **no** hagas commit ni push: deja los cambios en el working tree y coméntalo.
 
 ## Checklist final
 
 Antes de dar por terminado:
 
-- [ ] El contenido está en una carpeta nueva en la raíz del proyecto (no dentro de `technologies/`, salvo petición explícita).
+- [ ] El contenido está en una carpeta de tema dentro de la categoría que le corresponde (no dentro de `technologies/`, salvo petición explícita).
 - [ ] Cada ficha está en español, dirigida a un perfil fullstack junior-medio: sin explicar fundamentos de programación, pero definiendo los términos propios de la tecnología.
 - [ ] Es autónoma: se entiende sin conocer ningún proyecto concreto (sin módulos ni dominios privados).
 - [ ] El género usado para el lector es coherente en toda la colección.

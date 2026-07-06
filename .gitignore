@@ -7,3 +7,6 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Información privada / específica de proyectos internos (no es tutorial genérico)
+private-information/
