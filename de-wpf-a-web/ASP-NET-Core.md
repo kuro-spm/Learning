@@ -49,6 +49,10 @@ app.MapControllers();
 app.Run(); // se queda escuchando hasta que pares el servidor
 ```
 
+> Este patrón de *builder* no es exclusivo de la web: las apps de consola y muchas
+> librerías arrancan de forma muy parecida. En [Hosts y builders en .NET](Hosts-y-Builders.md)
+> tienes la comparación.
+
 **2. Se ejecuta como un servicio de larga duración, no como una ventana**
 
 Tu app de WPF vivía mientras la ventana estuviera abierta. ASP.NET Core arranca una vez

@@ -43,7 +43,8 @@ El motor sobre el que se construye todo lo demás, con sus piezas transversales.
 |---|---|---|
 | 5 | [ASP.NET Core](ASP-NET-Core.md) | El "App" de tu aplicación web: el motor que atiende peticiones. Base de todo lo siguiente. |
 | 6 | [Inyección de dependencias](Inyeccion-de-Dependencias.md) | Cómo se organizan y entregan los servicios; viene integrada en el framework. |
-| 7 | [Routing y Middleware](Routing-y-Middleware.md) | Cómo se decide qué código atiende cada URL y qué pasos comunes atraviesa toda petición. |
+| 7 | [Hosts y builders en .NET](Hosts-y-Builders.md) | Por qué el arranque de una web y el de una app de consola se parecen tanto, y en qué se diferencian de verdad. |
+| 8 | [Routing y Middleware](Routing-y-Middleware.md) | Cómo se decide qué código atiende cada URL y qué pasos comunes atraviesa toda petición. |
 
 ### 4. Las tres formas de hacer web con C#
 
@@ -52,9 +53,9 @@ para saber cuál elegir en cada caso.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 8 | [Razor Pages y MVC](Razor-Pages-y-MVC.md) | HTML generado en el servidor; el camino más corto desde WPF. |
-| 9 | [Web API y REST](Web-API-y-REST.md) | El backend que devuelve datos (JSON) cuando la interfaz la pone otra cosa. |
-| 10 | [Blazor](Blazor.md) | Interfaces interactivas en C# con componentes y binding: el puente más cercano a WPF. |
+| 9 | [Razor Pages y MVC](Razor-Pages-y-MVC.md) | HTML generado en el servidor; el camino más corto desde WPF. |
+| 10 | [Web API y REST](Web-API-y-REST.md) | El backend que devuelve datos (JSON) cuando la interfaz la pone otra cosa. |
+| 11 | [Blazor](Blazor.md) | Interfaces interactivas en C# con componentes y binding: el puente más cercano a WPF. |
 
 ### 5. Conceptos transversales
 
@@ -62,9 +63,9 @@ Temas que cruzan todas las opciones anteriores y que conviene entender antes de 
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 11 | [Autenticación y estado web](Autenticacion-y-Estado-Web.md) | Cómo sabe la app quién eres y cómo recuerda algo, pese a que HTTP no tiene memoria. |
-| 12 | [Entity Framework Core](Entity-Framework-Core.md) | El acceso a datos: persistir en una base de datos lo que en WPF te bastaba con tener en memoria. |
-| 13 | [SignalR](SignalR.md) | Tiempo real: el servidor empuja datos al navegador, como los eventos del escritorio pero por la red. |
+| 12 | [Autenticación y estado web](Autenticacion-y-Estado-Web.md) | Cómo sabe la app quién eres y cómo recuerda algo, pese a que HTTP no tiene memoria. |
+| 13 | [Entity Framework Core](Entity-Framework-Core.md) | El acceso a datos: persistir en una base de datos lo que en WPF te bastaba con tener en memoria. |
+| 14 | [SignalR](SignalR.md) | Tiempo real: el servidor empuja datos al navegador, como los eventos del escritorio pero por la red. |
 
 ---
 
