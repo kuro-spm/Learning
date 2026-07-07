@@ -30,7 +30,7 @@ El proyecto agrupa las colecciones de tutoriales en **carpetas de categoría** e
         └── <Concepto>.md     ← una ficha por tecnología o concepto
 ```
 
-Categorías existentes: `arquitectura-de-software/`, `desarrollo-web/`, `lenguajes/`, `bases-de-datos/`, `testing/`, `devops/`, `seguridad/`, `redes/`, `herramientas/`.
+Categorías existentes: `arquitectura-de-software/`, `desarrollo-web/`, `lenguajes/`, `bases-de-datos/`, `testing/`, `devops/`, `seguridad/`, `redes/`, `herramientas/`, `ia/`.
 
 - Antes de crear la carpeta del tema, **decide en qué categoría encaja** mirando las categorías existentes (y las colecciones que ya contienen, para calibrar). Si el tema encaja en varias o en ninguna, **pregúntalo** a la usuaria en vez de asumir.
 - Si el tema justifica una categoría nueva, créala igual que las demás (kebab-case) y añádele su propio `README.md` índice.

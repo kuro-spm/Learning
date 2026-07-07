@@ -32,3 +32,6 @@ Conexiones remotas, carpetas compartidas, NAS, SSH, VPN y compañía.
 
 ### [Herramientas y sistemas](herramientas/README.md)
 Odoo y correo transaccional.
+
+### [IA](ia/README.md)
+Context engineering: cómo diseñar y gestionar todo lo que recibe un modelo de lenguaje en cada llamada.
