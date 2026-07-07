@@ -35,7 +35,8 @@ Conceptos transversales, sea cual sea el broker elegido.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 4 | [Dead Letter Queues](Dead-Letter-Queues.md) | Qué pasa cuando un mensaje no se puede procesar. Aplica a cualquiera de los brokers anteriores. |
+| 4 | [Outbox Pattern](Outbox-Pattern.md) | Cómo garantizar que un evento se publica siempre, sin quedar a medias con el dato que lo origina. |
+| 5 | [Dead Letter Queues](Dead-Letter-Queues.md) | Qué pasa cuando un mensaje no se puede procesar. Aplica a cualquiera de los brokers anteriores. |
 
 ---
 

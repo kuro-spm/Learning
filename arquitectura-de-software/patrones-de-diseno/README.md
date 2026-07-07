@@ -33,6 +33,15 @@ Patrones de propósito general que aparecen constantemente al construir el domin
 | 6 | [Factory](Factory.md) | Cómo centralizar y proteger la creación de objetos con reglas propias. |
 | 7 | [Strategy](Strategy.md) | Cómo intercambiar un algoritmo (cálculo, validación, ordenación) sin `switch` gigantes. |
 | 8 | [Decorator](Decorator.md) | Cómo añadir capacidades (caché, logging, reintentos) envolviendo un objeto sin tocar su implementación. |
+| 9 | [Mediator](Mediator.md) | Cómo desacoplar a quien pide una acción de quien la ejecuta, hablando siempre a través de un mediador. |
+
+### 3. Patrones habituales al diseñar la capa de aplicación
+
+No son patrones GoF, pero aparecen constantemente junto a los anteriores al diseñar cómo se comunican los casos de uso con el exterior.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 10 | [Result Pattern](Result-Pattern.md) | Cómo comunicar un fallo esperado del negocio como un valor de retorno, en vez de con una excepción. |
 
 ---
 

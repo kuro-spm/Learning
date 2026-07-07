@@ -11,6 +11,8 @@ Documentación introductoria del lenguaje C# y la plataforma .NET, pensada para 
 | 1 | [.NET](DotNET.md) | El runtime y la plataforma de ejecución. La base sobre la que corre todo lo demás. |
 | 2 | [C#](CSharp.md) | El lenguaje: tipos, sintaxis moderna y cómo se apoya en el runtime de .NET. |
 | 3 | [MSBuild](MSBuild.md) | El sistema de build que convierte tu código C# en un ejecutable. |
+| 4 | [NuGet](NuGet.md) | El gestor de paquetes: cómo se referencian, versionan y fijan las dependencias de un proyecto. |
+| 5 | [CancellationToken](CancellationToken.md) | Cómo se propaga de extremo a extremo la petición de cancelar una operación asíncrona. |
 
 ---
 

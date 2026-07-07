@@ -20,10 +20,11 @@ Empieza por entender la idea antes de mirar herramientas concretas.
 |---|---|---|
 | 1 | [Observabilidad](Observabilidad.md) | La idea central: qué es, en qué se diferencia del monitoring clásico y cuáles son sus tres pilares. Empieza siempre por aquí. |
 | 2 | [Logging Estructurado](Logging-Estructurado.md) | El primer pilar en detalle: tratar los logs como datos consultables en vez de texto plano. |
-| 3 | [Serilog](Serilog.md) | La librería .NET más habitual para aplicar logging estructurado en la práctica. |
-| 4 | [Métricas](Metricas.md) | El segundo pilar: contadores, gauges e histogramas para vigilar un sistema en el tiempo. |
-| 5 | [Tracing Distribuido](Tracing-Distribuido.md) | El tercer pilar: seguir una petición a través de varios servicios. |
-| 6 | [OpenTelemetry](OpenTelemetry.md) | El estándar que unifica los tres pilares y evita atarte a un proveedor concreto. Ciérralo con esto. |
+| 3 | [ILogger&lt;T&gt;](ILogger-T.md) | La abstracción de logging de .NET sobre la que se escribe ese logging estructurado en código. |
+| 4 | [Serilog](Serilog.md) | La librería .NET más habitual para aplicar logging estructurado en la práctica. |
+| 5 | [Métricas](Metricas.md) | El segundo pilar: contadores, gauges e histogramas para vigilar un sistema en el tiempo. |
+| 6 | [Tracing Distribuido](Tracing-Distribuido.md) | El tercer pilar: seguir una petición a través de varios servicios. |
+| 7 | [OpenTelemetry](OpenTelemetry.md) | El estándar que unifica los tres pilares y evita atarte a un proveedor concreto. Ciérralo con esto. |
 
 ---
 

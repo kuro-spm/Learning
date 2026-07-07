@@ -56,6 +56,7 @@ para saber cuál elegir en cada caso.
 | 9 | [Razor Pages y MVC](Razor-Pages-y-MVC.md) | HTML generado en el servidor; el camino más corto desde WPF. |
 | 10 | [Web API y REST](Web-API-y-REST.md) | El backend que devuelve datos (JSON) cuando la interfaz la pone otra cosa. |
 | 11 | [Blazor](Blazor.md) | Interfaces interactivas en C# con componentes y binding: el puente más cercano a WPF. |
+| 12 | [FluentValidation](FluentValidation.md) | Cómo validar los datos de entrada de una petición antes de que lleguen a la lógica de negocio. |
 
 ### 5. Conceptos transversales
 
