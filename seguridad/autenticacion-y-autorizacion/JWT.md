@@ -86,7 +86,7 @@ El claim `exp` marca cuándo deja de ser válido, y esa comprobación la hace ca
 - **Valida `iss` y `aud`, no solo la firma** — una firma válida solo demuestra quién lo emitió; sin comprobar la audiencia, un token válido para otra API distinta podría colarse como válido en la tuya si comparten emisor.
 - **Prepara la rotación de claves con `kid` y un endpoint JWKS** — identificar la clave usada en cada token (el campo `kid` del header) permite rotar claves de firma sin invalidar de golpe todos los tokens en circulación ni requerir un despliegue coordinado.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 [jwt.io](https://jwt.io) tiene un decodificador interactivo: pega cualquier JWT y verás sus tres partes separadas, decodificadas y coloreadas, además de poder verificar la firma en el propio navegador.
 

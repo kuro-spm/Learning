@@ -101,7 +101,7 @@ using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 var response = await client.GetAsync("/api/products", cts.Token);
 ```
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 - [The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html) — el artículo de referencia sobre la pirámide, con ejemplos y matices (en inglés).
 - [http.cat](https://http.cat/) — cada código de estado HTTP ilustrado con un gato; útil cuando asertas códigos de respuesta y no recuerdas qué era un 409.

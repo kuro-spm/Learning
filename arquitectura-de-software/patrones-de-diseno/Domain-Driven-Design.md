@@ -66,7 +66,7 @@ DDD y Clean Architecture responden a preguntas distintas y se complementan de ma
 - **No repartas el lenguaje ubicuo entre contextos distintos** — es tentador reutilizar la misma clase `Cliente` en Catálogo y en Facturación "para no duplicar". Cada contexto necesita su propio modelo, aunque el nombre se parezca; forzar uno compartido acopla contextos que deberían poder evolucionar por separado.
 - **Reserva el "diseño estratégico" completo para negocios realmente complejos** — técnicas como el *context mapping* formal o el *event storming* dan mucho valor en dominios grandes con varios equipos, pero son coste innecesario en una aplicación pequeña con un único contexto claro.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 Si quieres profundizar más allá de esta introducción, el libro de referencia es *Domain-Driven Design* de Eric Evans (conocido como "el libro azul"); y la técnica de taller *EventStorming* (con post-its de colores modelando eventos de negocio) es una forma muy visual y amena de descubrir los contextos y eventos de un dominio en grupo.
 

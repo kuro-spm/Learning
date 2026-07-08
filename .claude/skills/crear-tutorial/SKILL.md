@@ -123,9 +123,11 @@ en producción.
 - **<Práctica>** — en qué consiste, por qué la aplican los mejores y qué pasa si no.
 - **<Error sutil a evitar>** — por qué es fácil caer en él y cómo detectarlo.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
-Recursos para que el usuario pueda interactuar de manera divertida, si existen. Por ejemplo: para explicar los códigos de error HTTP, mencionar https://http.cat/.
+Recursos que ayuden a fijar o explorar el concepto (documentación navegable, herramientas interactivas, visualizaciones...), si existen y aportan de verdad; si no hay ninguno que valga la pena, omite la sección. Y si encuentras alguno **divertido o interactivo**, mejor todavía: por ejemplo, para explicar los códigos de error HTTP, mencionar https://http.cat/.
+
+> El título de la sección es siempre `## Recursos didácticos` (sin "divertidos"), aunque el recurso concreto sea divertido.
 
 
 ---

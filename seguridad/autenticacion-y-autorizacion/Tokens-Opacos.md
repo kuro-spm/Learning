@@ -86,7 +86,7 @@ token=9f8Ka2...   →   { "active": true, "sub": "42", "scope": "pedidos:leer" }
 - **Añade un prefijo o marca al token para detectarlo si se filtra** — un prefijo reconocible (estilo `sess_...`) permite que escáneres de secretos y sistemas de detección identifiquen tokens filtrados en logs o repositorios, y de paso descarta de inmediato entradas con formato inválido antes de tocar el almacén.
 - **Aprovecha el estado para gestionar sesiones concurrentes** — como cada sesión es una fila en el almacén, tienes casi gratis lo que a un JWT le cuesta sangre: listar los dispositivos activos de una usuaria, cerrar la sesión de uno solo o hacer un "cerrar sesión en todos los dispositivos" borrando todas sus filas. Modela la tabla pensando en ello (una fila por sesión, con identificador de usuaria, dispositivo y última actividad) y esa funcionalidad sale casi sola.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 La [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) es la referencia práctica sobre entropía, atributos de cookie y ciclo de vida de sesión, con ejemplos concretos de qué hacer y qué no.
 

@@ -80,7 +80,7 @@ services:
 - **Nunca escribas la URL del backend en el código del frontend** — usa siempre rutas relativas y deja que el proxy (en desarrollo) o la configuración de despliegue (en producción) resuelvan el destino real. Si un día cambia el dominio del backend, no tocas ni una línea de frontend.
 - **Sé explícito con los orígenes permitidos en CORS** — declarar dominios exactos con `WithOrigins(...)` en vez de `AllowAnyOrigin()` es lo que hace que la protección sirva de algo; `AllowAnyOrigin()` combinado con credenciales ni siquiera está permitido por la propia especificación CORS.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 Para depurar peticiones CORS bloqueadas, la pestaña "Network" de las herramientas de desarrollador del navegador es tu mejor amiga: un error CORS siempre aparece ahí con el motivo exacto.
 

@@ -77,7 +77,7 @@ public IActionResult PanelDeVentas() => Ok(_ventas.ObtenerResumen());
 - **Aplica el principio de mínimo privilegio también a nivel de diseño de API** — no crees un único rol "Usuaria" con acceso a todo lo no-administrativo; separa permisos por acción (leer, escribir, borrar) para poder combinarlos según el caso real, en vez de sobre-conceder por comodidad.
 - **Exige reautenticación para acciones sensibles** — que una sesión lleve autenticada seis horas no significa que deba bastar para cambiar la contraseña o eliminar la cuenta; pedir de nuevo la contraseña (*step-up authentication*) reduce el daño si el dispositivo quedó desatendido.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 Para memorizar la diferencia entre los códigos 401 y 403 (y el resto de la familia HTTP) de forma visual, [http.cat](https://http.cat) ilustra cada código de estado con la foto de un gato.
 

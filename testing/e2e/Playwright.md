@@ -167,7 +167,7 @@ El sitio natural de la suite E2E es el pipeline, como **puerta de validación an
 
 > Nota: `npx playwright install --with-deps` descarga los navegadores y sus dependencias del sistema; en local se ejecuta una sola vez tras instalar el paquete.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 - [try.playwright.dev](https://try.playwright.dev/) — un playground en el navegador para escribir y ejecutar tests sin instalar nada.
 - `npx playwright codegen <url>` — abre un navegador, graba tus clics y va escribiendo el test por ti; la mejor forma de aprender qué locator usar para cada elemento.

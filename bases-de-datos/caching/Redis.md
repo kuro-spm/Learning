@@ -80,7 +80,7 @@ string? nombre = await db.StringGetAsync("producto:123:nombre");
 - **Vigila el tamaño de las claves "calientes"** — una sola clave accedida por miles de peticiones por segundo (un contador global, por ejemplo) puede convertirse en cuello de botella aunque Redis en conjunto tenga capacidad de sobra; a veces conviene particionarla.
 - **Usa *pipelining* para ráfagas de comandos** — si necesitas ejecutar muchos comandos seguidos, agruparlos en un *pipeline* evita pagar la latencia de ida y vuelta de red en cada uno por separado.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 [try.redis.io](https://try.redis.io/) deja probar comandos de Redis en una consola interactiva desde el navegador, sin instalar nada.
 

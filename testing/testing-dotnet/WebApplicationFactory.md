@@ -113,7 +113,7 @@ var dto = JsonSerializer.Deserialize<LoginResultDto>(json, jsonOptions);
 - **Ten un test que verifique el "secure by default"** — un `GET` a un endpoint protegido *sin* token debe devolver 401. Este test vigila que nadie desactive por accidente la `FallbackPolicy` de autorización; es la alarma antirrobo de la API.
 - **Dos factories mejor que una configurable** — una factory ligera sin base de datos (para smoke tests y endpoints sin datos) y otra con base de datos real. Los tests eligen la que necesitan y los baratos siguen siendo baratos.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 - [http.cat](https://http.cat/) — cuando asertes códigos de estado, cada uno tiene su gato.
 

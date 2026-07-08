@@ -85,7 +85,7 @@ El refresh token es el activo valioso (dura mucho y renueva el acceso), así que
 - **Para revocar el access sin tirar el stateless por la borda, usa una "versión de sesión"** — guarda un contador por usuaria en la base de datos e inclúyelo como claim en el JWT (p. ej. `sv: 7`); al validar, comparas el claim con el valor actual. Cambiar la contraseña, banear o forzar un logout global se reduce a incrementar ese contador, y todos los access tokens anteriores dejan de cuadrar al instante. Es el punto intermedio entre el JWT puro y una denylist entrada por entrada: una sola lectura (y cacheable) en lugar de renunciar del todo a la revocación.
 - **Para acceso sensible, plantéate tokens ligados al portador (DPoP o mTLS)** — un *bearer token* vale para cualquiera que lo tenga: si se filtra, se reutiliza sin más. Los esquemas *sender-constrained* como DPoP (OAuth2) o mTLS atan el token a una clave que solo el cliente legítimo posee, de modo que robar el token ya no basta —hay que robar también la clave—. Es la diferencia entre una llave y una llave que solo funciona en tu mano.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 El [OAuth 2.0 Security Best Current Practice](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics) del IETF dedica una sección entera a la rotación de refresh tokens y la detección de reuso; y en [jwt.io](https://jwt.io) puedes decodificar el access token para ver su `exp` corto en acción.
 

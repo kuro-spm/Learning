@@ -79,7 +79,7 @@ Como atiende a muchos clientes en paralelo, no puedes guardar datos de un client
 - **Respeta los tiempos de vida de la DI** — inyectar un servicio `Scoped` (vive una petición) dentro de uno `Singleton` (vive toda la app) "captura" el scoped y lo congela: es la *captive dependency*, fuente de bugs sutiles con datos obsoletos. `WebApplication.CreateBuilder` valida esto en desarrollo si no lo desactivas.
 - **El comportamiento debe depender del entorno** — ASP.NET Core sabe si corre en `Development` o `Production` (`ASPNETCORE_ENVIRONMENT`). La página de excepciones con detalles va solo en desarrollo; en producción filtraría información interna a cualquiera.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 El propio SDK te monta un proyecto de ejemplo funcionando en segundos con `dotnet new webapi` y `dotnet run`: la forma más rápida de ver un `Program.cs` real y toquetearlo. Para los códigos de estado HTTP que devolverás sin parar, <https://http.cat/> los explica con gatos.
 
