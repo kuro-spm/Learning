@@ -10,10 +10,10 @@ Colección personal de guías introductorias en español, organizadas por catego
 Clean Architecture, patrones de diseño y Domain-Driven Design, multi-tenancy y los distintos tipos de APIs.
 
 ### [Desarrollo web](desarrollo-web/README.md)
-La transición de C# WPF a C# para web con ASP.NET Core, y el stack frontend React + Vite + TypeScript.
+ASP.NET Core desde cero (qué añade sobre .NET Core y sus atributos), la transición desde C# WPF a la web, y el stack frontend React + Vite + TypeScript.
 
 ### [Lenguajes y runtimes](lenguajes/README.md)
-Fundamentos de C# y .NET: el lenguaje, el runtime y MSBuild.
+Fundamentos de C# y .NET (lenguaje, runtime, MSBuild y NuGet) y características del lenguaje como los atributos.
 
 ### [Bases de datos](bases-de-datos/README.md)
 Acceso a datos en .NET, caching con Redis y migraciones de esquema.
