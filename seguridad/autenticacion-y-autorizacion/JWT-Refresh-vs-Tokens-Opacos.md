@@ -31,12 +31,22 @@ Esa única decisión arrastra todo lo demás: la capacidad de revocar, la facili
 | Filtración de datos | El payload es legible por cualquiera | Nula: no hay nada que leer |
 | Tamaño del token | Grande (crece con los claims) | Diminuto (bytes aleatorios) |
 | Estado en el servidor | Solo para el refresh | Para toda la sesión |
+| ¿Segundo token (refresh)? | Necesario (compensa la no-revocabilidad) | Innecesario: ya es revocable |
+| Vista de tus datos | Foto fija del momento de emisión | Estado vivo, leído fresco en cada request |
 
 **2. El eje que lo decide casi todo: revocación vs statelessness**
 
 Estos dos deseos están en tensión directa. El JWT es imbatible en escalado precisamente *porque* el servidor no recuerda nada; pero no recordar nada es justo lo que le impide revocar. El token opaco revoca al instante *porque* el servidor lo recuerda todo; pero recordarlo todo es lo que le obliga a consultar en cada request. No puedes maximizar ambos a la vez.
 
-**3. Cómo cierra sesión cada uno**
+**3. Foto fija vs estado vivo**
+
+La consecuencia más sutil de esa tensión: un JWT es una *fotografía* de tus datos en el instante en que se emitió. El rol, los permisos y el estado de la cuenta quedan congelados dentro del token hasta que caduca. Si a mitad de sesión le retiras un permiso a la usuaria o desactivas su cuenta, su JWT sigue afirmando lo de antes. Un token opaco, en cambio, obliga al servidor a leer el estado *vivo* en cada request, así que **cualquier** cambio —no solo la revocación total, también bajar un rol o desactivar la cuenta— surte efecto en la siguiente petición.
+
+**4. Por qué el token opaco se ahorra el refresh**
+
+El par access/refresh existe *para compensar* una carencia del JWT: como no se puede revocar, se le da vida corta; y como la vida corta molestaría a la usuaria, se añade un segundo token para renovar sin re-loguear. Un token opaco no arrastra ese problema: al ser revocable de por sí, puede tener vida larga con expiración deslizante sin peligro. No necesita un refresh porque no necesita ser efímero. Dicho de otro modo: el refresh token no es una virtud del modelo JWT, sino el parche a su talón de Aquiles.
+
+**5. Cómo cierra sesión cada uno**
 
 ```text
 JWT autocontenido:  el token sigue vivo hasta su 'exp'. "Cerrar sesión" es,
@@ -46,7 +56,7 @@ Token opaco:        borras la entrada en el servidor → la siguiente request
                     falla al instante. Cierre de sesión real e inmediato.
 ```
 
-**4. El punto medio que usa casi todo el mundo**
+**6. El punto medio que usa casi todo el mundo**
 
 El patrón dominante no elige uno puro, sino que aprovecha cada modelo donde brilla: el **access token** es un JWT de vida corta (validación local, escala sin esfuerzo) y el **refresh token** es opaco y guardado en el servidor (revocable). Así, revocar el refresh corta la capacidad de renovar, y la vida corta del access limita el daño mientras tanto.
 

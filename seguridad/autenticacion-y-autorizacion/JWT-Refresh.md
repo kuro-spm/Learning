@@ -68,7 +68,7 @@ La práctica moderna es que cada refresh token sea **de un solo uso**: al canjea
 
 **5. Dónde guardar cada token**
 
-El refresh token es el activo valioso (dura mucho y renueva el acceso), así que va donde JavaScript no pueda leerlo: una cookie `HttpOnly` + `Secure` + `SameSite`, o el almacén seguro del sistema en móvil. El access token, al ser efímero, suele vivir solo en memoria del cliente. **Guardar el refresh token en `localStorage` es un error común**: queda expuesto a cualquier XSS.
+El refresh token es el activo valioso (dura mucho y renueva el acceso), así que va donde JavaScript no pueda leerlo: una cookie `HttpOnly` + `Secure` + `SameSite` (idealmente con el `Path` acotado al endpoint de refresh, para que ni siquiera viaje en las demás requests), o el almacén seguro del sistema en móvil. El access token, al ser efímero, suele vivir solo en memoria del cliente. **Guardar el refresh token en `localStorage` es un error común**: queda expuesto a cualquier XSS.
 
 ## Lo que NO hace
 
@@ -82,7 +82,8 @@ El refresh token es el activo valioso (dura mucho y renueva el acceso), así que
 - **Combina expiración deslizante con una absoluta** — que el refresh se renueve con el uso está bien, pero fija además un tope absoluto (p. ej. 30 días desde el login) tras el cual toca reautenticarse sí o sí. Sin ese tope, una sesión activa se perpetúa indefinidamente y nunca fuerza una revalidación de credenciales.
 - **Guarda solo el hash del refresh token, no el token en claro** — trátalo como una contraseña: si te roban la base de datos de sesiones, un hash no es utilizable, el token en claro sí. Basta un hash rápido (SHA-256) porque el token ya tiene entropía alta; no necesita bcrypt.
 - **Vincula el refresh a un contexto y valida `iss`/`aud` del access** — atar el refresh a la sesión (device, IP aproximada) permite detectar canjes desde ubicaciones imposibles. Y no olvides validar audiencia y emisor del access token, no solo la firma (ver [JWT](JWT.md) → *Buenas prácticas*).
-- **No pongas el refresh token en el cuerpo si puedes evitarlo** — entregarlo en una cookie `HttpOnly` con path restringido al endpoint de refresh reduce su superficie de exposición frente a devolverlo en JSON que el JavaScript tenga que manejar y guardar.
+- **Para revocar el access sin tirar el stateless por la borda, usa una "versión de sesión"** — guarda un contador por usuaria en la base de datos e inclúyelo como claim en el JWT (p. ej. `sv: 7`); al validar, comparas el claim con el valor actual. Cambiar la contraseña, banear o forzar un logout global se reduce a incrementar ese contador, y todos los access tokens anteriores dejan de cuadrar al instante. Es el punto intermedio entre el JWT puro y una denylist entrada por entrada: una sola lectura (y cacheable) en lugar de renunciar del todo a la revocación.
+- **Para acceso sensible, plantéate tokens ligados al portador (DPoP o mTLS)** — un *bearer token* vale para cualquiera que lo tenga: si se filtra, se reutiliza sin más. Los esquemas *sender-constrained* como DPoP (OAuth2) o mTLS atan el token a una clave que solo el cliente legítimo posee, de modo que robar el token ya no basta —hay que robar también la clave—. Es la diferencia entre una llave y una llave que solo funciona en tu mano.
 
 ## Recursos didácticos divertidos
 
