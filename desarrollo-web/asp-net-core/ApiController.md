@@ -44,6 +44,8 @@ public IActionResult Create(CreateProductRequest request)
 
 No necesitas anotar los parámetros: el framework deduce que los tipos complejos vienen del cuerpo (`[FromBody]`), y los simples de la ruta o la query (ver [Model binding](Model-Binding.md)). Menos ruido en la firma.
 
+El `IActionResult` que devuelve la acción es "el resultado" (código de estado + cuerpo); tienes sus variantes en [Tipos de retorno de una acción](Tipos-de-Retorno-de-una-Accion.md).
+
 **4. Requiere routing por atributos**
 
 Con `[ApiController]` es obligatorio definir la ruta con atributos (`[Route]`, `[HttpGet("...")]`). No funciona con el enrutado convencional por convención.

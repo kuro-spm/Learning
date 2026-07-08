@@ -28,21 +28,29 @@ Los atributos son la forma en que ASP.NET Core recibe instrucciones declarativas
 | 5 | [Validación con Data Annotations](Validacion-con-DataAnnotations.md) | `[Required]`, `[Range]`, `[EmailAddress]`... : las reglas que deben cumplir los datos de entrada. |
 | 6 | [[Authorize] y [AllowAnonymous]](Authorize.md) | Quién puede acceder a cada endpoint: autenticación, roles y políticas. |
 
-### 3. El panorama completo
+### 3. Qué devuelve una acción
+
+Una vez la petición llega a tu método, falta la otra mitad: qué le respondes al cliente.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 7 | [Tipos de retorno de una acción](Tipos-de-Retorno-de-una-Accion.md) | `IActionResult`, `ActionResult<T>` y los helpers (`Ok`, `NotFound`, `CreatedAtRoute`...): cómo se traduce lo que devuelves en un código de estado y un JSON. |
+
+### 4. El panorama completo
 
 Una vez visto MVC de cerca, la vista de pájaro: qué otros estilos ofrece el framework y por qué MVC no te ata a ninguna arquitectura concreta.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 7 | [Modelos de programación web](Modelos-de-programacion-web.md) | MVC, Razor Pages, Web API, Minimal APIs y Blazor comparados, y cómo encajan como capa de presentación de una Clean Architecture. |
+| 8 | [Modelos de programación web](Modelos-de-programacion-web.md) | MVC, Razor Pages, Web API, Minimal APIs y Blazor comparados, y cómo encajan como capa de presentación de una Clean Architecture. |
 
-### 4. Llevarlo a producción
+### 5. Llevarlo a producción
 
 Ya construida la app, el último paso: sacarla de tu máquina y ponerla a atender peticiones reales.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 8 | [Despliegue](Despliegue.md) | `dotnet publish`, ejecución del artefacto, configuración por entorno, contenedores y Kestrel tras un reverse proxy. |
+| 9 | [Despliegue](Despliegue.md) | `dotnet publish`, ejecución del artefacto, configuración por entorno, contenedores y Kestrel tras un reverse proxy. |
 
 ---
 

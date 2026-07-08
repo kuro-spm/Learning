@@ -28,6 +28,8 @@ public class ProductsController : ControllerBase { }
 
 **2. Los atributos de verbo mapean cada método, y completan la ruta**
 
+El tipo de retorno `IActionResult` que verás abajo es simplemente "el resultado de la acción" (un `200`, un `404`, un JSON...); se explica en detalle en [Tipos de retorno de una acción](Tipos-de-Retorno-de-una-Accion.md). Aquí céntrate en el atributo de verbo y la ruta.
+
 ```csharp
 [HttpGet]                        // GET /api/products
 public IActionResult GetAll() { }
