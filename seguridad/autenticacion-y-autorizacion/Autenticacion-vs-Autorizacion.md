@@ -4,11 +4,11 @@
 
 ## ¿Qué es?
 
-Dos preguntas distintas que toda aplicación con usuarias tiene que responder: **autenticación** (*AuthN*) es "¿quién eres?", y **autorización** (*AuthZ*) es "¿qué puedes hacer?". Son procesos secuenciales pero independientes: primero se verifica la identidad y después, con esa identidad ya confirmada, se decide qué acciones o recursos están permitidos.
+Dos preguntas distintas que toda aplicación con usuarios tiene que responder: **autenticación** (*AuthN*) es "¿quién eres?", y **autorización** (*AuthZ*) es "¿qué puedes hacer?". Son procesos secuenciales pero independientes: primero se verifica la identidad y después, con esa identidad ya confirmada, se decide qué acciones o recursos están permitidos.
 
 ## ¿Por qué existe?
 
-La confusión entre ambos conceptos es tan frecuente que tiene nombre propio en muchos foros: "AuthN vs AuthZ". Ocurre porque en la práctica van pegados (te logueas y, acto seguido, la aplicación decide qué ves) y porque en inglés ambas palabras empiezan igual. Pero mezclarlas en el diseño de una aplicación lleva a errores de seguridad: dar por hecho que "si está autenticado, puede hacer esto" es exactamente el fallo que abre la puerta a que cualquier usuaria logueada acceda a datos o acciones que no le corresponden.
+La confusión entre ambos conceptos es tan frecuente que tiene nombre propio en muchos foros: "AuthN vs AuthZ". Ocurre porque en la práctica van pegados (te logueas y, acto seguido, la aplicación decide qué ves) y porque en inglés ambas palabras empiezan igual. Pero mezclarlas en el diseño de una aplicación lleva a errores de seguridad: dar por hecho que "si está autenticado, puede hacer esto" es exactamente el fallo que abre la puerta a que cualquier usuario logueado acceda a datos o acciones que no le corresponden.
 
 > Piensa en un aeropuerto: enseñar tu DNI en el control de seguridad es autenticación (confirman que eres quien dices ser). La tarjeta de embarque de tu vuelo y asiento concretos es autorización (determina a qué avión y qué asiento puedes acceder). Tener DNI válido no te da derecho a subir a cualquier avión.
 
@@ -52,7 +52,7 @@ app.UseAuthorization();  // decide si esa identidad puede acceder al endpoint so
 
 // La autenticación resuelve el "quién": rellena HttpContext.User
 // La autorización se declara por endpoint o controlador:
-[Authorize(Roles = "Administradora")]
+[Authorize(Roles = "Administrador")]
 [HttpGet("panel-ventas")]
 public IActionResult PanelDeVentas() => Ok(_ventas.ObtenerResumen());
 ```
