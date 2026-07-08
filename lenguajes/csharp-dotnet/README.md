@@ -27,6 +27,7 @@ Features del lenguaje y patrones idiomáticos de .NET que vas encontrando al esc
 |---|---|---|
 | 5 | [CancellationToken](caracteristicas-del-lenguaje/CancellationToken.md) | Cómo se propaga de extremo a extremo la petición de cancelar una operación asíncrona. |
 | 6 | [Atributos](caracteristicas-del-lenguaje/Atributos.md) | Metadatos declarativos (`[Algo]`) que el framework lee por reflection para decidir cómo tratar tu código. |
+| 7 | [Atributos personalizados](caracteristicas-del-lenguaje/Atributos-Personalizados.md) | Crear los tuyos y el porqué de la restricción de constantes de compilación: cómo se graban en los metadatos del ensamblado. |
 
 ---
 

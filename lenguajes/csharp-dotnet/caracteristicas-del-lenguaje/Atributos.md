@@ -73,12 +73,12 @@ if (info is not null)
 
 ## Buenas prácticas avanzadas
 
-- **Los argumentos deben ser constantes de compilación** — solo puedes pasar valores conocidos al compilar: literales, `const`, `typeof(...)`, enums y arrays de esos. Por eso no existe `[Authorize(Roles = miVariable)]`. Cuando necesitas una regla dinámica (leída de base de datos, por ejemplo), el atributo no basta: hay que resolver la lógica en ejecución (en ASP.NET Core, con *policies* o filtros).
-- **Puedes crear los tuyos, y lo natural es que "hagan algo" vía un procesador** — heredar de `Attribute` te da la etiqueta, pero por sí sola es inerte. Cobra sentido cuando otra pieza la busca por reflection: un *action filter* en ASP.NET Core, un serializador, un validador propio. La etiqueta declara la intención; el procesador la ejecuta.
+- **Los argumentos deben ser constantes de compilación** — solo puedes pasar valores conocidos al compilar: literales, `const`, `typeof(...)`, enums y arrays de esos. Por eso no existe `[Authorize(Roles = miVariable)]`. Cuando necesitas una regla dinámica (leída de base de datos, por ejemplo), el atributo no basta: hay que resolver la lógica en ejecución (en ASP.NET Core, con *policies* o filtros). El porqué de fondo (los metadatos que graba el compilador) está en [Atributos personalizados](Atributos-Personalizados.md).
+- **Puedes crear los tuyos, y lo natural es que "hagan algo" vía un procesador** — heredar de `Attribute` te da la etiqueta, pero por sí sola es inerte. Cobra sentido cuando otra pieza la busca por reflection: un *action filter* en ASP.NET Core, un serializador, un validador propio. La etiqueta declara la intención; el procesador la ejecuta. Cómo hacerlo, paso a paso, en [Atributos personalizados](Atributos-Personalizados.md).
 - **Controla dónde se puede poner con `[AttributeUsage]`** — al declarar un atributo propio, `[AttributeUsage(AttributeTargets.Method)]` impide que alguien lo cuele sobre una clase por error, y `AllowMultiple = true/false` decide si puede repetirse. Es la diferencia entre una etiqueta que se usa mal en silencio y una que avisa en compilación.
 - **La *reflection* no es gratis: cachea si la usas en caliente** — inspeccionar atributos en cada iteración de un bucle o en cada petición es un cuello de botella clásico y silencioso. Los frameworks maduros leen los metadatos una vez al arrancar y reutilizan el resultado; si escribes tú el código que hace `GetCustomAttributes(...)`, cachéalo igual.
 
-## Recursos didácticos divertidos
+## Recursos didácticos
 
 La documentación oficial mantiene el catálogo de atributos integrados navegable en <https://learn.microsoft.com/dotnet/api/system.attribute>: útil para descubrir cuántos trae .NET de serie más allá de los cuatro de siempre.
 
