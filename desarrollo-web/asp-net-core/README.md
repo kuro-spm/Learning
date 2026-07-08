@@ -1,6 +1,6 @@
 # Primeros pasos con ASP.NET Core — Guía de tecnologías
 
-Introducción a **ASP.NET Core**, el framework web de .NET, pensada para quien ya programa en C#/.NET (consola, librerías, backend) pero **no ha tocado ASP.NET todavía**. Parte de lo que ya sabes de la plataforma y explica qué añade el framework encima, cuáles son los atributos que verás en el día a día de una API y qué estilos de programación web (MVC, Web API, Minimal APIs, Blazor...) puedes elegir.
+Introducción a **ASP.NET Core**, el framework web de .NET, pensada para quien ya programa en C#/.NET (consola, librerías, backend) pero **no ha tocado ASP.NET todavía**. Parte de lo que ya sabes de la plataforma y explica qué añade el framework encima, cuáles son los atributos que verás en el día a día de una API, qué estilos de programación web (MVC, Web API, Minimal APIs, Blazor...) puedes elegir y cómo desplegar la app en producción.
 
 No asume conocimiento previo de web con C#: cada ficha explica qué es, por qué existe, cuándo se usa y lo mínimo para no perderse, con ejemplos genéricos (una tienda online, una API de productos, un formulario de registro).
 
@@ -35,6 +35,14 @@ Una vez visto MVC de cerca, la vista de pájaro: qué otros estilos ofrece el fr
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 7 | [Modelos de programación web](Modelos-de-programacion-web.md) | MVC, Razor Pages, Web API, Minimal APIs y Blazor comparados, y cómo encajan como capa de presentación de una Clean Architecture. |
+
+### 4. Llevarlo a producción
+
+Ya construida la app, el último paso: sacarla de tu máquina y ponerla a atender peticiones reales.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 8 | [Despliegue](Despliegue.md) | `dotnet publish`, ejecución del artefacto, configuración por entorno, contenedores y Kestrel tras un reverse proxy. |
 
 ---
 
