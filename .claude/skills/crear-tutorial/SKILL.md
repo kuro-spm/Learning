@@ -175,7 +175,10 @@ Cuando se pida crear uno o varios tutoriales:
 2. **Determina la categoría y el tema, y crea la carpeta** dentro de la categoría correspondiente (kebab-case). Si la categoría, el nombre o el alcance no están claros, pregunta.
 3. **Elige la variante** de cada ficha (completa o compacta) según su importancia.
 4. **Escribe las fichas** respetando el formato, con ejemplos genéricos y autónomos.
-5. **Crea o actualiza el `README.md`-índice** de la carpeta: añade cada ficha a la tabla de orden de lectura (en su posición temática, renumerando `#` si hace falta) y, si procede, al índice colapsable. Si el tema es nuevo, enlázalo también desde el `README.md` de su categoría y, si la categoría es nueva, desde el `README.md` raíz.
+5. **Crea o actualiza los `README.md`-índice afectados**, de dentro hacia fuera:
+   - **El de la carpeta del tema**: añade cada ficha a la tabla de orden de lectura (en su posición temática, renumerando `#` si hace falta) y, si procede, al índice colapsable.
+   - **El de la categoría**: si el tema es nuevo, enlázalo desde el `README.md` de su categoría; si el tema ya existía pero ha cambiado de alcance, revisa que su descripción siga siendo fiel.
+   - **El `README.md` raíz** (`<raíz>/README.md`): revísalo **siempre**, no solo cuando la categoría es nueva. Tiene una descripción de una línea por categoría; si el trabajo que acabas de hacer amplía o cambia lo que esa categoría cubre, actualiza esa línea para que no se quede obsoleta. Si la categoría es nueva, añádele su entrada.
 6. **Verifica los enlaces.** Toda ruta relativa debe resolver (nombre de archivo exacto, mayúsculas incluidas). Ten en cuenta la profundidad: un enlace a un tema de otra categoría necesita `../../`, no `../`.
 7. **Haz commit y push directamente, sin pedir confirmación, si la sesión ha sido satisfactoria.** Cuando el trabajo esté terminado y verificado (todas las fichas creadas, el índice actualizado y los enlaces comprobados), haz `git add` **solo de los ficheros y carpetas que ha tocado esta skill** (nunca `git add -A` ni `git add .`, para no arrastrar cambios ajenos que ya estuvieran en el working tree), un `git commit` con un mensaje descriptivo en español (p. ej. `Añade guía de <tema>`) y un `git push`. Esta es una instrucción permanente de la usuaria: no hace falta preguntar "¿hago commit y push?" cada vez, el paso 7 ya lo autoriza. Si algo quedó incompleto, falló, la usuaria no está conforme, o el trabajo se hizo en varios subagentes en paralelo y conviene una revisión de conjunto antes de subir, **no** hagas commit ni push: deja los cambios en el working tree y coméntalo explicando por qué.
 
@@ -192,4 +195,5 @@ Antes de dar por terminado:
 - [ ] El código de ejemplo usa nombres genéricos y reconocibles, no `foo`/`bar` ni nombres de un proyecto privado.
 - [ ] Cada ficha cierra con `---` y la frase `*En resumen: ...*`.
 - [ ] La carpeta tiene un `README.md`-índice con enlaces a todas las fichas, y todos los enlaces funcionan.
+- [ ] Se han revisado los índices de nivel superior: el `README.md` de la categoría y el `README.md` raíz, actualizando sus descripciones si el nuevo contenido cambia lo que la categoría cubre.
 - [ ] Si la sesión ha sido satisfactoria, se ha hecho `commit` y `push` de los cambios **sin pedir confirmación previa** (staging selectivo, solo lo tocado por esta skill), y si no lo ha sido, los cambios se han dejado sin subir y se ha avisado explicando por qué.
