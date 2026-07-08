@@ -1,6 +1,6 @@
 # Primeros pasos con ASP.NET Core — Guía de tecnologías
 
-Introducción a **ASP.NET Core**, el framework web de .NET, pensada para quien ya programa en C#/.NET (consola, librerías, backend) pero **no ha tocado ASP.NET todavía**. Parte de lo que ya sabes de la plataforma y explica qué añade el framework encima y cuáles son los atributos que verás en el día a día de una API.
+Introducción a **ASP.NET Core**, el framework web de .NET, pensada para quien ya programa en C#/.NET (consola, librerías, backend) pero **no ha tocado ASP.NET todavía**. Parte de lo que ya sabes de la plataforma y explica qué añade el framework encima, cuáles son los atributos que verás en el día a día de una API y qué estilos de programación web (MVC, Web API, Minimal APIs, Blazor...) puedes elegir.
 
 No asume conocimiento previo de web con C#: cada ficha explica qué es, por qué existe, cuándo se usa y lo mínimo para no perderse, con ejemplos genéricos (una tienda online, una API de productos, un formulario de registro).
 
@@ -18,7 +18,7 @@ Antes de los detalles, el cambio de mentalidad: de un programa que hace algo y t
 
 ### 2. Los atributos más habituales de una API
 
-Los atributos son la forma en que ASP.NET Core recibe instrucciones declarativas. Estos son los que aparecen en casi cualquier controlador. Si el concepto de "atributo" te suena a chino, empieza por [Atributos](../../lenguajes/csharp-dotnet/caracteristicas-del-lenguaje/Atributos.md) en la guía del lenguaje.
+Los atributos son la forma en que ASP.NET Core recibe instrucciones declarativas. Estos son los que aparecen en casi cualquier controlador. Si el concepto de "atributo" suena a chino, empieza por [Atributos](../../lenguajes/csharp-dotnet/caracteristicas-del-lenguaje/Atributos.md) en la guía del lenguaje.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
@@ -27,6 +27,14 @@ Los atributos son la forma en que ASP.NET Core recibe instrucciones declarativas
 | 4 | [Model binding ([From...])](Model-Binding.md) | `[FromBody]`, `[FromQuery]`, `[FromRoute]`... : de dónde sale el valor de cada parámetro. |
 | 5 | [Validación con Data Annotations](Validacion-con-DataAnnotations.md) | `[Required]`, `[Range]`, `[EmailAddress]`... : las reglas que deben cumplir los datos de entrada. |
 | 6 | [[Authorize] y [AllowAnonymous]](Authorize.md) | Quién puede acceder a cada endpoint: autenticación, roles y políticas. |
+
+### 3. El panorama completo
+
+Una vez visto MVC de cerca, la vista de pájaro: qué otros estilos ofrece el framework y por qué MVC no te ata a ninguna arquitectura concreta.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 7 | [Modelos de programación web](Modelos-de-programacion-web.md) | MVC, Razor Pages, Web API, Minimal APIs y Blazor comparados, y cómo encajan como capa de presentación de una Clean Architecture. |
 
 ---
 
