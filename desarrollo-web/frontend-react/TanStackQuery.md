@@ -71,4 +71,27 @@ Toda la app comparte este cliente. Es el equivalente a un servicio singleton en 
 
 ---
 
+## Buenas prácticas avanzadas
+
+- **`staleTime` es la palanca que casi nadie toca** — por defecto vale `0`, así que cada dato se considera "viejo" al instante y TanStack Query lo re-consulta en cuanto el componente se vuelve a montar o la ventana recupera el foco. Ajusta `staleTime` al tiempo que un dato sigue siendo "suficientemente fresco" (p. ej. `staleTime: 60_000` para un catálogo que apenas cambia) y las peticiones redundantes desaparecen. No lo confundas con `gcTime` (antes `cacheTime`): `staleTime` decide *cuándo re-consultar*; `gcTime`, *cuándo tirar de memoria* una caché que ya nadie usa.
+- **La `queryKey` es tu array de dependencias** — todo valor que use la `queryFn` (un id, un filtro, una página) debe formar parte de la key, igual que las dependencias de un `useEffect`. Si filtras por `status` pero la key es `['products']` a secas, verás datos del filtro anterior. Estructura las keys de lo general a lo específico —`['products', { status, page }]`— para poder invalidarlas por grupos.
+
+```tsx
+useQuery({
+  queryKey: ['products', { status, page }],   // cada variable, en la key
+  queryFn: () => fetchProducts({ status, page }),
+});
+```
+
+- **Actualizaciones optimistas con rollback** — para una UI que responde al instante, actualiza la caché en `onMutate` antes de que el servidor conteste y guarda el valor previo; si la mutación falla, restáuralo en `onError`. Es lo que hace que marcar una tarea como completada se sienta inmediato sin esperar al *round-trip*.
+- **No copies `data` a un `useState`** — el antipatrón más común: meter el `data` de `useQuery` en un estado local con un `useEffect`. Eso duplica la fuente de verdad, rompe la sincronización de la caché y reintroduce justo el *boilerplate* que la librería elimina. Lee siempre desde `data`; si necesitas un dato derivado, usa la opción `select`.
+
+---
+
+## Recursos didácticos
+
+La documentación oficial (<https://tanstack.com/query/latest>) es excelente y tiene ejemplos ejecutables. Instala **React Query Devtools** (`@tanstack/react-query-devtools`): un panel interactivo que muestra en vivo cada query, su estado (fresh/stale/fetching) y su contenido en caché — la mejor forma de *ver* qué hace la librería mientras desarrollas. Y el blog de TkDodo (Dominik Dorfmeister, mantenedor del proyecto) es la referencia de facto para patrones avanzados: <https://tkdodo.eu/blog/practical-react-query>.
+
+---
+
 *En resumen: TanStack Query es la capa de caché y sincronización entre tu frontend React y la API .NET — evita peticiones duplicadas, mantiene los datos consistentes y elimina el boilerplate de `useEffect` para cargar datos.*
