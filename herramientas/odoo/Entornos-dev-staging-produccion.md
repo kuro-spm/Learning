@@ -40,7 +40,7 @@ Los cambios suben de desarrollo a producción, nunca al revés. Lo que sí baja 
 
 **3. Staging usa datos copiados y "neutralizados"**
 
-Para que las pruebas sean realistas, staging parte de una copia de los datos de producción. Pero esa copia se **neutraliza**: se desactivan los correos, los pagos y las conexiones externas para que un ensayo no mande facturas de verdad a clientes de verdad (ver [Duplicar y neutralizar la base de datos](Duplicar-y-Neutralizar-Base-de-Datos.md)).
+Para que las pruebas sean realistas, staging parte de una copia de los datos de producción. Pero esa copia se **neutraliza**: se desactivan los correos, los pagos y las conexiones externas para que un ensayo no mande facturas de verdad a clientes de verdad (ver [Neutralizar la base de datos](Neutralizar-Base-de-Datos.md)).
 
 **4. En Odoo.com y Odoo.sh esto viene de serie**
 

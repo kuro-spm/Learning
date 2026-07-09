@@ -25,9 +25,10 @@ El corazón de la guía: dónde probar, cómo aislar los datos reales y cómo te
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 4 | [Entornos: desarrollo, staging y producción](Entornos-dev-staging-produccion.md) | La idea base: separar entornos para tener un sitio donde equivocarte. |
-| 5 | [Duplicar y neutralizar la base de datos](Duplicar-y-Neutralizar-Base-de-Datos.md) | La técnica central: una copia realista pero sin efectos en el mundo real. |
-| 6 | [Backups y restauración](Backups-y-Restauracion.md) | Tu red de seguridad: cómo volver atrás cuando algo sale mal. |
-| 7 | [Pruebas seguras sobre un Odoo en producción](Pruebas-Seguras-en-Produccion.md) | La síntesis: el checklist de buenas prácticas que reúne todo lo anterior. |
+| 5 | [Duplicar la base de datos](Duplicar-Base-de-Datos.md) | El primer paso: una copia realista de producción para probar sobre datos de verdad. |
+| 6 | [Neutralizar la base de datos](Neutralizar-Base-de-Datos.md) | El paso imprescindible: apagar en la copia todo lo que puede escaparse al mundo real. |
+| 7 | [Backups y restauración](Backups-y-Restauracion.md) | Tu red de seguridad: cómo volver atrás cuando algo sale mal. |
+| 8 | [Pruebas seguras sobre un Odoo en producción](Pruebas-Seguras-en-Produccion.md) | La síntesis: el checklist de buenas prácticas que reúne todo lo anterior. |
 
 ---
 

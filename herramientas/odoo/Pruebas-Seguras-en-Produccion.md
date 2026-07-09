@@ -20,7 +20,7 @@ Cada vez que quieras tocar un sistema en producción: instalar o actualizar un m
 
 **1. No pruebes en producción: prueba en una copia**
 
-La primera opción **nunca** es producción. Duplica la base de datos, neutralízala y prueba ahí (ver [Duplicar y neutralizar la base de datos](Duplicar-y-Neutralizar-Base-de-Datos.md)). Solo si algo no se puede reproducir fuera, se considera tocar producción, y con las cautelas siguientes.
+La primera opción **nunca** es producción. Duplica la base de datos ([ver Duplicar la base de datos](Duplicar-Base-de-Datos.md)), [neutralízala](Neutralizar-Base-de-Datos.md) y prueba ahí. Solo si algo no se puede reproducir fuera, se considera tocar producción, y con las cautelas siguientes.
 
 **2. Backup antes de tocar nada**
 
