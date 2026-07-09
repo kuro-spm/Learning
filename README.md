@@ -16,7 +16,7 @@ ASP.NET Core desde cero (qué añade sobre .NET Core, sus atributos, sus modelos
 Fundamentos de C# y .NET (lenguaje, runtime, MSBuild y NuGet) y características del lenguaje como los atributos.
 
 ### [Bases de datos](bases-de-datos/README.md)
-Acceso a datos en .NET, caching con Redis, migraciones de esquema y bases de datos documentales (MongoDB).
+PostgreSQL, acceso a datos en .NET, caching con Redis, migraciones de esquema y bases de datos documentales (MongoDB).
 
 ### [Testing](testing/README.md)
 Testing en .NET: xUnit, Shouldly, NSubstitute, fixtures, Testcontainers y más.

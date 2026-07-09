@@ -1,10 +1,13 @@
 # Bases de datos — Guías
 
-Cómo acceder a una base de datos relacional desde una aplicación .NET, mantenerla en caché y versionar su esquema a lo largo del tiempo, además de una introducción a las bases de datos documentales (NoSQL) con MongoDB.
+PostgreSQL como base de datos relacional, cómo acceder a una desde una aplicación .NET, mantenerla en caché y versionar su esquema a lo largo del tiempo, además de una introducción a las bases de datos documentales (NoSQL) con MongoDB.
 
 ---
 
 ## Contenido
+
+### [PostgreSQL](postgresql/README.md)
+La base de datos relacional de código abierto: qué la distingue, tipos ricos, `JSONB`, extensiones e índices.
 
 ### [Acceso a datos en .NET](acceso-a-datos-dotnet/README.md)
 El driver de SQL Server y Dapper como micro-ORM.
