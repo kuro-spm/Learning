@@ -1,8 +1,8 @@
 # Odoo — Guía de tecnología
 
-Colección introductoria sobre **Odoo** (el ERP de código abierto) con foco en algo muy concreto: **cómo hacer pruebas de forma segura sobre un Odoo que está en producción**. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
+Colección introductoria sobre **Odoo** (el ERP de código abierto) con dos focos: **cómo hacer pruebas de forma segura sobre un Odoo que está en producción** y, ya en clave de desarrollo, **cómo se construyen las búsquedas y los filtros** que ve el usuario. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
 
-Primero entenderás qué es Odoo y cómo se organiza; luego, el conjunto de buenas prácticas para tocar un sistema real sin llevártelo por delante.
+Primero entenderás qué es Odoo y cómo se organiza; luego, el conjunto de buenas prácticas para tocar un sistema real sin llevártelo por delante; y aparte, una subcolección dedicada a búsqueda y filtros.
 
 ---
 
@@ -29,6 +29,14 @@ El corazón de la guía: dónde probar, cómo aislar los datos reales y cómo te
 | 6 | [Neutralizar la base de datos](Neutralizar-Base-de-Datos.md) | El paso imprescindible: apagar en la copia todo lo que puede escaparse al mundo real. |
 | 7 | [Backups y restauración](Backups-y-Restauracion.md) | Tu red de seguridad: cómo volver atrás cuando algo sale mal. |
 | 8 | [Pruebas seguras sobre un Odoo en producción](Pruebas-Seguras-en-Produccion.md) | La síntesis: el checklist de buenas prácticas que reúne todo lo anterior. |
+
+### 3. Desarrollo: búsqueda y filtros
+
+Ya en clave de desarrollo, cómo se construyen las herramientas de búsqueda y filtrado de un listado. Es una subcolección con su propio índice.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 9 | [Búsqueda y filtros en Odoo](busqueda-y-filtros/README.md) | Dominios, vista de búsqueda, *search panel* y filtros dinámicos, de lo básico a lo avanzado. |
 
 ---
 
