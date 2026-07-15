@@ -46,6 +46,7 @@ Una vez sabes quién es la usuaria, cómo decidir con precisión qué puede hace
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 9 | [RBAC y Claims](RBAC-y-Claims.md) | De los roles simples a las políticas basadas en claims para reglas más finas. |
+| 10 | [ACL (listas de control de acceso)](ACL.md) | El modelo complementario a RBAC: los permisos viven en el recurso, no en el rol. |
 
 ---
 
