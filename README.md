@@ -30,8 +30,11 @@ Algoritmos de hash modernos, y autenticación y autorización (OAuth2, OIDC, JWT
 ### [Redes](redes/README.md)
 Conexiones remotas, carpetas compartidas, NAS, SSH, VPN y compañía.
 
+### [Odoo](odoo/README.md)
+El ERP de código abierto: cómo hacer pruebas de forma segura sobre un Odoo en producción y cómo se construyen las búsquedas y los filtros (dominios, *search panel*, filtros dinámicos).
+
 ### [Herramientas y sistemas](herramientas/README.md)
-Odoo y correo transaccional.
+Correo transaccional.
 
 ### [IA](ia/README.md)
 Context engineering: cómo diseñar y gestionar todo lo que recibe un modelo de lenguaje en cada llamada.
