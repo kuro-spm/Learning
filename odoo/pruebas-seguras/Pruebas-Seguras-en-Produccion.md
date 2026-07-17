@@ -40,7 +40,7 @@ Aplica un cambio cada vez y comprueba que todo sigue bien antes del siguiente. S
 
 **6. Solo lectura cuando solo necesites mirar**
 
-Para investigar o consultar, usa un usuario con permisos de solo lectura o el modo desarrollador únicamente para *ver* (ver [Modo desarrollador](Modo-Desarrollador.md)). No hace falta poder escribir para diagnosticar.
+Para investigar o consultar, usa un usuario con permisos de solo lectura o el modo desarrollador únicamente para *ver* (ver [Modo desarrollador](../fundamentos/Modo-Desarrollador.md)). No hace falta poder escribir para diagnosticar.
 
 **7. Nunca toques PostgreSQL a mano en producción**
 
