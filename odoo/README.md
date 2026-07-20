@@ -1,6 +1,6 @@
 # Odoo — Guía de tecnología
 
-Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en tres subcolecciones: los **fundamentos** para entender qué es y cómo está montado, las **pruebas seguras** para tocar un sistema en producción sin romperlo, y el **desarrollo de búsquedas y filtros** que ve el usuario. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
+Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en cuatro subcolecciones: los **fundamentos** para entender qué es y cómo está montado, las **pruebas seguras** para tocar un sistema en producción sin romperlo, el **desarrollo de búsquedas y filtros** que ve el usuario, y las **maneras de configurar parámetros** para no dejar valores clavados en el código. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
 
 Cada subcolección tiene su propio índice con orden de lectura. Si empiezas de cero, recórrelas en el orden de abajo.
 
@@ -41,6 +41,19 @@ Ya en clave de desarrollo, cómo se construyen las herramientas de búsqueda y f
 | 11 | [Vista de búsqueda](busqueda-y-filtros/Vista-de-Busqueda.md) | Dónde se declaran los filtros, agrupaciones y campos buscables de un listado. |
 | 12 | [Search Panel](busqueda-y-filtros/Search-Panel.md) | El panel lateral de filtrado por facetas: el tema estrella y el más visual. |
 | 13 | [Dominios dinámicos](busqueda-y-filtros/Dominios-Dinamicos.md) | Filtros que se calculan según el contexto: otro campo, el usuario o una lógica en Python. |
+
+### 4. [Configuración de parámetros](configuracion-parametros/README.md)
+
+Las distintas maneras de guardar un valor configurable en Odoo, para no dejarlo clavado en el código.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 14 | [El fichero odoo.conf](configuracion-parametros/El-Fichero-odoo-conf.md) | La capa de infraestructura: lo que el servidor necesita para arrancar. |
+| 15 | [Parámetros del sistema (ir.config_parameter)](configuracion-parametros/Parametros-del-Sistema.md) | El almacén global clave-valor de la base de datos, editable en caliente. |
+| 16 | [Ajustes (res.config.settings)](configuracion-parametros/Ajustes.md) | La pantalla amable que expone esos parámetros al usuario de negocio. |
+| 17 | [Configuración por compañía](configuracion-parametros/Configuracion-por-Compania.md) | El mismo parámetro con un valor distinto en cada empresa. |
+| 18 | [Valores por defecto](configuracion-parametros/Valores-por-Defecto.md) | Qué se precarga en un campo al crear un registro, y desde dónde definirlo. |
+| 19 | [Referencias por ID externo (XML ID)](configuracion-parametros/Referencias-por-ID-Externo.md) | Apuntar a un registro concreto sin clavar su ID numérico. |
 
 ---
 
