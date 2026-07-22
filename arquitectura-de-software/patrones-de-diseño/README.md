@@ -34,6 +34,7 @@ Patrones de propósito general que aparecen constantemente al construir el domin
 | 7 | [Strategy](Strategy.md) | Cómo intercambiar un algoritmo (cálculo, validación, ordenación) sin `switch` gigantes. |
 | 8 | [Decorator](Decorator.md) | Cómo añadir capacidades (caché, logging, reintentos) envolviendo un objeto sin tocar su implementación. |
 | 9 | [Mediator](Mediator.md) | Cómo desacoplar a quien pide una acción de quien la ejecuta, hablando siempre a través de un mediador. |
+| 10 | [MediatR](MediatR.md) | La implementación del patrón Mediator en .NET: CQRS in-process, comunicación entre módulos y pipelines de comportamiento. Leer después de Mediator. |
 
 ### 3. Patrones habituales al diseñar la capa de aplicación
 
@@ -41,7 +42,7 @@ No son patrones GoF, pero aparecen constantemente junto a los anteriores al dise
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 10 | [Result Pattern](Result-Pattern.md) | Cómo comunicar un fallo esperado del negocio como un valor de retorno, en vez de con una excepción. |
+| 11 | [Result Pattern](Result-Pattern.md) | Cómo comunicar un fallo esperado del negocio como un valor de retorno, en vez de con una excepción. |
 
 ---
 

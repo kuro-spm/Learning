@@ -30,6 +30,7 @@ Recorre las capas en el mismo orden en que conviene diseñarlas: del corazón es
 | 5 | [Casos de Uso](Casos-de-Uso.md) | Cómo se orquesta cada acción de la aplicación alrededor del dominio. |
 | 6 | [Puertos y Adaptadores](Puertos-y-Adaptadores.md) | El vocabulario de las fronteras: cómo entra y sale la información del centro. |
 | 7 | [Capa de Infraestructura](Capa-de-Infraestructura.md) | El borde técnico: base de datos, web y demás detalles reemplazables. |
+| 8 | [Códigos de Resultado por Capa](Codigos-de-Resultado-por-Capa.md) | Con las capas ya vistas: en cuál vive el enum que dice cómo terminó una operación, y por qué. |
 
 ### 3. Organizar el código a lo grande
 
@@ -37,7 +38,7 @@ Con las capas claras, queda la pregunta del día a día en un monolito modular: 
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 8 | [Módulos vs Shared](Modulos-vs-Shared.md) | El criterio para decidir si el código nuevo va a un módulo propio o a los proyectos compartidos. |
+| 9 | [Módulos vs Shared](Modulos-vs-Shared.md) | El criterio para decidir si el código nuevo va a un módulo propio o a los proyectos compartidos. |
 
 ---
 
