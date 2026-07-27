@@ -1,6 +1,6 @@
 # DevOps y control de versiones — Guías
 
-Cómo se gestiona el código en equipo y cómo llega de forma automática a producción: control de versiones, integración continua y contenedores.
+Cómo se gestiona el código en equipo y cómo llega de forma automática a producción: control de versiones, integración continua, contenedores y el servidor donde acaban ejecutándose.
 
 ---
 
@@ -14,6 +14,9 @@ Cómo se describe un pipeline y qué herramientas y técnicas llevan el código 
 
 ### [Docker](docker/README.md)
 Cómo funciona la contenedorización y cómo escribir y entender un `Dockerfile`.
+
+### [Despliegue en un VPS](despliegue-en-vps/README.md)
+Llevar una aplicación dockerizada a un servidor Linux propio: endurecer el acceso (SSH, firewall, fail2ban), montar el reverse proxy con HTTPS automático, separar redes y volúmenes, y dejarlo operando solo con copias de seguridad, cron y acceso por VPN.
 
 ### [Observabilidad](observabilidad/README.md)
 Los tres pilares para entender qué pasa dentro de un sistema en producción: logs, métricas y trazas, y el estándar (OpenTelemetry) que los unifica.

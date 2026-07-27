@@ -8,5 +8,9 @@ desktop.ini
 .idea/
 *.swp
 
+# Artefactos que las extensiones del editor generan dentro de las carpetas de tema
+**/.github/copilot-instructions.md
+**/.github/instructions/
+
 # Información privada / específica de proyectos internos (no es tutorial genérico)
 private-information/
