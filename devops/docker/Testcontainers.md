@@ -35,13 +35,7 @@ Cuando un test pide un contenedor, Testcontainers habla con el demonio de Docker
 
 ## El primer test completo
 
-Instala el módulo de PostgreSQL, que ya trae imagen, usuario, contraseña y estrategia de espera preconfigurados:
-
-```bash
-dotnet add package Testcontainers.PostgreSql
-```
-
-Y el test entero, ejecutable tal cual:
+Instala el módulo de PostgreSQL (`dotnet add package Testcontainers.PostgreSql`), que ya trae imagen, usuario, contraseña y estrategia de espera preconfigurados. Y este es el test entero, ejecutable tal cual:
 
 ```csharp
 using Testcontainers.PostgreSql;
@@ -49,17 +43,16 @@ using Xunit;
 
 public class RepositorioPedidosTests : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine")
-        .Build();
+    private readonly PostgreSqlContainer _postgres =
+        new PostgreSqlBuilder().WithImage("postgres:16-alpine").Build();
 
     private RepositorioPedidos _repositorio = null!;
 
     public async Task InitializeAsync()
     {
-        await _postgres.StartAsync();                       // descarga, arranca y espera
+        await _postgres.StartAsync();                    // descarga, arranca y espera
         _repositorio = new RepositorioPedidos(_postgres.GetConnectionString());
-        await _repositorio.AplicarEsquemaAsync();           // la BD nace vacía: hay que crear tablas
+        await _repositorio.AplicarEsquemaAsync();        // la BD nace vacía: hay que crear tablas
     }
 
     public Task DisposeAsync() => _postgres.DisposeAsync().AsTask();
@@ -67,9 +60,7 @@ public class RepositorioPedidosTests : IAsyncLifetime
     [Fact]
     public async Task Guardar_PersisteElPedidoYLoRecupera()
     {
-        var pedido = new Pedido { Id = 4711, Cliente = "ACME", Total = 129.90m };
-
-        await _repositorio.GuardarAsync(pedido);
+        await _repositorio.GuardarAsync(new Pedido { Id = 4711, Cliente = "ACME", Total = 129.90m });
         var recuperado = await _repositorio.ObtenerPorIdAsync(4711);
 
         Assert.Equal(129.90m, recuperado!.Total);
@@ -102,16 +93,15 @@ Con el código anterior, **cada clase de tests arranca su propio PostgreSQL**. V
 | Un contenedor por clase | ~90 s | Bueno, aún caro |
 | Un contenedor compartido | ~10 s | Hay que limpiar entre tests |
 
-El patrón correcto en xUnit es **`ICollectionFixture`**: una instancia compartida por todas las clases de una colección. Tres piezas.
+El patrón correcto en xUnit es **`ICollectionFixture`**: una instancia compartida por todas las clases de una colección. Dos piezas.
 
-**1. El fixture, que posee el contenedor:**
+**1. El fixture, que posee el contenedor, más la clase vacía que da nombre a la colección:**
 
 ```csharp
 public class PostgresFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine")
-        .Build();
+    private readonly PostgreSqlContainer _postgres =
+        new PostgreSqlBuilder().WithImage("postgres:16-alpine").Build();
 
     public string CadenaConexion => _postgres.GetConnectionString();
 
@@ -123,16 +113,12 @@ public class PostgresFixture : IAsyncLifetime
 
     public Task DisposeAsync() => _postgres.DisposeAsync().AsTask();
 }
-```
 
-**2. La definición de la colección** — una clase vacía cuyo único cometido es dar nombre al grupo:
-
-```csharp
 [CollectionDefinition("postgres")]
 public class PostgresCollection : ICollectionFixture<PostgresFixture> { }
 ```
 
-**3. Cada clase de tests se apunta a la colección y recibe el fixture por constructor:**
+**2. Cada clase de tests se apunta a la colección y recibe el fixture por constructor:**
 
 ```csharp
 [Collection("postgres")]
@@ -158,14 +144,11 @@ Compartir contenedor reintroduce el problema que Testcontainers venía a resolve
 **Truncado entre tests.** Vaciar las tablas antes de cada test. A mano es frágil (el orden importa por las foreign keys), así que se usa **Respawn**, que inspecciona el esquema y genera el `TRUNCATE ... CASCADE` correcto:
 
 ```csharp
-public async Task InitializeAsync()
-{
-    var conexion = new NpgsqlConnection(_fixture.CadenaConexion);
-    await conexion.OpenAsync();
-    var respawner = await Respawner.CreateAsync(conexion,
-        new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
-    await respawner.ResetAsync(conexion);   // ~5 ms, deja el esquema intacto
-}
+var conexion = new NpgsqlConnection(_fixture.CadenaConexion);
+await conexion.OpenAsync();
+var respawner = await Respawner.CreateAsync(conexion,
+    new RespawnerOptions { DbAdapter = DbAdapter.Postgres });
+await respawner.ResetAsync(conexion);   // ~5 ms, borra filas y deja el esquema intacto
 ```
 
 Rápido y sencillo. Borra también los datos de referencia, así que hay que resembrarlos (Respawn admite `TablesToIgnore`).
@@ -228,11 +211,9 @@ private readonly RedisContainer _redis = new RedisBuilder().WithImage("redis:7-a
 public async Task Cache_DevuelveElPedidoGuardado()
 {
     var cache = ConnectionMultiplexer.Connect(_redis.GetConnectionString()).GetDatabase();
-
     await cache.StringSetAsync("pedido:4711", "129.90", TimeSpan.FromMinutes(5));
-    var valor = await cache.StringGetAsync("pedido:4711");
 
-    Assert.Equal("129.90", valor);          // con el TTL real de Redis, no un diccionario
+    Assert.Equal("129.90", await cache.StringGetAsync("pedido:4711"));  // TTL real, no un diccionario
 }
 ```
 
@@ -243,8 +224,8 @@ Hasta ahora se ha probado el repositorio aislado. Para probar el endpoint `GET /
 ```csharp
 public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine").Build();
+    private readonly PostgreSqlContainer _postgres =
+        new PostgreSqlBuilder().WithImage("postgres:16-alpine").Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder) =>
         builder.UseSetting("ConnectionStrings:Pedidos", _postgres.GetConnectionString());
@@ -252,11 +233,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     public async Task InitializeAsync() => await _postgres.StartAsync();
     public new Task DisposeAsync() => _postgres.DisposeAsync().AsTask();
 }
-```
 
-Y el test pide por HTTP, sin saber que hay un contenedor debajo:
-
-```csharp
 [Collection("api")]
 public class PedidosEndpointTests(ApiFactory factory)
 {
@@ -264,33 +241,18 @@ public class PedidosEndpointTests(ApiFactory factory)
     public async Task Get_DevuelveElPedido()
     {
         var respuesta = await factory.CreateClient().GetAsync("/pedidos/4711");
-        Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);   // 200 OK, contra PostgreSQL real
     }
 }
 ```
 
-Ojo con el orden: `ConfigureWebHost` se ejecuta cuando se crea el primer `HttpClient`, que es **después** de `InitializeAsync`. Si inviertes ese orden, `GetConnectionString()` lanza porque el contenedor aún no tiene puerto asignado.
+El test pide por HTTP sin saber que hay un contenedor debajo. Ojo con el orden: `ConfigureWebHost` se ejecuta cuando se crea el primer `HttpClient`, que es **después** de `InitializeAsync`. Si inviertes ese orden, `GetConnectionString()` lanza porque el contenedor aún no tiene puerto asignado.
 
 ## Ejecutar en CI
 
-Dos requisitos y una advertencia.
+**1. Docker tiene que estar disponible en el runner.** Los runners `ubuntu-latest` de GitHub Actions lo traen instalado y arrancado, así que un job normal con `actions/setup-dotnet` y `dotnet test` funciona sin configuración extra. En runners autoalojados o en agentes que ya corren dentro de un contenedor, hay que montar el socket (`/var/run/docker.sock`) o usar Docker-in-Docker. Ver [CI/CD](../ci-cd/README.md) y [Docker en CI/CD](../ci-cd/Docker-en-CI-CD.md).
 
-**1. Docker tiene que estar disponible en el runner.** Los runners `ubuntu-latest` de GitHub Actions lo traen instalado y arrancado, así que no hay nada que configurar:
-
-```yaml
-jobs:
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with: { dotnet-version: '8.0.x' }
-      - run: dotnet test
-```
-
-En runners autoalojados o en agentes que ya corren dentro de un contenedor, hay que montar el socket (`/var/run/docker.sock`) o usar Docker-in-Docker. Ver [CI/CD](../ci-cd/README.md) para el contexto general y [Docker en CI/CD](../ci-cd/Docker-en-CI-CD.md) para el caso concreto.
-
-**2. Caché de imágenes.** Cada job descarga `postgres:16-alpine` desde cero. Fijar una versión concreta y, si tienes una organizada, republicar la imagen en tu propio [registro](GitHub-Container-Registry.md) evita depender del límite de descargas de Docker Hub.
+**2. Caché de imágenes.** Cada job descarga `postgres:16-alpine` desde cero. Fijar una versión concreta y republicar la imagen en tu propio [registro](GitHub-Container-Registry.md) evita depender del límite de descargas de Docker Hub.
 
 **Ryuk, el basurero.** Al arrancar el primer contenedor, Testcontainers levanta también `testcontainers/ryuk`, que monta el socket de Docker y vigila la sesión de tests. Si el proceso muere sin llamar a `DisposeAsync` —un `Ctrl+C`, un runner cancelado, un fallo del proceso—, Ryuk detecta que la sesión ha desaparecido y elimina los contenedores, redes y volúmenes huérfanos. Es lo que impide que un CI acumule PostgreSQLs zombis hasta llenar el disco. Se desactiva con `TESTCONTAINERS_RYUK_DISABLED=true`, y hacerlo casi nunca es buena idea: solo en entornos donde montar el socket está prohibido, y asumiendo la limpieza tú.
 
@@ -319,8 +281,6 @@ En runners autoalojados o en agentes que ya corren dentro de un contenedor, hay 
 - [Documentación oficial de Testcontainers for .NET](https://dotnet.testcontainers.org/) — la referencia de la API: builders, *wait strategies*, redes y variables de entorno, con las firmas exactas de la versión que tengas instalada.
 - [Catálogo de módulos](https://testcontainers.com/modules/) — busca la tecnología que necesitas (Kafka, Elasticsearch, LocalStack, Keycloak...) y te da el paquete y el fragmento de arranque. Evita escribir a mano un `ContainerBuilder` genérico cuando ya existe módulo.
 - [Respawn](https://github.com/jbogard/Respawn) — el complemento natural: el README explica cómo detecta el grafo de foreign keys y qué opciones hay para preservar tablas de datos maestros entre tests.
-
-Para el contexto de testing en .NET, la colección [Testing en .NET](../../testing/testing-dotnet/README.md) cubre [xUnit](../../testing/testing-dotnet/xUnit.md), [fixtures](../../testing/testing-dotnet/Fixtures-y-ciclo-de-vida.md) y [WebApplicationFactory](../../testing/testing-dotnet/WebApplicationFactory.md) en detalle.
 
 ---
 

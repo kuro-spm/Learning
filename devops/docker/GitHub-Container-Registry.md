@@ -12,7 +12,7 @@ El registro más conocido es **Docker Hub**, y funciona. Pero si el código ya e
 
 > Piensa en un registro como la tienda de aplicaciones de tus imágenes: tú publicas versiones etiquetadas y cualquier máquina autorizada las instala por su nombre exacto. ghcr.io es la tienda que ya viene incluida con la cuenta de GitHub que ya tienes.
 
-Comparado con Docker Hub, en las cuatro cosas que se notan a diario:
+Frente a Docker Hub, en las cuatro cosas que se notan a diario:
 
 | | Docker Hub (plan gratuito) | ghcr.io |
 |---|---|---|
@@ -27,10 +27,9 @@ Ese primer punto es la razón por la que muchos equipos migran: un pipeline que 
 
 - **Publicar desde CI.** El pipeline construye la imagen de la aplicación y la sube etiquetada; el servidor de producción hace `pull` de esa etiqueta exacta. Es el uso principal y el que cubre casi toda esta ficha.
 - **Versionar despliegues.** Cada release corresponde a una imagen inmutable (`1.4.0`); volver atrás es descargar la etiqueta anterior en lugar de revertir commits y reconstruir.
-- **Compartir imágenes internas** entre proyectos o entre personas del equipo sin hacerlas públicas.
-- **Distribuir herramientas propias** (una CLI, un runner de tests) que otros repos consumen como imagen base.
+- **Compartir imágenes internas** entre proyectos o personas del equipo sin hacerlas públicas, y distribuir herramientas propias que otros repos consumen como imagen base.
 
-Esta ficha cubre `ghcr.io` en concreto y **cómo se publica** en él. El otro lado del proceso —cómo un servidor de producción se autentica y descarga, con cualquier proveedor— está en [Registros de imágenes privados](../despliegue-en-vps/Registros-de-Imagenes-Privados.md).
+Esta ficha cubre `ghcr.io` en concreto y **cómo se publica** en él. El otro lado —cómo un servidor de producción se autentica y descarga, con cualquier proveedor— está en [Registros de imágenes privados](../despliegue-en-vps/Registros-de-Imagenes-Privados.md).
 
 ---
 
@@ -180,16 +179,15 @@ Qué hace y qué deja detrás: al empujar el tag `v1.4.0`, el workflow construye
 
 La combinación práctica es **sha + semver**: cada push a una rama publica `sha-<commit>` para poder desplegar cualquier build a un entorno de prueba, y cada tag de Git publica el semver que va a producción. Así el nombre de la imagen desplegada responde por sí solo a "¿qué código es esto?".
 
-Escribir esas etiquetas a mano en el workflow es tedioso y se desincroniza. Por eso el ejemplo usa [`docker/metadata-action`](https://github.com/docker/metadata-action): las deriva del evento de Git y genera además los labels OCI. Si en algún momento quieres que los tags de versión también muevan `latest`, se añade `type=raw,value=latest,enable={{is_default_branch}}` y la lógica sigue viviendo en un solo sitio.
+Escribir esas etiquetas a mano se desincroniza enseguida; por eso el ejemplo usa [`docker/metadata-action`](https://github.com/docker/metadata-action), que las deriva del evento de Git y genera además los labels OCI. Si quieres que los tags de versión muevan también `latest`, se añade `type=raw,value=latest,enable={{is_default_branch}}` y la lógica sigue viviendo en un solo sitio.
 
 ## Visibilidad del paquete y del repositorio
 
 Esta es la fuente de confusión clásica de ghcr.io: **la visibilidad del paquete es independiente de la del repositorio**.
 
-- Un paquete publicado desde un repositorio privado nace **privado**. Descargarlo requiere `docker login` con un token con `read:packages`.
-- Un paquete publicado desde un repositorio público **también nace privado**. Que el código sea público no hace pública la imagen.
+- Todo paquete nace **privado**, venga de un repositorio privado o público. Que el código sea público no hace pública la imagen, y descargarla exige `docker login` con `read:packages`.
 - Hacer público el repositorio más tarde **no cambia** la visibilidad de los paquetes ya publicados.
-- Hacer público un paquete es una acción explícita en *Package settings → Change visibility*, y una vez público **cualquiera puede hacer `pull` sin autenticarse**, incluso sin cuenta de GitHub.
+- Publicar un paquete es una acción explícita en *Package settings → Change visibility*, y una vez público **cualquiera hace `pull` sin autenticarse**, incluso sin cuenta de GitHub.
 
 El síntoma típico es un servidor que falla al descargar una imagen "que es pública porque el repo es público":
 
@@ -218,13 +216,13 @@ docker inspect ghcr.io/mi-organizacion/tienda-api:1.4.0 \
 https://github.com/mi-organizacion/tienda-api
 ```
 
-`docker/metadata-action` añade este label automáticamente (junto con `.revision`, `.created` y `.version`): otra razón para no etiquetar a mano.
+`docker/metadata-action` añade este label automáticamente, junto con `.revision`, `.created` y `.version`: otra razón para no etiquetar a mano.
 
 ## Retención y limpieza
 
 Cada push que reutiliza una etiqueta deja la imagen anterior como versión **untagged**: sigue ocupando espacio y sigue siendo descargable por digest, pero ya no tiene nombre. Los builds multiarquitectura generan además manifiestos intermedios sin etiqueta. En un repositorio activo se acumulan cientos de versiones en meses, y en paquetes privados eso se factura.
 
-GitHub no borra nada por su cuenta, así que la limpieza se programa en un workflow con `on: schedule` (por ejemplo `cron: '0 3 * * 0'`, domingos a las 3:00) y `permissions: packages: write`:
+GitHub no borra nada por su cuenta, así que la limpieza se programa en un workflow con `on: schedule` (`cron: '0 3 * * 0'`, domingos a las 3:00) y `permissions: packages: write`:
 
 ```yaml
       - uses: actions/delete-package-versions@v5

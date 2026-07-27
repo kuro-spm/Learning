@@ -14,12 +14,9 @@ OpenTelemetry nace de fusionar dos proyectos previos (OpenTracing y OpenCensus) 
 
 ## ¿Cuándo y para qué se usa?
 
-En cualquier servicio .NET, Java, Node o Go que vaya a producción y necesite algo más que `Console.WriteLine`. Hoy es la forma por defecto de instrumentar, y hay dos razones prácticas por las que se elige:
+En cualquier servicio .NET, Java, Node o Go que vaya a producción. Hoy es la forma por defecto de instrumentar, por dos razones prácticas: **no quedarte atado** (empiezas con Jaeger y Prometheus en un contenedor, gratis, y migras luego a un producto de pago sin tocar código de negocio) y **unificar equipos** (varios servicios emitiendo el mismo formato y correlacionados por el mismo `traceId`).
 
-- **No quedarte atado.** Puedes empezar con Jaeger y Prometheus en un contenedor, gratis, y migrar más adelante a un producto de pago sin tocar una línea de código de negocio.
-- **Unificar equipos.** Varios servicios de varios equipos, cada uno con sus manías, emitiendo el mismo formato y correlacionados por el mismo `traceId`.
-
-Lo que OTel **no** es: un sitio donde guardar ni consultar nada. No tiene interfaz, no tiene base de datos, no dibuja gráficas. Genera y transporta; guardar y visualizar es trabajo de un backend (Jaeger, Prometheus, Grafana, Application Insights, el que sea).
+Lo que OTel **no** es: un sitio donde guardar ni consultar nada. No tiene interfaz, ni base de datos, ni dibuja gráficas. Genera y transporta; guardar y visualizar es trabajo de un backend (Jaeger, Prometheus, Grafana, Application Insights, el que sea).
 
 ---
 
@@ -215,21 +212,14 @@ Un *exporter* decide el destino, igual que un *sink* de [Serilog](Serilog.md). S
 })
 ```
 
-**Consola**, para depurar mientras montas todo esto. Es lo primero que hay que probar cuando "no llega nada": si en consola aparece y en el backend no, el problema es de red o de configuración del exporter, no de instrumentación.
-
-```csharp
-.AddConsoleExporter()
-```
+**Consola** (`.AddConsoleExporter()`), para depurar mientras montas todo esto. Es lo primero que hay que probar cuando "no llega nada": si en consola aparece y en el backend no, el problema es de red o de endpoint, no de instrumentación.
 
 ```
-Activity.TraceId:        4bf92f3577b34da6a3ce929d0e0e4736
-Activity.DisplayName:    pedidos.Confirmar
-Activity.Duration:       00:00:02.3401120
-Activity.Tags:
-    pedido.id: 4711
-    pedido.metodo_pago: tarjeta
-Resource associated with Activity:
-    service.name: pedidos
+Activity.TraceId:     4bf92f3577b34da6a3ce929d0e0e4736
+Activity.DisplayName: pedidos.Confirmar
+Activity.Duration:    00:00:02.3401120
+Activity.Tags:        pedido.id: 4711 / pedido.metodo_pago: tarjeta
+Resource:             service.name: pedidos
 ```
 
 **Prometheus**, solo para métricas y con un modelo distinto: en lugar de que la aplicación envíe, expone un endpoint `/metrics` que Prometheus consulta cada pocos segundos.
@@ -243,16 +233,14 @@ Ese endpoint no debe quedar expuesto a internet; detrás de un [reverse proxy](.
 
 ## El Collector: qué problema resuelve
 
-El **Collector** es un proceso independiente —un contenedor— que recibe telemetría, la procesa y la reenvía a uno o varios destinos.
+El **Collector** es un proceso independiente —un contenedor— que recibe telemetría de varios servicios, la procesa y la reenvía a uno o varios destinos.
 
 ```
-[pedidos]    ─┐
-[pagos]      ─┤
-[inventario] ─┼──►  [ Collector ]  ──┬──►  Jaeger      (trazas)
-[emails]     ─┘                      └──►  Prometheus  (métricas)
+[pedidos] [pagos] [inventario] [emails] ──►  [ Collector ] ──┬──►  Jaeger      (trazas)
+                                                             └──►  Prometheus  (métricas)
 ```
 
-Resuelve tres cosas concretas: cambiar de backend sin redesplegar ni un servicio, aplicar reglas comunes en un solo sitio (filtrar rutas de *health check*, borrar datos personales, añadir atributos del entorno), y que las aplicaciones no dependan de que el backend esté disponible.
+Resuelve tres cosas concretas: cambiar de backend sin redesplegar ni un servicio, aplicar reglas comunes en un solo sitio (filtrar rutas de *health check*, borrar datos personales, añadir atributos del entorno) y que las aplicaciones no dependan de que el backend esté disponible.
 
 **Y cuándo no lo necesitas: al empezar.** Exportar directamente desde la aplicación al backend funciona perfectamente con uno o dos servicios, y es una pieza menos que desplegar, vigilar y arreglar de madrugada. Añádelo cuando aparezca alguno de los tres problemas de arriba, no antes.
 
@@ -262,23 +250,17 @@ Una configuración mínima real, `otel-collector-config.yaml`:
 receivers:
   otlp:
     protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
-      http:
-        endpoint: 0.0.0.0:4318
+      grpc: { endpoint: 0.0.0.0:4317 }
+      http: { endpoint: 0.0.0.0:4318 }
 
 processors:
-  batch:
-    timeout: 5s
-  memory_limiter:
-    check_interval: 1s
-    limit_mib: 400
+  batch: { timeout: 5s }
+  memory_limiter: { check_interval: 1s, limit_mib: 400 }
 
 exporters:
   otlp/jaeger:
     endpoint: jaeger:4317
-    tls:
-      insecure: true
+    tls: { insecure: true }
   prometheus:
     endpoint: 0.0.0.0:8889
 
@@ -316,18 +298,14 @@ La regla práctica: **si el dato ya tiene nombre en el catálogo, úsalo**; para
 
 ## Logs: cómo convive con Serilog
 
-Esta es la señal que más dudas genera, porque parece que OTel y Serilog compiten. No compiten: se conectan en sitios distintos del mismo pipeline.
-
-En .NET todo el logging pasa por `ILogger`. OTel se engancha como un *proveedor* más de [Microsoft.Extensions.Logging](Microsoft-Extensions-Logging.md), igual que la consola. Serilog se engancha en el mismo punto. Hay dos montajes razonables:
+Es la señal que más dudas genera, porque parece que OTel y Serilog compiten. No compiten. En .NET todo el logging pasa por `ILogger`, y OTel se engancha como un *proveedor* más de [Microsoft.Extensions.Logging](Microsoft-Extensions-Logging.md), igual que la consola o que Serilog. Hay dos montajes razonables:
 
 | Montaje | Cómo | Cuándo |
 |---|---|---|
 | Solo OTel | `WithLogging().AddOtlpExporter()` | Proyecto nuevo, todo (logs, métricas, trazas) al mismo backend por OTLP |
 | Serilog + sink OTLP | `Serilog.Sinks.OpenTelemetry` | Ya usas Serilog y quieres conservar sus *enrichers*, `LogContext` y sus otros destinos |
 
-```bash
-dotnet add package Serilog.Sinks.OpenTelemetry
-```
+El segundo montaje, con el paquete `Serilog.Sinks.OpenTelemetry`:
 
 ```csharp
 builder.Services.AddSerilog((services, config) => config
@@ -338,9 +316,7 @@ builder.Services.AddSerilog((services, config) => config
     {
         options.Endpoint = "http://otel-collector:4318/v1/logs";
         options.ResourceAttributes = new Dictionary<string, object>
-        {
-            ["service.name"] = "pedidos"
-        };
+            { ["service.name"] = "pedidos" };
     }));
 ```
 

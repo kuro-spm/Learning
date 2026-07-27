@@ -115,7 +115,7 @@ RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish
 ```
 
-Cualquier cambio en cualquier fichero —una línea en un controlador, una coma en un README— modifica el contexto, invalida la capa del `COPY . .` y con ella la del `restore`. Docker vuelve a descargar todos los paquetes NuGet **en cada build**.
+Cualquier cambio en cualquier fichero —una línea en un controlador, una coma en un README— invalida la capa del `COPY . .` y con ella la del `restore`. Docker vuelve a resolver y descargar todos los paquetes NuGet **en cada build**.
 
 ✅ **Lo correcto:**
 
@@ -126,14 +126,10 @@ COPY . .
 RUN dotnet publish tienda-api.csproj -c Release -o /app/publish --no-restore
 ```
 
-La capa `COPY tienda-api.csproj .` solo cambia cuando cambian las dependencias del proyecto, que es raro. Mientras el `.csproj` sea idéntico, Docker reutiliza la capa del `restore` y salta directamente a compilar.
-
-Se ve en la salida del build. Fíjate en las líneas `CACHED`:
+La capa `COPY tienda-api.csproj .` solo cambia cuando cambian las dependencias del proyecto, que es raro. Mientras el `.csproj` sea idéntico, Docker reutiliza la capa del `restore` y salta directamente a compilar. Se ve en las líneas `CACHED` de la salida del build:
 
 ```
 [+] Building 21.4s (14/14) FINISHED
- => [internal] load build definition from Dockerfile                         0.0s
- => [build 2/6] WORKDIR /src                                                 0.0s
  => CACHED [build 3/6] COPY tienda-api.csproj .                              0.0s
  => CACHED [build 4/6] RUN dotnet restore                                    0.0s
  => [build 5/6] COPY . .                                                     0.2s
@@ -142,19 +138,17 @@ Se ve en la salida del build. Fíjate en las líneas `CACHED`:
  => => naming to docker.io/library/tienda-api:1.0.0                          0.0s
 ```
 
-Sin ese orden, el paso 4 tardaría entre 30 y 90 segundos más en cada build. La regla general: **ordena las instrucciones de menos a más volátil**, dejando para el final lo que cambia en cada commit.
+Sin ese orden, el paso 4 costaría entre 30 y 90 segundos más en cada build. La regla general: **ordena las instrucciones de menos a más volátil**, dejando para el final lo que cambia en cada commit.
 
 ## `.dockerignore`
 
-`COPY . .` copia el directorio entero al *contexto de build*, y ahí está todo: `bin/`, `obj/`, `.git/`, `.vs/`, y con suerte también un `appsettings.Development.json` con la cadena de conexión de tu base de datos local.
+`COPY . .` copia el directorio entero al *contexto de build*, y ahí está todo: `bin/`, `obj/`, `.git/`, `.vs/` y, con suerte, un `appsettings.Development.json` con la cadena de conexión de tu base de datos local. Tres problemas, en orden de gravedad:
 
-Tres problemas, en orden de gravedad:
+1. **Rompe la caché.** `obj/` cambia cada vez que compilas en local, así que el `COPY . .` se invalida siempre aunque no hayas tocado el código.
+2. **Engorda la imagen y el build.** Un `.git/` con años de historia son cientos de MB enviados al demonio en cada build.
+3. **Filtra secretos.** Un fichero copiado a una capa **queda en esa capa para siempre**, aunque una instrucción posterior lo borre; quien tenga la imagen puede extraerlo.
 
-1. **Rompe la caché.** `obj/` cambia cada vez que compilas en local, así que el `COPY . .` se invalida siempre, aunque no hayas tocado el código.
-2. **Engorda la imagen y el build.** Un `.git/` con años de historia son cientos de MB enviados al demonio de Docker en cada build.
-3. **Filtra secretos.** Un fichero copiado a una capa **queda en esa capa para siempre**, aunque una instrucción posterior lo borre. Quien tenga la imagen puede extraerlo.
-
-El remedio es un fichero `.dockerignore` junto al `Dockerfile`, con la misma sintaxis que `.gitignore`:
+El remedio es un `.dockerignore` junto al `Dockerfile`, con la misma sintaxis que `.gitignore`:
 
 ```
 bin/
@@ -173,21 +167,16 @@ Un truco para comprobar qué se está enviando: la primera línea del build mues
 
 ## Comandos del día a día
 
-**Construir la imagen.** El `-t` la etiqueta y el `.` final indica que el contexto de build es el directorio actual:
+**Construir y arrancar.** En `build`, el `-t` etiqueta la imagen y el `.` final indica que el contexto es el directorio actual. En `run`, `-d` deja el contenedor en segundo plano, `-p host:contenedor` publica el puerto, `--name` le da un nombre legible y `-e` pasa variables de entorno:
 
 ```bash
 docker build -t tienda-api:1.0.0 .
-```
-
-**Arrancar un contenedor.** `-d` lo deja en segundo plano, `-p host:contenedor` publica el puerto, `--name` le da un nombre legible y `-e` pasa variables de entorno:
-
-```bash
 docker run -d --name tienda-api -p 8080:8080 \
   -e ASPNETCORE_ENVIRONMENT=Production \
   tienda-api:1.0.0
 ```
 
-Devuelve el ID completo del contenedor. Ojo con el orden en `-p`: **primero el puerto del host**, después el del contenedor. `-p 5000:8080` significa que entras por el 5000 de tu máquina y llegas al 8080 de dentro.
+`run` devuelve el ID completo del contenedor. Ojo con el orden en `-p`: **primero el puerto del host**, después el del contenedor. `-p 5000:8080` significa que entras por el 5000 de tu máquina y llegas al 8080 de dentro.
 
 **Ver qué está corriendo:**
 
@@ -200,9 +189,9 @@ CONTAINER ID   IMAGE              COMMAND                  CREATED         STATU
 a3f19c2e8b10   tienda-api:1.0.0   "dotnet tienda-api.d…"   2 minutes ago   Up 2 minutes   0.0.0.0:8080->8080/tcp   tienda-api
 ```
 
-`docker ps -a` añade los parados, que es donde aparecen los contenedores que murieron al arrancar. Si un contenedor "no aparece", casi siempre es que ya terminó.
+`docker ps -a` añade los parados, que es donde aparecen los contenedores que murieron al arrancar: si uno "no aparece", casi siempre es que ya terminó.
 
-**Ver los logs.** Es lo primero que hay que mirar cuando algo falla; `-f` los sigue en vivo y `--tail` limita las líneas iniciales:
+**Ver los logs**, lo primero que hay que mirar cuando algo falla. `-f` los sigue en vivo y `--tail` limita las líneas iniciales:
 
 ```bash
 docker logs -f --tail 50 tienda-api
@@ -215,17 +204,10 @@ info: Microsoft.Hosting.Lifetime[0]
       Application started. Press Ctrl+C to shut down.
 ```
 
-**Entrar dentro del contenedor** para inspeccionarlo. `-it` da terminal interactiva:
+**Entrar dentro, parar y eliminar.** `exec -it` abre una terminal interactiva en un contenedor en marcha; si responde `executable file not found`, la imagen no trae `bash` y hay que usar `sh`:
 
 ```bash
 docker exec -it tienda-api bash
-```
-
-Si responde `executable file not found`, la imagen no trae `bash`: prueba con `sh`, que sí está en las imágenes Alpine.
-
-**Parar y eliminar:**
-
-```bash
 docker stop tienda-api    # envía SIGTERM y espera 10 s antes de matar
 docker rm tienda-api      # elimina el contenedor parado y su capa de escritura
 docker rm -f tienda-api   # las dos cosas de golpe
@@ -248,7 +230,7 @@ Los 231 MB de `tienda-api` no se suman a los 217 MB del runtime: comparten las m
 
 ## Varios servicios con Docker Compose
 
-`tienda-api` necesita una base de datos. Lanzar dos `docker run` a mano y acordarse de los parámetros no escala; Compose lo declara en un `docker-compose.yml`:
+`tienda-api` necesita una base de datos. Lanzar dos `docker run` a mano y acordarse de los parámetros no escala; Compose lo declara todo en un `docker-compose.yml`:
 
 ```yaml
 services:
@@ -298,16 +280,9 @@ El `${DB_PASSWORD}` lo lee Compose de un fichero `.env` en el mismo directorio, 
 
 ## No ejecutes como root
 
-Casi todas las imágenes base arrancan como `root`. Es cómodo y es un riesgo real: si alguien explota una vulnerabilidad de tu API, obtiene `root` **dentro** del contenedor, y a partir de ahí cualquier volumen montado, capacidad extra o error de configuración es un camino hacia el host.
+Casi todas las imágenes base arrancan como `root`. Es cómodo y es un riesgo real: si alguien explota una vulnerabilidad de tu API, obtiene `root` **dentro** del contenedor, y desde ahí cualquier volumen montado, capacidad extra o error de configuración es un camino hacia el host.
 
-Las imágenes de .NET 8 y posteriores ya traen un usuario sin privilegios llamado `app` (UID 1654), así que basta una línea antes del `ENTRYPOINT`:
-
-```dockerfile
-USER app
-ENTRYPOINT ["dotnet", "tienda-api.dll"]
-```
-
-En una imagen que no lo traiga, se crea a mano:
+Las imágenes de .NET 8 y posteriores ya traen un usuario sin privilegios llamado `app` (UID 1654), así que basta la línea `USER app` antes del `ENTRYPOINT`. En una imagen que no lo traiga, se crea a mano:
 
 ```dockerfile
 RUN adduser --disabled-password --gecos "" --uid 1654 app \
@@ -315,7 +290,7 @@ RUN adduser --disabled-password --gecos "" --uid 1654 app \
 USER app
 ```
 
-Compruébalo desde fuera:
+Se comprueba desde fuera:
 
 ```bash
 docker exec tienda-api whoami
@@ -325,7 +300,7 @@ docker exec tienda-api whoami
 app
 ```
 
-Efecto colateral que hay que anticipar: un usuario sin privilegios **no puede escribir en puertos por debajo del 1024** ni en directorios cuyo propietario sea `root`. Si montas un volumen para logs o ficheros subidos, el directorio del host debe pertenecer al mismo UID; ese detalle está desarrollado en [Volúmenes y permisos](../despliegue-en-vps/Volumenes-y-Permisos.md).
+Efecto colateral que conviene anticipar: un usuario sin privilegios **no puede abrir puertos por debajo del 1024** ni escribir en directorios cuyo propietario sea `root`. Si montas un volumen para logs o ficheros subidos, el directorio del host debe pertenecer al mismo UID; ese detalle está en [Volúmenes y permisos](../despliegue-en-vps/Volumenes-y-Permisos.md).
 
 ## Tamaño de imagen: qué base elegir
 
