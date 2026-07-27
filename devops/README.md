@@ -22,4 +22,4 @@ Llevar una aplicación dockerizada a un servidor Linux propio: endurecer el acce
 Los tres pilares para entender qué pasa dentro de un sistema en producción: logs, métricas y trazas, y el estándar (OpenTelemetry) que los unifica.
 
 ### [Mensajería asíncrona](mensajeria-asincrona/README.md)
-Cómo desacoplar servicios con colas y eventos en vez de llamadas directas, con RabbitMQ y Azure Service Bus como piezas concretas.
+Cómo desacoplar servicios con colas y eventos en vez de llamadas directas: colas frente a topics, garantías de entrega e idempotencia, RabbitMQ y Azure Service Bus como piezas concretas, y los patrones (outbox, dead-letter queues) que hacen que no se pierda ni se duplique trabajo.
