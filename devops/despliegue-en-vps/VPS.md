@@ -87,7 +87,14 @@ Antes de cerrar la sesión de `root`, abre **otra** terminal y comprueba que el 
 
 ```bash
 ssh deployer@203.0.113.10
-sudo whoami        # debe responder: root
+whoami             # deployer  → has entrado con el usuario nuevo
+sudo whoami        # root      → y puede elevar privilegios
+```
+
+Las dos respuestas son distintas a propósito. `whoami` a secas dice quién eres: `deployer`. `sudo whoami` ejecuta ese mismo comando **como root**, así que responder `root` es precisamente la prueba de que `sudo` funciona. Si el usuario no tuviera privilegios, no verías `deployer`, verías un rechazo:
+
+```
+deployer is not in the sudoers file.  This incident will be reported.
 ```
 
 Esta comprobación en una segunda terminal es la red de seguridad de todo lo que viene después: mientras la sesión de `root` siga abierta, siempre puedes deshacer un cambio que te haya dejado fuera.
