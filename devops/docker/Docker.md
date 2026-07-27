@@ -2,202 +2,374 @@
 
 ## ¿Qué es?
 
-Docker es una plataforma de **contenedores** que permite empaquetar una aplicación junto con todo lo que necesita para ejecutarse —sistema operativo base, dependencias, configuración— dentro de una unidad portable y reproducible llamada contenedor.
+Docker es una plataforma de **contenedores**: empaqueta una aplicación junto con todo lo que necesita para ejecutarse —runtime, dependencias, ficheros de configuración— en una unidad portable llamada *imagen*, que se ejecuta igual en cualquier máquina con Docker instalado.
 
 ## ¿Por qué existe?
 
-El problema clásico del desarrollo de software: *"en mi máquina funciona"*. Una aplicación puede funcionar perfectamente en el ordenador de un desarrollador y fallar en el servidor de producción porque las versiones de las herramientas son distintas, o porque hay una librería del sistema que en un entorno está instalada y en el otro no.
+Existe por *"en mi máquina funciona"*. Una API compila y arranca en el portátil de quien la escribió, y falla en el servidor porque allí hay otra versión del runtime, falta una librería del sistema o una variable de entorno se llama distinto. El problema no es el código: es que el **entorno** viaja por un canal distinto —un documento de instalación, la memoria de alguien, un script desactualizado— y los dos canales se desincronizan siempre. Docker mete el entorno dentro del propio artefacto: si la imagen funciona en tu portátil, funciona en producción, porque es literalmente el mismo sistema de ficheros ejecutándose con el mismo runtime.
 
-Docker resuelve esto garantizando que la aplicación siempre se ejecuta en exactamente el mismo entorno, da igual dónde se despliegue.
-
-> Si ya conoces las máquinas virtuales (VMware, VirtualBox), piensa en Docker como una versión mucho más ligera: en lugar de virtualizar hardware completo, comparte el kernel del sistema operativo del host pero aísla el proceso y su sistema de archivos.
+> Piensa en el contenedor marítimo, del que Docker toma el nombre. Antes de estandarizarlo, cada mercancía se cargaba a su manera y cada puerto necesitaba saber qué transportaba para manipularla. Con el contenedor, el puerto solo conoce una caja de medidas fijas con unos enganches fijos: da igual si dentro hay plátanos o lavadoras. Tu servidor deja de saber si la aplicación es .NET, Node o Python; solo sabe arrancar cajas.
 
 ## ¿Cuándo y para qué se usa?
 
-- **Despliegue de aplicaciones**: Empaquetar un servidor web (Node.js, .NET, Python…) para que cualquier servidor pueda ejecutarlo con un solo comando.
-- **Entornos de desarrollo reproducibles**: Que todo el equipo trabaje con la misma versión de la base de datos, el mismo runtime, la misma configuración, sin instalar nada en el sistema anfitrión.
-- **Microservicios**: Ejecutar varios servicios independientes (API, base de datos, cola de mensajes) en la misma máquina sin que interfieran entre sí.
-- **CI/CD**: Correr los tests en un entorno limpio y reproducible en cada pull request.
+- **Desplegar aplicaciones**: el servidor no acumula runtimes ni dependencias; cada aplicación trae la suya dentro de su imagen.
+- **Entornos de desarrollo reproducibles**: todo el equipo levanta la misma versión de PostgreSQL con un comando, sin instalar nada en el sistema anfitrión.
+- **Microservicios**: varios servicios independientes en la misma máquina, aislados entre sí aunque necesiten versiones incompatibles de la misma librería.
+- **CI/CD**: ejecutar tests en un entorno limpio y idéntico en cada *pull request*, sin arrastrar basura de la ejecución anterior.
 
-## Lo mínimo que necesitas saber
+Esta ficha cubre qué es realmente un contenedor y cómo escribir un `Dockerfile`. Operar Docker en un servidor de producción —instalación, rotación de logs, políticas de reinicio— está en [Docker en un VPS](../despliegue-en-vps/Docker-en-un-VPS.md).
 
-**Conceptos clave antes de empezar**
+## Contenedor y máquina virtual no son lo mismo
 
-Tres conceptos que aparecen en todo momento:
+Una máquina virtual emula un ordenador completo: virtualiza hardware, arranca su propio kernel y encima de él un sistema operativo entero. Un contenedor **no arranca ningún sistema operativo**: es un proceso normal de Linux que se ejecuta sobre el kernel del host, al que se le ha mentido sobre lo que puede ver.
 
-- **Imagen**: La "receta" de un contenedor. Es un archivo inmutable que describe el sistema operativo base, las dependencias y el código de la aplicación. Se construye a partir de un `Dockerfile`.
-- **Contenedor**: Una instancia en ejecución de una imagen. Es como "ejecutar" la receta: puede arrancar, pararse y eliminarse. De la misma imagen puedes crear cientos de contenedores.
-- **Dockerfile**: El archivo de texto que define cómo construir una imagen, instrucción por instrucción.
+Esa mentira son dos mecanismos del kernel:
 
----
+- **Namespaces** — aíslan lo que el proceso *ve*. Tiene su propio árbol de procesos (tu API es el PID 1 y no ve nada más), su propio sistema de ficheros, su propia interfaz de red y su propio hostname. No es que no tenga permiso para ver el resto: es que para él no existe.
+- **cgroups** (*control groups*) — limitan lo que el proceso *consume*: cuánta CPU, cuánta memoria, cuánta E/S de disco. Es lo que permite decir "este contenedor no pasa de 512 MB" y que el kernel lo haga cumplir.
 
-**1. Cómo se escribe un Dockerfile a mano**
+| | Máquina virtual | Contenedor |
+|---|---|---|
+| Qué aísla | Hardware virtualizado | Procesos, mediante namespaces y cgroups |
+| Kernel | Uno propio por VM | Comparte el del host |
+| Arranque | Decenas de segundos (boot completo) | Milisegundos (arrancar un proceso) |
+| Tamaño típico | Varios GB | Decenas o cientos de MB |
+| Densidad por servidor | Unas pocas | Decenas o cientos |
+| Aislamiento | Fuerte (frontera de hardware) | Menor: un fallo del kernel afecta a todos |
+| Sistema operativo invitado | Cualquiera | Solo el que comparta kernel con el host |
 
-Un `Dockerfile` es un archivo de texto sin extensión que vive en la raíz del proyecto. Cada línea es una instrucción que Docker ejecuta en orden al construir la imagen.
+La última fila es la limitación que más sorprende: un contenedor Linux **no se ejecuta de forma nativa en Windows**. Docker Desktop arranca por debajo una máquina virtual Linux ligera (WSL2) y ejecuta ahí los contenedores.
 
-Ejemplo para una API de .NET:
+## Imagen, contenedor y capas
+
+Tres términos que se confunden constantemente:
+
+- **Imagen**: el artefacto inmutable. Un sistema de ficheros congelado más los metadatos de cómo arrancarlo. No se ejecuta; se guarda y se copia.
+- **Contenedor**: una imagen en ejecución. De la misma imagen puedes lanzar veinte contenedores a la vez, y cada uno tiene su propia capa de escritura temporal.
+- **Dockerfile**: el fichero de texto que describe cómo construir la imagen.
+
+La relación es la de una clase con sus instancias: la imagen es la clase, el contenedor el objeto. Y lo que escribes dentro del contenedor **se pierde al eliminarlo**, porque esa capa de escritura muere con él; los datos que deben sobrevivir van en un [volumen](../despliegue-en-vps/Volumenes-y-Permisos.md).
+
+La parte que de verdad hay que entender es que **una imagen no es un fichero, es una pila de capas**. Cada instrucción del `Dockerfile` que modifica el sistema de ficheros (`FROM`, `COPY`, `RUN`) produce una capa nueva que guarda solo la *diferencia* respecto a la anterior, y la imagen final es todas ellas apiladas y vistas como un único sistema de ficheros. Dos consecuencias muy prácticas:
+
+1. **Las capas se comparten.** Si tienes cinco imágenes construidas sobre `mcr.microsoft.com/dotnet/aspnet:8.0`, esos 217 MB están una sola vez en disco. Por eso `docker images` puede sumar 3 GB y el disco ocupar mucho menos.
+2. **Las capas se cachean.** Si una capa no cambia, Docker reutiliza la que ya calculó. Y si una capa cambia, **todas las siguientes se invalidan** aunque sus instrucciones sean idénticas. De ahí que el orden de las instrucciones decida si un build tarda 5 segundos o 3 minutos.
+
+## El Dockerfile de `tienda-api`, instrucción a instrucción
+
+El ejemplo que acompaña toda la ficha es `tienda-api`, la API .NET de una tienda online. El `Dockerfile` va en la raíz del proyecto, junto al `.csproj`, y se llama exactamente así, sin extensión.
+
+Un detalle antes: .NET necesita el **SDK** para compilar (compilador, plantillas, herramientas: ~830 MB) pero solo el **runtime** para ejecutar (~217 MB). Meter el SDK en la imagen de producción es cargar 600 MB de herramientas que nadie usará, además de todo el código fuente. La solución es un **multi-stage build**: varias etapas en el mismo fichero, de las que solo la última acaba en la imagen final.
 
 ```dockerfile
-# Imagen base con el SDK de .NET para compilar
+# ---------- Etapa 1: compilar ----------
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+WORKDIR /src
 
-# Copiar el archivo de proyecto y restaurar dependencias
-COPY *.csproj .
+# Primero solo el .csproj: cambia poco y permite cachear el restore
+COPY tienda-api.csproj .
 RUN dotnet restore
 
-# Copiar el resto del código y compilar
+# Ahora sí el resto del código, que cambia en cada commit
 COPY . .
-RUN dotnet publish -c Release -o /out
+RUN dotnet publish tienda-api.csproj -c Release -o /app/publish --no-restore
 
-# Imagen final más ligera (solo runtime, sin SDK)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# ---------- Etapa 2: ejecutar ----------
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-COPY --from=build /out .
+
+# Solo se copia el resultado compilado; el SDK y el código fuente se quedan atrás
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "MiApi.dll"]
+USER app
+ENTRYPOINT ["dotnet", "tienda-api.dll"]
 ```
 
-Las instrucciones más frecuentes:
+Qué hace cada instrucción:
 
-| Instrucción | Qué hace |
-|---|---|
-| `FROM` | Define la imagen base de la que parte todo |
-| `WORKDIR` | Establece el directorio de trabajo dentro del contenedor |
-| `COPY` | Copia archivos del host al contenedor |
-| `RUN` | Ejecuta un comando durante la construcción de la imagen |
-| `EXPOSE` | Documenta en qué puerto escucha la aplicación |
-| `ENTRYPOINT` | El comando que se ejecuta al arrancar el contenedor |
+| Instrucción | Qué hace | Detalle que importa |
+|---|---|---|
+| `FROM imagen AS nombre` | Empieza una etapa a partir de una imagen base | El `AS build` la nombra para poder copiar de ella después |
+| `WORKDIR /src` | Fija el directorio de trabajo | Lo crea si no existe; evita `RUN cd ...`, que no persiste entre instrucciones |
+| `COPY origen destino` | Copia del contexto de build al sistema de ficheros de la imagen | El origen es relativo al contexto, nunca puede salir de él con `../` |
+| `RUN comando` | Ejecuta un comando **durante el build** y congela el resultado en una capa | No se ejecuta al arrancar el contenedor |
+| `COPY --from=build` | Copia desde otra etapa en lugar del contexto | La clave del multi-stage |
+| `ENV CLAVE=valor` | Variable de entorno presente en tiempo de build y de ejecución | Nunca metas secretos aquí: quedan visibles en la imagen |
+| `EXPOSE 8080` | **Documenta** el puerto en el que escucha la app | No publica nada: eso lo hace `-p` en `docker run` |
+| `USER app` | Cambia el usuario que ejecutará el proceso | Todo lo posterior corre sin privilegios |
+| `ENTRYPOINT ["…"]` | El proceso que arranca con el contenedor | Forma *exec* (lista JSON), no cadena suelta |
 
----
+Dos más que aparecen a menudo: `CMD` define los argumentos por defecto que recibe el `ENTRYPOINT` y que puedes sobrescribir en `docker run`; `ARG` declara una variable disponible **solo durante el build** (`ARG VERSION=1.0.0`, y se pasa con `docker build --build-arg VERSION=1.4.0`). Y sobre `ASPNETCORE_HTTP_PORTS=8080`: desde .NET 8 ese ya es el puerto por defecto, pero fijarlo evita sorpresas al cambiar de imagen base. Lo que **no** debe hacer la aplicación es escuchar en `localhost`, porque dentro del contenedor `localhost` es el contenedor y nada de fuera podrá conectarse.
 
-**2. Comandos esenciales**
+## La caché de capas: por qué el `.csproj` va antes que el código
+
+Esta es la optimización con más impacto en el día a día, y explica la parte del `Dockerfile` que parece redundante: ¿por qué copiar el `.csproj`, restaurar y *luego* copiar todo otra vez con `COPY . .`?
+
+❌ **Lo intuitivo, y lento:**
+
+```dockerfile
+COPY . .
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
+```
+
+Cualquier cambio en cualquier fichero —una línea en un controlador, una coma en un README— modifica el contexto, invalida la capa del `COPY . .` y con ella la del `restore`. Docker vuelve a descargar todos los paquetes NuGet **en cada build**.
+
+✅ **Lo correcto:**
+
+```dockerfile
+COPY tienda-api.csproj .
+RUN dotnet restore
+COPY . .
+RUN dotnet publish tienda-api.csproj -c Release -o /app/publish --no-restore
+```
+
+La capa `COPY tienda-api.csproj .` solo cambia cuando cambian las dependencias del proyecto, que es raro. Mientras el `.csproj` sea idéntico, Docker reutiliza la capa del `restore` y salta directamente a compilar.
+
+Se ve en la salida del build. Fíjate en las líneas `CACHED`:
+
+```
+[+] Building 21.4s (14/14) FINISHED
+ => [internal] load build definition from Dockerfile                         0.0s
+ => [build 2/6] WORKDIR /src                                                 0.0s
+ => CACHED [build 3/6] COPY tienda-api.csproj .                              0.0s
+ => CACHED [build 4/6] RUN dotnet restore                                    0.0s
+ => [build 5/6] COPY . .                                                     0.2s
+ => [build 6/6] RUN dotnet publish tienda-api.csproj -c Release ...         18.9s
+ => exporting to image                                                       1.4s
+ => => naming to docker.io/library/tienda-api:1.0.0                          0.0s
+```
+
+Sin ese orden, el paso 4 tardaría entre 30 y 90 segundos más en cada build. La regla general: **ordena las instrucciones de menos a más volátil**, dejando para el final lo que cambia en cada commit.
+
+## `.dockerignore`
+
+`COPY . .` copia el directorio entero al *contexto de build*, y ahí está todo: `bin/`, `obj/`, `.git/`, `.vs/`, y con suerte también un `appsettings.Development.json` con la cadena de conexión de tu base de datos local.
+
+Tres problemas, en orden de gravedad:
+
+1. **Rompe la caché.** `obj/` cambia cada vez que compilas en local, así que el `COPY . .` se invalida siempre, aunque no hayas tocado el código.
+2. **Engorda la imagen y el build.** Un `.git/` con años de historia son cientos de MB enviados al demonio de Docker en cada build.
+3. **Filtra secretos.** Un fichero copiado a una capa **queda en esa capa para siempre**, aunque una instrucción posterior lo borre. Quien tenga la imagen puede extraerlo.
+
+El remedio es un fichero `.dockerignore` junto al `Dockerfile`, con la misma sintaxis que `.gitignore`:
+
+```
+bin/
+obj/
+.git/
+.vs/
+.vscode/
+**/appsettings.Development.json
+**/*.user
+Dockerfile
+.dockerignore
+README.md
+```
+
+Un truco para comprobar qué se está enviando: la primera línea del build muestra el tamaño del contexto. Si `transferring context: 340.12MB` aparece en un proyecto de una API pequeña, falta el `.dockerignore`.
+
+## Comandos del día a día
+
+**Construir la imagen.** El `-t` la etiqueta y el `.` final indica que el contexto de build es el directorio actual:
 
 ```bash
-# Construir una imagen a partir del Dockerfile del directorio actual
-docker build -t mi-api:latest .
-
-# Ejecutar un contenedor de esa imagen
-# -p mapea el puerto 8080 del host al 8080 del contenedor
-docker run -p 8080:8080 mi-api:latest
-
-# Ver los contenedores en ejecución
-docker ps
-
-# Detener un contenedor
-docker stop <id-del-contenedor>
-
-# Ver las imágenes locales
-docker images
-
-# Eliminar un contenedor parado
-docker rm <id-del-contenedor>
+docker build -t tienda-api:1.0.0 .
 ```
 
----
+**Arrancar un contenedor.** `-d` lo deja en segundo plano, `-p host:contenedor` publica el puerto, `--name` le da un nombre legible y `-e` pasa variables de entorno:
 
-**3. Docker Compose: varios servicios a la vez**
+```bash
+docker run -d --name tienda-api -p 8080:8080 \
+  -e ASPNETCORE_ENVIRONMENT=Production \
+  tienda-api:1.0.0
+```
 
-Cuando la aplicación necesita más de un servicio (por ejemplo, una API más una base de datos), se usa `docker-compose.yml` para definir y arrancar todo con un solo comando.
+Devuelve el ID completo del contenedor. Ojo con el orden en `-p`: **primero el puerto del host**, después el del contenedor. `-p 5000:8080` significa que entras por el 5000 de tu máquina y llegas al 8080 de dentro.
+
+**Ver qué está corriendo:**
+
+```bash
+docker ps
+```
+
+```
+CONTAINER ID   IMAGE              COMMAND                  CREATED         STATUS         PORTS                    NAMES
+a3f19c2e8b10   tienda-api:1.0.0   "dotnet tienda-api.d…"   2 minutes ago   Up 2 minutes   0.0.0.0:8080->8080/tcp   tienda-api
+```
+
+`docker ps -a` añade los parados, que es donde aparecen los contenedores que murieron al arrancar. Si un contenedor "no aparece", casi siempre es que ya terminó.
+
+**Ver los logs.** Es lo primero que hay que mirar cuando algo falla; `-f` los sigue en vivo y `--tail` limita las líneas iniciales:
+
+```bash
+docker logs -f --tail 50 tienda-api
+```
+
+```
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://[::]:8080
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+```
+
+**Entrar dentro del contenedor** para inspeccionarlo. `-it` da terminal interactiva:
+
+```bash
+docker exec -it tienda-api bash
+```
+
+Si responde `executable file not found`, la imagen no trae `bash`: prueba con `sh`, que sí está en las imágenes Alpine.
+
+**Parar y eliminar:**
+
+```bash
+docker stop tienda-api    # envía SIGTERM y espera 10 s antes de matar
+docker rm tienda-api      # elimina el contenedor parado y su capa de escritura
+docker rm -f tienda-api   # las dos cosas de golpe
+```
+
+**Ver las imágenes locales:**
+
+```bash
+docker images
+```
+
+```
+REPOSITORY                        TAG     IMAGE ID       CREATED          SIZE
+tienda-api                        1.0.0   7c4b2f8a1d93   2 minutes ago    231MB
+mcr.microsoft.com/dotnet/aspnet   8.0     e19b5c33a7f1   3 weeks ago      217MB
+mcr.microsoft.com/dotnet/sdk      8.0     b8d21f094c6a   3 weeks ago      834MB
+```
+
+Los 231 MB de `tienda-api` no se suman a los 217 MB del runtime: comparten las mismas capas. Lo propio de la aplicación son apenas 14 MB.
+
+## Varios servicios con Docker Compose
+
+`tienda-api` necesita una base de datos. Lanzar dos `docker run` a mano y acordarse de los parámetros no escala; Compose lo declara en un `docker-compose.yml`:
 
 ```yaml
 services:
-  api:
+  tienda-api:
     build: .
     ports:
       - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Tienda: "Host=db;Database=tienda;Username=tienda;Password=${DB_PASSWORD}"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
   db:
-    image: postgres:16
+    image: postgres:16.4
     environment:
-      POSTGRES_USER: usuario
-      POSTGRES_PASSWORD: contraseña
-      POSTGRES_DB: miapp
+      POSTGRES_USER: tienda
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: tienda
     volumes:
-      - datos-postgres:/var/lib/postgresql/data
+      - datos-tienda:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tienda"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
 
 volumes:
-  datos-postgres:
+  datos-tienda:
 ```
 
 ```bash
-# Arrancar todos los servicios
-docker compose up
-
-# Arrancarlos en segundo plano
-docker compose up -d
-
-# Pararlos y eliminar los contenedores
-docker compose down
+docker compose up -d --build   # construye y arranca todo en segundo plano
+docker compose ps              # estado de los servicios
+docker compose logs -f tienda-api
+docker compose down            # para y elimina contenedores (los volúmenes se quedan)
 ```
 
----
+Dos cosas que se aprenden a base de tropezar:
 
-**4. Cómo genera Claude un Dockerfile automáticamente**
+- **El host de la base de datos es `db`, no `localhost`.** Compose crea una red propia y registra cada servicio con su nombre; dentro de `tienda-api`, `localhost` es `tienda-api`. Cómo funcionan esas redes está en [Redes Docker y exposición de servicios](../despliegue-en-vps/Redes-Docker-y-Exposicion-de-Servicios.md).
+- **`depends_on` en su forma corta solo espera a que el contenedor arranque, no a que el servicio esté listo.** PostgreSQL tarda unos segundos en aceptar conexiones, y la API falla en ese hueco. Por eso el ejemplo usa `healthcheck` más `condition: service_healthy`.
 
-Cuando se le pide a Claude que cree un `Dockerfile` o un `docker-compose.yml`, el proceso no consiste en escribir una plantilla genérica y rellenar huecos. Estos son los pasos reales que sigue:
+El `${DB_PASSWORD}` lo lee Compose de un fichero `.env` en el mismo directorio, que nunca se sube al repositorio.
 
-**Paso 1 — Identificar el tipo de aplicación**
+## No ejecutes como root
 
-Lo primero es entender qué hay que contenerizar. Claude lee los archivos del proyecto para detectar:
-- El lenguaje y runtime (`.csproj` → .NET, `package.json` → Node.js, `requirements.txt` → Python…).
-- La versión concreta del runtime que usa el proyecto (evita poner una versión aleatoria que rompa la aplicación).
-- Si es una API, una aplicación web, un worker, una función…
+Casi todas las imágenes base arrancan como `root`. Es cómodo y es un riesgo real: si alguien explota una vulnerabilidad de tu API, obtiene `root` **dentro** del contenedor, y a partir de ahí cualquier volumen montado, capacidad extra o error de configuración es un camino hacia el host.
 
-**Paso 2 — Buscar las dependencias externas**
+Las imágenes de .NET 8 y posteriores ya traen un usuario sin privilegios llamado `app` (UID 1654), así que basta una línea antes del `ENTRYPOINT`:
 
-Claude revisa la configuración del proyecto para detectar qué servicios externos necesita: ¿usa una base de datos?, ¿qué motor?, ¿un sistema de caché como Redis?, ¿una cola de mensajes? Estos servicios acaban como entradas adicionales en `docker-compose.yml`.
+```dockerfile
+USER app
+ENTRYPOINT ["dotnet", "tienda-api.dll"]
+```
 
-**Paso 3 — Elegir las imágenes base correctas**
+En una imagen que no lo traiga, se crea a mano:
 
-Conociendo el runtime y la versión, Claude elige las imágenes oficiales adecuadas. Para .NET, por ejemplo, hay que distinguir entre la imagen con el SDK completo (necesaria para compilar) y la imagen de solo runtime (más ligera, para producción). Usar la imagen correcta reduce el tamaño final de la imagen y la superficie de ataque de seguridad.
+```dockerfile
+RUN adduser --disabled-password --gecos "" --uid 1654 app \
+    && chown -R app:app /app
+USER app
+```
 
-**Paso 4 — Decidir si usar multi-stage build**
+Compruébalo desde fuera:
 
-Si el proyecto necesita compilarse antes de ejecutarse (como en .NET, Go o Java), Claude estructura el Dockerfile en dos etapas:
-1. Una etapa de *build* con el SDK completo que compila el código.
-2. Una etapa final con solo el runtime, que copia únicamente el artefacto compilado.
+```bash
+docker exec tienda-api whoami
+```
 
-Esto produce imágenes de producción mucho más pequeñas (a veces 10 veces más ligeras que sin esta técnica).
+```
+app
+```
 
-**Paso 5 — Optimizar el orden de las capas**
+Efecto colateral que hay que anticipar: un usuario sin privilegios **no puede escribir en puertos por debajo del 1024** ni en directorios cuyo propietario sea `root`. Si montas un volumen para logs o ficheros subidos, el directorio del host debe pertenecer al mismo UID; ese detalle está desarrollado en [Volúmenes y permisos](../despliegue-en-vps/Volumenes-y-Permisos.md).
 
-Docker cachea cada instrucción del Dockerfile como una "capa". Si una capa cambia, todas las siguientes se reconstruyen desde cero. Por eso Claude sigue este orden deliberado:
+## Tamaño de imagen: qué base elegir
 
-1. Copiar primero los archivos que cambian poco (como el `.csproj` o el `package.json`).
-2. Ejecutar la restauración/instalación de dependencias.
-3. Copiar el código fuente (que cambia con frecuencia) al final.
+El tamaño no es cosmética: cada MB se descarga en cada despliegue y en cada job de CI, y cada paquete instalado es superficie de ataque que alguien tendrá que parchear.
 
-Así, si solo modificas código pero no añades paquetes nuevos, Docker reutiliza la capa de dependencias y la construcción es mucho más rápida.
+| Base para `tienda-api` | Tamaño aprox. | Cuándo usarla |
+|---|---|---|
+| `sdk:8.0` como imagen final | ~1,05 GB | Nunca en producción. Solo como etapa de build. |
+| `aspnet:8.0` (Debian bookworm-slim) | ~231 MB | Por defecto. Máxima compatibilidad, trae `bash` y `glibc`. |
+| `aspnet:8.0-alpine` | ~125 MB | Cuando el tamaño importa y has verificado que todo funciona. |
+| `aspnet:8.0-noble-chiseled` | ~110 MB | Producción endurecida: sin shell ni gestor de paquetes. |
 
-**Paso 6 — Configurar puertos, variables de entorno y volúmenes**
+Alpine usa **musl** en lugar de **glibc** como librería estándar de C. La mayoría de las aplicaciones .NET funcionan sin cambios, pero las que dependen de librerías nativas (algunos drivers, procesamiento de imágenes con SkiaSharp) pueden fallar de formas poco obvias. Y las imágenes *chiseled* no tienen shell, así que `docker exec ... bash` no es una opción: se depura solo con logs.
 
-Claude revisa la configuración de la aplicación para:
-- Exponer el puerto correcto con `EXPOSE` y su mapeo en `docker-compose.yml`.
-- Identificar qué valores sensibles (contraseñas, cadenas de conexión) deben pasarse como variables de entorno, no escritos directamente en el archivo.
-- Definir volúmenes para los datos que deben persistir entre reinicios del contenedor (carpetas de base de datos, archivos subidos por usuarios…).
+La ganancia grande, en cualquier caso, no viene de elegir Alpine sino del multi-stage: pasar de 1,05 GB a 231 MB es un factor de 4,5, mucho más de lo que aporta después cambiar de distribución.
 
-**Paso 7 — Escribir el archivo con comentarios explicativos**
+## Errores frecuentes
 
-Por último, Claude escribe el archivo con comentarios en los bloques no obvios y explica qué hace cada parte para que puedas entenderlo, modificarlo y aprenderlo, no solo copiarlo.
-
-## Lo que NO hace
-
-- **No virtualiza hardware** — comparte el kernel del sistema operativo del host, así que un contenedor Linux no corre de forma nativa en Windows sin una capa de traducción (WSL2 o una VM).
-- **No reemplaza la gestión de secretos** — las variables de entorno en `docker-compose.yml` no son seguras para producción real; herramientas como Vault o los secrets de Kubernetes son para eso.
-- **No gestiona múltiples máquinas** — eso es Kubernetes. Docker y Docker Compose trabajan en una sola máquina.
-- **No garantiza seguridad automática** — un contenedor mal configurado puede exponer la red del host o escalar privilegios; la configuración hay que revisarla.
+| Síntoma | Causa habitual |
+|---|---|
+| `curl localhost:8080` da *connection refused* y el contenedor está `Up` | Falta `-p 8080:8080`, o la app escucha en `localhost` dentro del contenedor en vez de en `0.0.0.0` |
+| El contenedor arranca y desaparece de `docker ps` al instante | El proceso principal terminó. Mira `docker logs`: casi siempre es el nombre del `.dll` mal escrito en el `ENTRYPOINT` |
+| `COPY failed: no such file or directory` | El fichero está excluido en `.dockerignore`, o la ruta sale del contexto de build con `../` |
+| El `restore` se repite en cada build pese al orden correcto | Falta `.dockerignore` y `obj/` invalida el `COPY` anterior |
+| La API no encuentra la base de datos en Compose | Se usó `localhost` en la cadena de conexión en lugar del nombre del servicio (`db`) |
+| Falla al conectar solo los primeros segundos tras `compose up` | `depends_on` sin `healthcheck`: la BD aún no acepta conexiones |
+| `Permission denied` al escribir en un volumen montado | El UID del usuario del contenedor no es propietario del directorio del host |
+| `docker stop` tarda siempre 10 segundos exactos | `ENTRYPOINT` en forma *shell*: `sh` es PID 1 y la app nunca recibe el `SIGTERM` |
+| `no space left on device` en el servidor | Imágenes viejas y caché de build acumuladas: `docker system df` y `docker system prune` |
 
 ## Buenas prácticas avanzadas
 
-- **Fija la versión exacta de la imagen base, nunca `latest`** — `FROM node:latest` (o incluso `node:20`) apunta a imágenes distintas según el día en que construyas, así que dos builds del mismo Dockerfile pueden producir resultados diferentes. Usa etiquetas concretas (`node:20.11-alpine`) y, para despliegues críticos, el digest inmutable (`node:20.11-alpine@sha256:...`), que no puede cambiar aunque alguien re-publique la etiqueta.
-- **El `.dockerignore` importa tanto como el Dockerfile** — sin él, `COPY . .` arrastra `node_modules`, `.git`, artefactos de build y hasta archivos `.env` con secretos al contexto de build. No solo engorda la imagen: cualquier archivo tocado invalida la caché de esa capa, y un `.env` copiado por accidente queda incrustado para siempre en las capas de la imagen, aunque luego lo borres con otro `RUN`.
-- **Usa siempre la forma *exec* en `ENTRYPOINT`/`CMD`** — `ENTRYPOINT dotnet MiApi.dll` (forma *shell*) envuelve el proceso en `/bin/sh -c`, y ese `sh` se convierte en PID 1: tu aplicación nunca recibe el `SIGTERM` de `docker stop`, así que no cierra conexiones ni termina peticiones en curso; Docker espera 10 segundos y la mata a la fuerza. La forma *exec* (`ENTRYPOINT ["dotnet", "MiApi.dll"]`) hace que la app sea PID 1 y reciba las señales directamente.
-- **No ejecutes como root dentro del contenedor** — casi todas las imágenes oficiales arrancan como root por defecto. Si alguien explota una vulnerabilidad de tu app, es root dentro del contenedor, y cualquier volumen montado o descuido de configuración convierte eso en un problema del host. Crea un usuario sin privilegios en el Dockerfile y actívalo con `USER` antes del `ENTRYPOINT` (las imágenes de .NET 8+ ya traen uno preparado: `USER app`).
-- **`depends_on` no espera a que el servicio esté listo, solo a que arranque** — el error clásico en Compose: la API arranca antes de que PostgreSQL acepte conexiones y falla al conectar. La solución es declarar un `healthcheck` en el servicio de la base de datos y usar la forma larga `depends_on: { db: { condition: service_healthy } }`, que sí espera al chequeo real.
+- **Fija la versión exacta de la imagen base, nunca `latest`.** `FROM postgres:latest` apunta a imágenes distintas según el día en que construyas, así que dos builds del mismo `Dockerfile` producen resultados diferentes y el fallo aparece semanas después sin que nada haya cambiado en el repositorio. Usa etiquetas concretas (`postgres:16.4`) y, para despliegues críticos, el digest inmutable (`postgres:16.4@sha256:...`), que no cambia aunque alguien republique la etiqueta.
+- **Usa siempre la forma *exec* en `ENTRYPOINT` y `CMD`.** `ENTRYPOINT dotnet tienda-api.dll` (forma *shell*) envuelve el proceso en `/bin/sh -c`, y ese `sh` pasa a ser PID 1: tu aplicación nunca recibe el `SIGTERM` de `docker stop`, no cierra conexiones ni termina las peticiones en curso, y Docker la mata a la fuerza tras 10 segundos. La forma de lista JSON hace que la app sea PID 1 y reciba las señales directamente.
+- **Agrupa los `RUN` que instalan paquetes y limpia en la misma instrucción.** Un `RUN apt-get install` seguido de un `RUN rm -rf /var/lib/apt/lists/*` en otra capa no libera nada: la primera capa ya contiene los ficheros y las capas no se pueden borrar hacia atrás. Encadena ambos con `&&` en una sola instrucción para que la capa nazca ya limpia.
+- **Nunca pases secretos con `ARG` ni los dejes en un `ENV`.** Ambos quedan grabados en los metadatos de la imagen y cualquiera con acceso a ella los recupera con `docker history`. Las credenciales se inyectan en tiempo de ejecución (variables del entorno del contenedor, ficheros montados o un gestor de secretos) y, si hacen falta durante el build, con `RUN --mount=type=secret`, que no deja rastro en ninguna capa.
+- **Construye la imagen en CI, no en el servidor.** Compilar en el VPS exige tener allí el código fuente y el SDK, y provoca picos de CPU y memoria que degradan los contenedores que están sirviendo tráfico. Que el pipeline construya, publique en un registro como [GitHub Container Registry](GitHub-Container-Registry.md) y el servidor solo haga `pull` convierte el despliegue en una operación de segundos y permite volver atrás cambiando una etiqueta. El montaje completo está en [CI/CD](../ci-cd/README.md) y [despliegue en VPS](../despliegue-en-vps/README.md).
+
+## Recursos didácticos
+
+- [Play with Docker](https://labs.play-with-docker.com/) — una máquina Linux con Docker en el navegador durante cuatro horas, sin instalar nada. Perfecta para escribir el `Dockerfile` de esta ficha y ver de verdad los `CACHED` apareciendo al reconstruir.
+- [Dive](https://github.com/wagoodman/dive) — explorador interactivo de imágenes en terminal: recorres capa a capa, ves qué ficheros añadió cada instrucción y cuánto espacio desperdicias. Es la forma más rápida de entender el modelo de capas dejando de creerlo y empezando a verlo.
+- [Hadolint](https://hadolint.github.io/hadolint/) — linter de `Dockerfile` con versión web: pegas el tuyo y te señala versiones sin fijar, `RUN` mal agrupados o ejecución como root, con la explicación de cada regla. Útil como revisión antes de dar por bueno un fichero.
 
 ---
 
-*En resumen: Docker empaqueta tu aplicación y todo lo que necesita en una caja estandarizada que se ejecuta igual en cualquier sitio — y cuando Claude crea esa caja por ti, lee tu proyecto, elige las piezas correctas y ordena las instrucciones para que la construcción sea lo más rápida y ligera posible.*
+*En resumen: un contenedor no es una máquina virtual pequeña, es un proceso al que el kernel le ha limitado la vista; y casi todo lo que separa un `Dockerfile` mediocre de uno bueno —multi-stage, orden de las capas, `.dockerignore`, usuario no root— sale de entender que una imagen es una pila de capas cacheadas.*
