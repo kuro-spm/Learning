@@ -35,9 +35,9 @@ Casi todo lo que sabes de SQL tiene equivalente directo:
 
 Ese último punto es el que más cuesta interiorizar: añadir un campo no es una operación de esquema. El coste no desaparece, se traslada al código, que tiene que saber tratar documentos de dos generaciones distintas.
 
-## Un documento de verdad: el pedido #4711
+## La decisión central: incrustar o referenciar
 
-Este es el aspecto que tendría un pedido en la colección `pedidos`:
+Es el 80 % del diseño de una base documental y donde más se equivoca quien viene de SQL, porque el instinto de normalizar juega en contra. **Incrustar** (*embed*) es meter el subobjeto dentro del documento padre; **referenciar** es guardar solo su `_id`. Así queda el pedido #4711 en la colección `pedidos`:
 
 ```js
 {
@@ -45,13 +45,10 @@ Este es el aspecto que tendría un pedido en la colección `pedidos`:
   numero: 4711,
   fecha: ISODate("2026-03-14T10:22:00Z"),
   estado: "pagado",
-  cliente: {                                    // copia congelada, no referencia viva
-    _id: ObjectId("6612b0aa9d1c4400aa10ff02"),
-    nombre: "Ada Lovelace",
-    email: "ada@example.com"
-  },
+  cliente: { _id: ObjectId("6612b0aa9d1c4400aa10ff02"),   // incrustado, pero con su _id
+             nombre: "Ada Lovelace", email: "ada@example.com" },
   envio: { ciudad: "Valencia", cp: "46001" },
-  lineas: [                                     // lo que en SQL sería lineas_pedido
+  lineas: [                                               // en SQL serían lineas_pedido
     { productoId: ObjectId("65f0aa11bb22cc33dd44ee55"), nombre: "Teclado mecánico", cantidad: 2, precio: NumberDecimal("79.99") },
     { productoId: ObjectId("65f0aa11bb22cc33dd44ee77"), nombre: "Ratón vertical",   cantidad: 1, precio: NumberDecimal("34.50") }
   ],
@@ -59,34 +56,23 @@ Este es el aspecto que tendría un pedido en la colección `pedidos`:
 }
 ```
 
-Fíjate en las tres decisiones que ya están tomadas ahí: las líneas van **incrustadas** (nunca se consultan sin su pedido), el cliente va **incrustado pero con su `_id`** (para poder ir a la colección `clientes` si hace falta el resto de la ficha) y el producto va **referenciado** por `_id`, con el nombre y el precio copiados como fotografía del momento de la compra.
-
-## La decisión central: incrustar o referenciar
-
-Es el 80 % del diseño de una base documental y el punto donde más se equivoca quien viene de SQL, porque el instinto de normalizar juega en contra.
-
-**Incrustar** (*embed*) es meter el subobjeto dentro del documento padre. **Referenciar** es guardar solo su `_id` y hacer una segunda consulta o un `$lookup`.
+Hay tres decisiones tomadas ahí: las líneas van incrustadas (nunca se consultan sin su pedido), el cliente va incrustado con su `_id` para poder ir a `clientes` si hace falta el resto de la ficha, y el producto va referenciado, con nombre y precio copiados como fotografía del momento de la compra. Los criterios que llevan a una u otra:
 
 | Criterio | Incrustar | Referenciar |
 |---|---|---|
 | Cardinalidad | 1:1 y 1:pocos (decenas) | 1:muchos sin techo, y N:M |
 | ¿Se consulta el hijo por su cuenta? | No, siempre con el padre | Sí, tiene vida propia |
-| Frecuencia de cambio del hijo | Baja o irrelevante (es una foto) | Alta: cambia y debe verse actualizado en todas partes |
+| Frecuencia de cambio del hijo | Baja o irrelevante (es una foto) | Alta: cambia y debe verse al día en todas partes |
 | Tamaño | El documento entero cabe holgado en 16 MB | El array crecería sin límite |
 | Coste de lectura | Una sola parada, sin `$lookup` | Dos consultas o una agregación |
 
-Aplicado a la tienda:
+Por eso el pedido apunta al cliente y no al revés:
 
 ```js
-// ✅ Líneas INCRUSTADAS: nadie pregunta "dame todas las líneas de pedido"
-//    sin decir de qué pedido. Son pocas, y no cambian nunca una vez pagado.
-{ numero: 4711, lineas: [ { nombre: "Teclado mecánico", cantidad: 2 } ] }
-
-// ❌ Pedidos INCRUSTADOS dentro del cliente: un cliente fiel acumula
-//    miles de pedidos, el array crece sin techo y revienta los 16 MB.
+// ❌ Pedidos INCRUSTADOS en el cliente: un cliente fiel acumula miles y revienta los 16 MB
 { _id: ..., nombre: "Ada Lovelace", pedidos: [ /* ...y creciendo para siempre */ ] }
 
-// ✅ Pedidos REFERENCIADOS: el pedido guarda a quién pertenece.
+// ✅ Pedidos REFERENCIADOS: cada pedido guarda a quién pertenece
 { numero: 4711, cliente: { _id: ObjectId("6612b0..."), nombre: "Ada Lovelace" } }
 ```
 
@@ -113,16 +99,14 @@ Es el equivalente a `SELECT numero, total, ... WHERE estado = 'pagado' AND total
 { numero: 4711, total: NumberDecimal("194.48"), cliente: { nombre: "Ada Lovelace" } }
 ```
 
-Proyectar no es cosmético: sin ella arrastras el documento completo —líneas incluidas— por la red y la RAM del servidor.
-
-Con arrays hay una trampa clásica. Estas dos consultas **no** son iguales:
+Proyectar no es cosmético: sin ella arrastras el documento entero —líneas incluidas— por la red y la RAM del servidor. Y con arrays hay una trampa clásica, porque estas dos consultas **no** son iguales:
 
 ```js
-// ❌ Cada condición puede cumplirse en una línea DISTINTA del array.
-//    Casa un pedido con un teclado (cantidad 1) y un ratón (cantidad 3).
+// ❌ Cada condición puede cumplirse en una línea DISTINTA: casa un pedido con
+//    un teclado (cantidad 1) y un ratón (cantidad 3)
 db.pedidos.find({ "lineas.nombre": "Teclado mecánico", "lineas.cantidad": { $gte: 2 } })
 
-// ✅ $elemMatch exige que UNA MISMA línea cumpla ambas condiciones.
+// ✅ $elemMatch exige que UNA MISMA línea cumpla ambas condiciones
 db.pedidos.find({ lineas: { $elemMatch: { nombre: "Teclado mecánico", cantidad: { $gte: 2 } } } })
 ```
 
@@ -164,9 +148,18 @@ Devuelve un recibo con lo que ha pasado:
 { acknowledged: true, matchedCount: 1, modifiedCount: 1, upsertedId: null }
 ```
 
-`matchedCount: 0` significa que el filtro no encontró nada; `modifiedCount: 0` con `matchedCount: 1` significa que lo encontró pero los valores ya eran esos.
+`matchedCount: 0` significa que el filtro no encontró nada; `modifiedCount: 0` con `matchedCount: 1`, que lo encontró pero los valores ya eran esos. En C# es la misma operación con `Builders<T>.Update`:
 
-Con `upsert: true`, si el filtro no casa con nada, MongoDB **inserta** el documento en lugar de no hacer nada. `$setOnInsert` aplica solo en ese caso:
+```csharp
+var update = Builders<Pedido>.Update
+    .Set(p => p.Estado, "enviado")
+    .Inc(p => p.IntentosEnvio, 1)
+    .Push(p => p.Historial, new Evento("enviado", DateTime.UtcNow));
+
+var res = await pedidos.UpdateOneAsync(p => p.Numero == 4711, update);   // res.ModifiedCount == 1
+```
+
+Con `upsert: true`, si el filtro no casa con nada MongoDB **inserta** el documento en lugar de no hacer nada, y `$setOnInsert` aplica solo en ese caso:
 
 ```js
 db.productos.updateOne(
@@ -177,19 +170,7 @@ db.productos.updateOne(
 )
 ```
 
-Es el `INSERT ... ON CONFLICT DO UPDATE` de PostgreSQL, y resuelve en una sola operación atómica el clásico "mira si existe, y si no créalo" que en dos pasos sufre condiciones de carrera.
-
-En C#:
-
-```csharp
-var update = Builders<Pedido>.Update
-    .Set(p => p.Estado, "enviado")
-    .Inc(p => p.IntentosEnvio, 1)
-    .Push(p => p.Historial, new Evento("enviado", DateTime.UtcNow));
-
-var res = await pedidos.UpdateOneAsync(p => p.Numero == 4711, update);
-// res.MatchedCount == 1, res.ModifiedCount == 1
-```
+Es el `INSERT ... ON CONFLICT DO UPDATE` de PostgreSQL: resuelve en una sola operación atómica el clásico "mira si existe, y si no créalo" que hecho en dos pasos sufre condiciones de carrera.
 
 ## El aggregation pipeline
 
