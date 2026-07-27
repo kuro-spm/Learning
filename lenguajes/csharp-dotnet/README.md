@@ -2,7 +2,7 @@
 
 Documentación introductoria del lenguaje C# y la plataforma .NET, pensada para quien ya programa (en cualquier lenguaje) y quiere entender las piezas base sobre las que se construye cualquier aplicación .NET, antes de entrar en frameworks concretos como ASP.NET Core.
 
-La guía separa dos planos: los **fundamentos** (la plataforma, el lenguaje, el build y los paquetes) y las **características del lenguaje** (features e idioms de C#/.NET que aparecen una vez superada la sintaxis básica).
+La guía separa tres planos: los **fundamentos** (la plataforma, el lenguaje, el build y los paquetes), las **características del lenguaje** (features e idioms de C#/.NET que aparecen una vez superada la sintaxis básica) y la **configuración** (cómo una aplicación .NET consume sus ajustes de forma tipada, con el Options pattern).
 
 ---
 
@@ -28,6 +28,14 @@ Features del lenguaje y patrones idiomáticos de .NET que vas encontrando al esc
 | 5 | [CancellationToken](caracteristicas-del-lenguaje/CancellationToken.md) | Cómo se propaga de extremo a extremo la petición de cancelar una operación asíncrona. |
 | 6 | [Atributos](caracteristicas-del-lenguaje/Atributos.md) | Metadatos declarativos (`[Algo]`) que el framework lee por reflection para decidir cómo tratar tu código. |
 | 7 | [Atributos personalizados](caracteristicas-del-lenguaje/Atributos-Personalizados.md) | Crear los tuyos y el porqué de la restricción de constantes de compilación: cómo se graban en los metadatos del ensamblado. |
+
+### 3. Configuración de la aplicación
+
+Cómo una aplicación .NET (de consola, worker o web) lee sus ajustes externos y los expone al código de forma tipada. No es exclusivo de ningún framework: vive en el *host* de cualquier app .NET.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 8 | [Microsoft.Extensions.Options](Microsoft-Extensions-Options.md) | El Options pattern: bindear una sección de configuración a una clase POCO, consumirla con `IOptions`/`IOptionsSnapshot`/`IOptionsMonitor` y validarla al arrancar. |
 
 ---
 

@@ -1,6 +1,6 @@
 # Learning — Guías de tecnología
 
-Colección personal de guías introductorias en español, organizadas por categoría. Cada carpeta de tema es autónoma: un README-índice y una ficha por tecnología o concepto, pensadas para leerse sin conocer ningún proyecto concreto.
+Colección personal de guías de tecnología en español, organizadas por categoría. Cada carpeta de tema es autónoma: un README-índice y una ficha por tecnología o concepto, pensadas para leerse sin conocer ningún proyecto concreto. Empiezan por una introducción accesible y desarrollan el tema con la profundidad que pida, siempre con ejemplos de código guiados.
 
 ---
 
@@ -22,10 +22,10 @@ PostgreSQL, acceso a datos en .NET, caching con Redis, migraciones de esquema y 
 Testing en .NET: xUnit, Shouldly, NSubstitute, fixtures, Testcontainers y más.
 
 ### [DevOps y control de versiones](devops/README.md)
-Git, CI/CD, Docker, observabilidad y mensajería asíncrona.
+Git, CI/CD, Docker, despliegue en un VPS propio (proxy inverso, HTTPS, backups, VPN), observabilidad y mensajería asíncrona.
 
 ### [Seguridad](seguridad/README.md)
-Algoritmos de hash modernos, y autenticación y autorización (OAuth2, OIDC, JWT).
+Algoritmos de hash modernos, autenticación y autorización (OAuth2, OIDC, JWT), y el manejo de secretos: guardarlos en desarrollo y no filtrarlos al usarlos en llamadas salientes.
 
 ### [Redes](redes/README.md)
 Conexiones remotas, carpetas compartidas, NAS, SSH, VPN y compañía.

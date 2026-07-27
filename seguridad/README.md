@@ -14,3 +14,6 @@ Quién eres y qué puedes hacer: sesiones y tokens, JWT, OAuth2, OpenID Connect 
 
 ### [Gestión de secretos en desarrollo](gestion-de-secretos-en-desarrollo/README.md)
 Cómo manejar claves de API, contraseñas y claves de cifrado sin que acaben en git: por qué se separan del código, user-secrets de .NET y el cifrado en reposo de credenciales con su clave maestra.
+
+### [Secretos en llamadas salientes](secretos-en-llamadas-salientes/README.md)
+El complemento en runtime: cómo evitar filtrar una credencial al usarla para llamar a una API externa (logs, redirects, URLs de terceros, TLS).

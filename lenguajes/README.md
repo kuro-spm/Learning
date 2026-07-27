@@ -7,4 +7,4 @@ Fundamentos de lenguajes y plataformas de ejecución, previos a cualquier framew
 ## Contenido
 
 ### [C# y .NET](csharp-dotnet/README.md)
-El lenguaje C#, el runtime de .NET y MSBuild como sistema de build.
+El lenguaje C#, el runtime de .NET y MSBuild como sistema de build, más la configuración tipada de una app .NET con el Options pattern (`Microsoft.Extensions.Options`).
