@@ -24,14 +24,15 @@ El modelo mental sin el que todo lo demás son recetas. Dos fichas cortas que ex
 
 ### 2. Programar con IA
 
-Cómo usar agentes de codificación a nivel experto. El hilo conductor: lo que decide el resultado no es cómo pides las cosas, es qué información das y cómo se verifica lo que sale.
+Cómo usar agentes de codificación a nivel experto, y cómo repartir esa configuración al resto del equipo. El hilo conductor: lo que decide el resultado no es cómo pides las cosas, es qué información das y cómo se verifica lo que sale.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 3 | [Prompting para programadores](Prompting-para-Programadores.md) | Qué hace que una petición produzca código integrable, qué técnicas funcionan y cuáles son folclore. Base de las tres fichas siguientes. |
 | 4 | [Agentes de codificación](Agentes-de-Codificacion.md) | El bucle, las herramientas, los permisos, el fichero de instrucciones del repositorio y la técnica que más cambia los resultados: darle un bucle cerrado. |
-| 5 | [Desarrollo dirigido por especificación](Desarrollo-Dirigido-por-Especificacion.md) | Cómo abordar tareas grandes: explorar, especificar, planificar, implementar por pasos. Porque cuando implementar es barato, lo caro es decidir. |
-| 6 | [Revisión de código generado](Revision-de-Codigo-Generado.md) | Cómo falla el código generado —que no es como falla el humano— y cómo revisarlo sin que el aspecto impecable te desarme. |
+| 5 | [Plugin marketplaces](Plugin-Marketplaces.md) | Cómo se empaqueta y se reparte todo lo anterior: convertir tus *skills*, *hooks* y subagentes en una dependencia instalable y versionada para el equipo. |
+| 6 | [Desarrollo dirigido por especificación](Desarrollo-Dirigido-por-Especificacion.md) | Cómo abordar tareas grandes: explorar, especificar, planificar, implementar por pasos. Porque cuando implementar es barato, lo caro es decidir. |
+| 7 | [Revisión de código generado](Revision-de-Codigo-Generado.md) | Cómo falla el código generado —que no es como falla el humano— y cómo revisarlo sin que el aspecto impecable te desarme. |
 
 ### 3. Construir software con LLMs
 
@@ -39,10 +40,10 @@ El lado de ingeniería: poner un modelo dentro de tu aplicación. De la llamada 
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 7 | [Llamadas a la API](Llamadas-a-la-API.md) | La petición, los roles, los bloques de respuesta, el *streaming*, los errores y los lotes. La base mecánica de todo lo demás. |
-| 8 | [Salidas estructuradas y tool use](Salidas-Estructuradas-y-Tool-Use.md) | Cómo convertir texto en datos con esquema garantizado y cómo darle al modelo capacidad de actuar. Las dos piezas que lo hacen integrable. |
-| 9 | [Agentes con LLMs](Agentes-LLM.md) | El bucle donde el modelo decide los pasos, cuándo *no* construirlo (casi siempre) y los límites sin los que es una factura abierta. |
-| 10 | [MCP](MCP.md) | El protocolo estándar para conectar modelos con tus sistemas: cuándo compensa, cómo escribir un servidor y por qué es la superficie de seguridad más delicada. |
+| 8 | [Llamadas a la API](Llamadas-a-la-API.md) | La petición, los roles, los bloques de respuesta, el *streaming*, los errores y los lotes. La base mecánica de todo lo demás. |
+| 9 | [Salidas estructuradas y tool use](Salidas-Estructuradas-y-Tool-Use.md) | Cómo convertir texto en datos con esquema garantizado y cómo darle al modelo capacidad de actuar. Las dos piezas que lo hacen integrable. |
+| 10 | [Agentes con LLMs](Agentes-LLM.md) | El bucle donde el modelo decide los pasos, cuándo *no* construirlo (casi siempre) y los límites sin los que es una factura abierta. |
+| 11 | [MCP](MCP.md) | El protocolo estándar para conectar modelos con tus sistemas: cuándo compensa, cómo escribir un servidor y por qué es la superficie de seguridad más delicada. |
 
 ### 4. Llevarlo a producción
 
@@ -50,15 +51,15 @@ Lo que distingue un prototipo que funciona en una demo de un sistema que aguanta
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 11 | [Evaluaciones de LLMs](Evaluaciones-de-LLMs.md) | Cómo medir si un cambio mejora, con un componente no determinista. Sin esto, iterar un *prompt* es apostar. |
-| 12 | [Coste, latencia y fiabilidad](Coste-Latencia-y-Fiabilidad.md) | Dónde está el dinero, dónde el tiempo, y los tres modos de fallo que llegan con código 200 y nadie detecta. |
-| 13 | [Seguridad en aplicaciones con LLMs](Seguridad-en-Aplicaciones-LLM.md) | *Prompt injection* directa e indirecta, fuga de datos, exceso de agencia. La seguridad no está en el *prompt*: está en lo que puede hacer el sistema cuando el *prompt* falle. |
+| 12 | [Evaluaciones de LLMs](Evaluaciones-de-LLMs.md) | Cómo medir si un cambio mejora, con un componente no determinista. Sin esto, iterar un *prompt* es apostar. |
+| 13 | [Coste, latencia y fiabilidad](Coste-Latencia-y-Fiabilidad.md) | Dónde está el dinero, dónde el tiempo, y los tres modos de fallo que llegan con código 200 y nadie detecta. |
+| 14 | [Seguridad en aplicaciones con LLMs](Seguridad-en-Aplicaciones-LLM.md) | *Prompt injection* directa e indirecta, fuga de datos, exceso de agencia. La seguridad no está en el *prompt*: está en lo que puede hacer el sistema cuando el *prompt* falle. |
 
 ### 5. Cierre
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 14 | [Antipatrones y límites](Antipatrones-y-Limites.md) | El catálogo de formas de usar mal esto, con su señal de alarma y su corrección, y los límites reales que no se corrigen sino que se gestionan. Se lee mejor al final, cuando ya reconoces cada escenario. |
+| 15 | [Antipatrones y límites](Antipatrones-y-Limites.md) | El catálogo de formas de usar mal esto, con su señal de alarma y su corrección, y los límites reales que no se corrigen sino que se gestionan. Se lee mejor al final, cuando ya reconoces cada escenario. |
 
 ---
 
@@ -74,6 +75,7 @@ Lo que distingue un prototipo que funciona en una demo de un sistema que aguanta
 **Programar con IA**
 - [Prompting para programadores](Prompting-para-Programadores.md)
 - [Agentes de codificación](Agentes-de-Codificacion.md)
+- [Plugin marketplaces](Plugin-Marketplaces.md)
 - [Desarrollo dirigido por especificación](Desarrollo-Dirigido-por-Especificacion.md)
 - [Revisión de código generado](Revision-de-Codigo-Generado.md)
 
