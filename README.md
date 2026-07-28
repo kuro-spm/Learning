@@ -22,7 +22,7 @@ PostgreSQL, acceso a datos en .NET, caching con Redis, migraciones de esquema y 
 Testing en .NET: xUnit, Shouldly, NSubstitute, fixtures, Testcontainers y más.
 
 ### [DevOps y control de versiones](devops/README.md)
-Git, CI/CD, Docker, despliegue en un VPS propio (proxy inverso, HTTPS, backups, VPN), observabilidad y mensajería asíncrona.
+Git, la administración de organizaciones de GitHub (permisos, equipos, rulesets, seguridad y gobierno), CI/CD, Docker, despliegue en un VPS propio (proxy inverso, HTTPS, backups, VPN), observabilidad y mensajería asíncrona.
 
 ### [Seguridad](seguridad/README.md)
 Algoritmos de hash modernos, autenticación y autorización (OAuth2, OIDC, JWT), y el manejo de secretos: guardarlos en desarrollo y no filtrarlos al usarlos en llamadas salientes.

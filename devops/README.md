@@ -9,6 +9,9 @@ Cómo se gestiona el código en equipo y cómo llega de forma automática a prod
 ### [Git](git/README.md)
 El sistema de control de versiones: commits, ramas, merge, rebase, stash y el resto de piezas del flujo diario.
 
+### [Organizaciones de GitHub](github-organizaciones/README.md)
+El lado administrativo de GitHub: crear una organización, migrar repositorios desde una cuenta personal, repartir permisos con roles y equipos, compartir secretos y entornos, proteger ramas con rulesets, y las políticas de seguridad y gobierno que lo mantienen en pie.
+
 ### [CI/CD](ci-cd/README.md)
 Cómo se describe un pipeline y qué herramientas y técnicas llevan el código a producción de forma automática y segura.
 
