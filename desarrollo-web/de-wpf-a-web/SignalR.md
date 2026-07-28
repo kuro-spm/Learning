@@ -96,7 +96,7 @@ mensajes; los detalles de transporte los gestiona la librería.
 ## Lo que NO hace
 
 - **No reemplaza a HTTP ni a tu Web API** — convive con ellos; SignalR es para avisos en tiempo real, no para el CRUD normal.
-- **No guarda los mensajes** — si necesitas un historial, lo persistes tú (por ejemplo con [EF Core](Entity-Framework-Core.md)).
+- **No guarda los mensajes** — si necesitas un historial, lo persistes tú (por ejemplo con [EF Core](../../bases-de-datos/acceso-a-datos-dotnet/Entity-Framework-Core.md)).
 - **No garantiza una conexión eterna** — las conexiones pueden caerse; hay que contemplar reconexiones y que un cliente pueda perderse mensajes.
 
 ## Buenas prácticas avanzadas

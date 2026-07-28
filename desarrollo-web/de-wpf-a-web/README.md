@@ -65,7 +65,7 @@ Temas que cruzan todas las opciones anteriores y que conviene entender antes de 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 12 | [Autenticación y estado web](Autenticacion-y-Estado-Web.md) | Cómo sabe la app quién eres y cómo recuerda algo, pese a que HTTP no tiene memoria. |
-| 13 | [Entity Framework Core](Entity-Framework-Core.md) | El acceso a datos: persistir en una base de datos lo que en WPF te bastaba con tener en memoria. |
+| 13 | [Entity Framework Core](../../bases-de-datos/acceso-a-datos-dotnet/Entity-Framework-Core.md) ↗ | El acceso a datos: persistir en una base de datos lo que en WPF te bastaba con tener en memoria. La ficha vive en la colección de [acceso a datos en .NET](../../bases-de-datos/acceso-a-datos-dotnet/README.md), donde tiene al lado el driver y el micro-ORM con los que se compara. |
 | 14 | [SignalR](SignalR.md) | Tiempo real: el servidor empuja datos al navegador, como los eventos del escritorio pero por la red. |
 | 15 | [Comunicación entre frontend y backend](Comunicacion-Frontend-Backend.md) | Cómo hablan en la práctica un frontend SPA y tu Web API: proxy en desarrollo, CORS y contenedores en producción. |
 

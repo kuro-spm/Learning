@@ -18,7 +18,7 @@ La conclusión práctica es corta: **si estás en .NET 6+, usas `Microsoft.Data.
 
 En cualquier backend .NET que hable con SQL Server. El ejemplo conductor de esta guía es una **tienda online** con base de datos `TiendaDB`, tablas `Productos`, `Pedidos` y `Clientes`, y un pedido concreto que iremos siguiendo: el **#4711**.
 
-Casi nunca lo usarás en crudo para el CRUD del día a día —para eso están [Dapper](Dapper.md) y [Entity Framework Core](../../desarrollo-web/de-wpf-a-web/Entity-Framework-Core.md), que van por encima de este mismo driver—, pero sí para lo que ellos no cubren bien: cargas masivas con `SqlBulkCopy`, procedimientos con varios *result sets*, control fino de tipos y tamaños de parámetro, o depurar por qué una consulta que en SSMS tarda 3 ms desde la aplicación tarda 800.
+Casi nunca lo usarás en crudo para el CRUD del día a día —para eso están [Dapper](Dapper.md) y [Entity Framework Core](Entity-Framework-Core.md), que van por encima de este mismo driver—, pero sí para lo que ellos no cubren bien: cargas masivas con `SqlBulkCopy`, procedimientos con varios *result sets*, control fino de tipos y tamaños de parámetro, o depurar por qué una consulta que en SSMS tarda 3 ms desde la aplicación tarda 800.
 
 Y aunque nunca escribas un `SqlCommand` a mano, la cadena de conexión, el *pooling* y los errores transitorios son suyos. Todo lo que falla en la capa de datos de un backend .NET falla aquí.
 
@@ -412,7 +412,7 @@ Y una advertencia que aplica a cualquier reintento: reintentar una **lectura** e
 |---|---|---|
 | `SqlCommand` en crudo | Nada: control total | `SqlBulkCopy`, varios *result sets*, control fino de tipos, diagnóstico |
 | [Dapper](Dapper.md) | Mapea filas a objetos; el SQL lo escribes tú | Consultas de lectura y SQL a medida |
-| [Entity Framework Core](../../desarrollo-web/de-wpf-a-web/Entity-Framework-Core.md) | Genera el SQL, sigue los cambios, migra el esquema | CRUD, agregados, [migraciones](../migraciones-de-esquema/README.md) |
+| [Entity Framework Core](Entity-Framework-Core.md) | Genera el SQL, sigue los cambios, migra el esquema | CRUD, agregados, [migraciones](../migraciones-de-esquema/README.md) |
 
 Los tres comparten el mismo driver, la misma cadena de conexión y el mismo pool. Eso significa dos cosas útiles: puedes mezclarlos en la misma aplicación sin penalización, y todo lo de esta guía —`Encrypt`, `Max Pool Size`, errores transitorios— aplica igual aunque nunca escribas un `SqlCommand`.
 

@@ -29,7 +29,7 @@ var productos = await conexion.QueryAsync<Producto>(
     "SELECT Id, Nombre, Precio FROM Productos WHERE Id = @id", new { id = 17 });
 ```
 
-El otro extremo es un ORM completo como [Entity Framework Core](../../desarrollo-web/de-wpf-a-web/Entity-Framework-Core.md), que genera el SQL a partir de LINQ, rastrea los cambios de las entidades y gestiona migraciones. Es cómodo, y a cambio pierdes control sobre la consulta que acaba llegando a la base de datos.
+El otro extremo es un ORM completo como [Entity Framework Core](Entity-Framework-Core.md), que genera el SQL a partir de LINQ, rastrea los cambios de las entidades y gestiona migraciones. Es cómodo, y a cambio pierdes control sobre la consulta que acaba llegando a la base de datos.
 
 > Si ya conoces EF Core, piensa en Dapper como "EF Core sin el `DbContext`, sin las migraciones y sin el generador de SQL — solo la parte de leer resultados".
 
