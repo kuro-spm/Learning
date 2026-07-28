@@ -159,14 +159,42 @@ Lo que funciona, aprendido en la primera tanda:
 - **Contar con errores 529 del API.** En la primera tanda, 6 de 8 agentes terminaron con `529 Overloaded`, todos en el paso final de recortar longitud, después de haber producido un documento completo y coherente. Ante un fallo: verificar estructura (secciones fijas, delimitadores de código pares, cierre presente) antes de asumir que hay que rehacerlo. Uno de los ocho murió antes de escribir nada y se reescribió a mano.
 - **La extensión se va por encima del rango indicado, y suele estar justificada.** En la segunda tanda se pidieron 250-350 líneas y salieron entre 327 y 519, sin relleno: cuando el brief lista 14-16 bloques de contenido y cada uno pide su snippet o su tabla, la aritmética no da para menos. Dos consecuencias prácticas: **el rango del brief funciona como orientación, no como límite**, y si de verdad quieres una ficha corta hay que recortar la lista de contenido, no repetir el número. No pidas a un agente que recorte al final: es justo donde murieron los de la primera tanda.
 - **Avisar al agente de que verá cambios ajenos en `git status`.** Con varios agentes en paralelo, cada uno ve los ficheros de los demás como modificados y lo reporta como anomalía. No es un problema, pero ensucia el informe final.
+- **Pedirle que escriba pronto y refine con ediciones, no que vuelque el documento al final.** El 28/07/2026 un agente murió con `Connection closed mid-response` justo después de leer las referencias y antes de escribir una sola línea: se perdió todo su trabajo. Los que escriben temprano y van editando sobreviven a un fallo tardío con un documento aprovechable. Ante un agente caído, lo primero es mirar el fichero: si sigue en su versión original, se relanza sin más.
+- **Se puede parar una tanda a mitad sin dejar destrozos.** Al cerrar la sesión del 28/07/2026 se detuvieron cuatro agentes en marcha: tres estaban leyendo o preparando y no habían tocado nada, y el cuarto había terminado un documento válido y solo le quedaba una pasada de recorte. Ninguna ficha quedó a medio escribir. Aun así, tras parar conviene comprobar la estructura de cada fichero afectado antes de comitear.
 
 ---
 
 ## 7. Estado
 
-**Convertidas: 65 fichas en 13 colecciones. Pendientes: 198 fichas en 21 colecciones.**
+**Convertidas: 71 fichas en 13 colecciones y media. Pendientes: 192 fichas en 21 colecciones.**
 
-Todas las fichas convertidas salvo `Entity-Framework-Core.md` son anteriores a la sección `Documentación oficial` y no la tienen (ver la nota de la sección 2: no hay retrofit).
+Llevan la sección `Documentación oficial` las 7 de `algoritmos-de-hash` y EF Core, más las 6 convertidas de `autenticacion-y-autorizacion`. El resto son anteriores a esa regla y no la tienen (ver la nota de la sección 2: no hay retrofit).
+
+### `seguridad/autenticacion-y-autorizacion`: a medio convertir
+
+La sesión del 28/07/2026 terminó con esta colección **6 de 10**. Es el punto exacto por donde retomar.
+
+| Ficha | Estado | Líneas |
+|---|---|---:|
+| `Autenticacion-vs-Autorizacion.md` | ✅ convertida | 285 |
+| `Sesiones-vs-Tokens.md` | ✅ convertida | 285 |
+| `JWT.md` | ✅ convertida | 355 |
+| `OAuth2.md` | ✅ convertida | 376 |
+| `OpenID-Connect.md` | ✅ convertida | 440 |
+| `Tokens-Opacos.md` | ✅ convertida | 304 |
+| `JWT-Refresh.md` | ⬜ formato antiguo | 94 |
+| `JWT-Refresh-vs-Tokens-Opacos.md` | ⬜ formato antiguo | 78 |
+| `RBAC-y-Claims.md` | ⬜ formato antiguo, con banner 🧭 | 88 |
+| `ACL.md` | ⬜ formato antiguo | 106 |
+| `README.md` | ⬜ sin reescribir, con banner 🧭 | 53 |
+
+Notas para retomarla:
+
+- **El README sigue siendo válido como índice** (los cuatro bloques y el orden de lectura no cambian), así que se dejó intacto a propósito para reescribirlo de una vez cuando cierre la colección. Hay que quitarle el banner 🧭.
+- **El ejemplo conductor de la colección**, ya aplicado en las seis convertidas y que las cuatro restantes deben respetar: tienda online con API en `api.tienda.ejemplo.com` y frontend en `tienda.ejemplo.com`; tablas `Clientes`, `Pedidos`, `Sesiones` (y `RefreshTokens` en la ficha del refresh); pedido **#4711** de la clienta **42**; roles **`Cliente`, `Empleado`, `Administrador`**; endpoints `GET /pedidos/4711`, `DELETE /productos/17`, `GET /admin/informes`. En OAuth2 el tercero es `envios.ejemplo.com` con `scope=pedidos.read`; en OIDC el proveedor es `accounts.proveedor.ejemplo.com` con `client_id=tienda-online`.
+- **`RBAC-y-Claims.md` usa «Administradora» y «Editor» como roles**: hay que alinearlos con `Cliente`/`Empleado`/`Administrador`.
+- **Las fronteras entre fichas son el trabajo delicado de esta colección**, porque cinco de las diez rondan el mismo territorio. Las que quedan: `JWT-Refresh` explica **cómo funciona** el patrón (rotación, familias, dónde guardar cada token), `Tokens-Opacos` ya explica su modelo, y `JWT-Refresh-vs-Tokens-Opacos` es **solo la decisión** entre los dos, a nivel de implementación — mientras que `Sesiones-vs-Tokens` ya cubre la disyuntiva de más alto nivel (con estado frente a sin estado). `RBAC-y-Claims` es el modelo centrado en el sujeto y `ACL` el centrado en el recurso.
+- Las cuatro fichas pendientes tienen «Buenas prácticas avanzadas» **excepcionalmente buenas** ya escritas (las familias de tokens y la «versión de sesión» de `JWT-Refresh`, la `mask` de las POSIX ACL en `ACL`). Hay que conservarlas y afilarlas, no sustituirlas.
 
 ### Hecho
 
@@ -192,27 +220,26 @@ Orden propuesto: por valor de uso y por dependencias entre colecciones. Las pequ
 
 | # | Colección | Fichas | Avisos |
 |---:|---|---:|---|
-| 1 | `seguridad/algoritmos-de-hash` | 6 | |
-| 2 | `seguridad/autenticacion-y-autorizacion` | 10 | 7 ficheros con banner 🧭. |
-| 3 | `devops/ci-cd` | 12 | Enlazada desde `docker` y `despliegue-en-vps`. |
-| 4 | `devops/git` | 20 | |
-| 5 | `arquitectura-de-software/clean-architecture` | 9 | |
-| 6 | `arquitectura-de-software/patrones-de-diseno` | 11 | 9 ficheros con banner 🧭. Carpeta renombrada de `patrones-de-diseño` el 27/07/2026. |
-| 7 | `arquitectura-de-software/tipos-de-apis` | 13 | |
-| 8 | `arquitectura-de-software/multi-tenancy` | 7 | |
-| 9 | `lenguajes/csharp-dotnet` (+ 2 subcarpetas) | 8 | Tiene subcarpetas con README propio. |
-| 10 | `testing/testing-dotnet` | 9 | Se cruza con `docker/Testcontainers.md`, ya convertida. |
-| 11 | `testing/e2e` | 1 | |
-| 12 | `desarrollo-web/asp-net-core` | 9 | |
-| 13 | `desarrollo-web/de-wpf-a-web` | 15 | `Entity-Framework-Core.md` salió de aquí a `bases-de-datos/acceso-a-datos-dotnet` el 28/07/2026; el README la enlaza en su nueva ubicación. |
-| 14 | `desarrollo-web/frontend-react` | 28 | ⚠️ La más grande. La skill citaba su `README.md` como modelo de índice y `clsx.md` como ejemplo; ya no (ver sección 8). |
-| 15 | `redes/redes-y-acceso-remoto` | 11 | `SSH.md` y `VPN.md` se cruzan con `despliegue-en-vps`, ya convertida. |
-| 16 | `odoo/fundamentos` | 4 | |
-| 17 | `odoo/busqueda-y-filtros` | 4 | |
-| 18 | `odoo/pruebas-seguras` | 5 | |
-| 19 | `odoo/configuracion-parametros` | 6 | |
-| 20 | `ia/context-engineering` | 9 | Revisar solapamiento con `ia/ingenieria-con-llms`, ya en formato nuevo. |
-| 21 | `herramientas/correo-transaccional` | 1 | |
+| 1 | `seguridad/autenticacion-y-autorizacion` | 4 + README | **Empezar por aquí: está a medio convertir, 6 de 10 hechas.** Ver el detalle al principio de esta sección. |
+| 2 | `devops/ci-cd` | 12 | Enlazada desde `docker` y `despliegue-en-vps`. |
+| 3 | `devops/git` | 20 | |
+| 4 | `arquitectura-de-software/clean-architecture` | 9 | |
+| 5 | `arquitectura-de-software/patrones-de-diseno` | 11 | 9 ficheros con banner 🧭. Carpeta renombrada de `patrones-de-diseño` el 27/07/2026. |
+| 6 | `arquitectura-de-software/tipos-de-apis` | 13 | |
+| 7 | `arquitectura-de-software/multi-tenancy` | 7 | |
+| 8 | `lenguajes/csharp-dotnet` (+ 2 subcarpetas) | 8 | Tiene subcarpetas con README propio. |
+| 9 | `testing/testing-dotnet` | 9 | Se cruza con `docker/Testcontainers.md`, ya convertida. |
+| 10 | `testing/e2e` | 1 | |
+| 11 | `desarrollo-web/asp-net-core` | 9 | |
+| 12 | `desarrollo-web/de-wpf-a-web` | 15 | `Entity-Framework-Core.md` salió de aquí a `bases-de-datos/acceso-a-datos-dotnet` el 28/07/2026; el README la enlaza en su nueva ubicación. |
+| 13 | `desarrollo-web/frontend-react` | 28 | ⚠️ La más grande. La skill citaba su `README.md` como modelo de índice y `clsx.md` como ejemplo; ya no (ver sección 8). |
+| 14 | `redes/redes-y-acceso-remoto` | 11 | `SSH.md` y `VPN.md` se cruzan con `despliegue-en-vps`, ya convertida. |
+| 15 | `odoo/fundamentos` | 4 | |
+| 16 | `odoo/busqueda-y-filtros` | 4 | |
+| 17 | `odoo/pruebas-seguras` | 5 | |
+| 18 | `odoo/configuracion-parametros` | 6 | |
+| 19 | `ia/context-engineering` | 9 | Revisar solapamiento con `ia/ingenieria-con-llms`, ya en formato nuevo. |
+| 20 | `herramientas/correo-transaccional` | 1 | |
 
 ---
 
