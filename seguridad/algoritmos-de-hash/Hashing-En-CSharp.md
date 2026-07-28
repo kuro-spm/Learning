@@ -86,9 +86,7 @@ Ese es exactamente el digest de la cadena `"4711|89.90|EUR"` completa. `GetHashA
 
 ## Thread-safety: la trampa que nadie ve
 
-Aquí está el bug más desagradable de la ficha, porque es intermitente y no se reproduce en local. Las **instancias** de `SHA256` (`SHA256.Create()`) y de `IncrementalHash` **no son thread-safe**, porque mantienen estado interno entre llamadas; los **métodos estáticos** `HashData` **sí** se pueden llamar desde cualquier hilo, porque no comparten nada.
-
-El caso real es este: alguien registra un servicio como *singleton* y guarda el hasher en un campo, porque "crear el objeto en cada llamada es un desperdicio".
+Aquí está el bug más desagradable de la ficha, porque es intermitente y no se reproduce en local. Las **instancias** de `SHA256` (`SHA256.Create()`) y de `IncrementalHash` **no son thread-safe**, porque mantienen estado interno entre llamadas; los **métodos estáticos** `HashData` **sí** se pueden llamar desde cualquier hilo, porque no comparten nada. El caso real es este: alguien registra un servicio como *singleton* y guarda el hasher en un campo, porque "crear el objeto en cada llamada es un desperdicio".
 
 ```csharp
 // ❌ Singleton + instancia compartida: bomba de relojería
@@ -224,9 +222,7 @@ Ojo con la "solución" de pre-hashear con SHA-256: si pasas el digest en binario
 | `Isopoh.Cryptography.Argon2` | **CC BY 4.0** — Creative Commons con atribución, poco habitual en código y que **puede requerir revisión legal** | Alto nivel: `Hash` y `Verify` | Automáticas, formato `$argon2id$...` | No |
 | `PasswordHasher<Cliente>` (PBKDF2) | Microsoft, MIT | Alto nivel | Automáticas, dentro del hash | **Sí, sin discusión** |
 
-Si tu contexto exige FIPS, la última fila cierra el debate: Argon2 no está aprobado por el NIST y PBKDF2 sí. No es cuestión de qué algoritmo es mejor —Argon2id lo es— sino de qué puedes certificar.
-
-Con Isopoh el código es de dos líneas y el hash lleva sus propios parámetros:
+Si tu contexto exige FIPS, la última fila cierra el debate: Argon2 no está aprobado por el NIST y PBKDF2 sí. No es cuestión de qué algoritmo es mejor —Argon2id lo es— sino de qué puedes certificar. Con Isopoh, en cambio, el código es de dos líneas y el hash lleva sus propios parámetros:
 
 ```csharp
 string hash = Isopoh.Cryptography.Argon2.Argon2.Hash("contraseña-del-cliente");
@@ -290,15 +286,11 @@ if (hashRecibido.SequenceEqual(hashAlmacenado)) { ... }
 if (CryptographicOperations.FixedTimeEquals(hashRecibido, hashAlmacenado)) { ... }
 ```
 
-El caso concreto: validar el token de una cookie contra la columna `TokenHash`. La diferencia por byte es de nanosegundos y a través de la red suena a ruido, pero con suficientes intentos promediados se distingue, y automatizar suficientes intentos es gratis. Cuesta lo mismo escribirlo bien.
-
-Su hermana `CryptographicOperations.ZeroMemory` sobrescribe un `byte[]` con ceros cuando terminas con él, y es lo que hay que usar con sales y claves derivadas: `finally { CryptographicOperations.ZeroMemory(clave); }`. El recolector no lo hace por ti, y una clave olvidada en el *heap* sale en cualquier volcado del proceso.
+El caso concreto: validar el token de una cookie contra la columna `TokenHash`. La diferencia por byte es de nanosegundos y a través de la red suena a ruido, pero con suficientes intentos promediados se distingue, y automatizar suficientes intentos es gratis. Cuesta lo mismo escribirlo bien. Su hermana `CryptographicOperations.ZeroMemory` sobrescribe un `byte[]` con ceros cuando terminas con él, y es lo que hay que usar con sales y claves derivadas: `finally { CryptographicOperations.ZeroMemory(clave); }`. El recolector no lo hace por ti, y una clave olvidada en el *heap* sale en cualquier volcado del proceso.
 
 ## La contraseña en un `string` vive más de lo que crees
 
-Los `string` de .NET son **inmutables**: no puedes sobrescribirlos. Cuando la contraseña llega como `string`, permanece en el *heap* —y en cualquier volcado de memoria del proceso— hasta que el recolector decida limpiar ese hueco, que puede ser mucho después de que tu método haya terminado. Poner `password = null` no borra nada: solo suelta la referencia.
-
-En ASP.NET Core **no puedes evitarlo del todo**, porque el *model binding* ya te entrega la contraseña como `string` antes de que tu código exista. Lo honesto es reconocerlo y limitar el daño: no la registres nunca —un `logger.LogDebug("Login {@Peticion}", peticion)` la vuelca entera—, no la interpoles en mensajes de excepción o de validación, no la caches "para revalidar luego", y pásala directa al hasher sin copiarla a campos ni propiedades de vida más larga. `SecureString` existe y **no es la respuesta**: Microsoft recomienda no usarla en código nuevo, porque no cifra en todas las plataformas y el `string` intermedio suele aparecer igual.
+Los `string` de .NET son **inmutables**: no puedes sobrescribirlos. Cuando la contraseña llega como `string`, permanece en el *heap* —y en cualquier volcado de memoria del proceso— hasta que el recolector decida limpiar ese hueco, que puede ser mucho después de que tu método haya terminado. Poner `password = null` no borra nada: solo suelta la referencia. Y en ASP.NET Core **no puedes evitarlo del todo**, porque el *model binding* ya te entrega la contraseña como `string` antes de que tu código exista. Lo honesto es reconocerlo y limitar el daño: no la registres nunca —un `logger.LogDebug("Login {@Peticion}", peticion)` la vuelca entera—, no la interpoles en mensajes de excepción o de validación, no la caches "para revalidar luego", y pásala directa al hasher sin copiarla a campos ni propiedades de vida más larga. `SecureString` existe y **no es la respuesta**: Microsoft recomienda no usarla en código nuevo, porque no cifra en todas las plataformas y el `string` intermedio suele aparecer igual.
 
 ## Qué API usar para qué
 
@@ -306,8 +298,8 @@ En ASP.NET Core **no puedes evitarlo del todo**, porque el *model binding* ya te
 |---|---|---|---|
 | Integridad de `instalador.exe` | `SHA256.HashData` | En la caja | Compara con `FixedTimeEquals`, no con `==` |
 | Huella de `video-4gb.mp4` | `SHA256.HashDataAsync(stream)` | En la caja | Nunca `File.ReadAllBytes` primero |
-| Huella de varios campos | `IncrementalHash` | En la caja | Instancia no thread-safe; usa separadores |
-| Hasheo rápido sin adversario | `XxHash64` | `System.IO.Hashing` | No criptográfico: colisiones fabricables |
+| Huella de varios campos a la vez | `IncrementalHash` | En la caja | Instancia no thread-safe; usa separadores |
+| Hasheo rápido sin adversario | `XxHash64` | `System.IO.Hashing` | No criptográfico: colisiones fabricables a propósito |
 | Contraseña de un `Cliente` | `PasswordHasher<Cliente>` | `Microsoft.Extensions.Identity.Core` | Fija `IterationCount` y persiste el re-hash |
 | Contraseña con bcrypt | `BCrypt.Net.BCrypt` | `BCrypt.Net-Next` (MIT) | Solo los primeros 72 bytes cuentan |
 | Contraseña con Argon2id | `Argon2` | Konscious (MIT) / Isopoh (CC BY 4.0) | Revisa la licencia antes del `add package` |
@@ -352,7 +344,7 @@ Y el que no está en la tabla: **`SHA256` para contraseñas**. Está en la caja,
 - [BenchmarkDotNet](https://benchmarkdotnet.org/articles/guides/getting-started.html) — la forma correcta de medir cuánto tarda un hash en **tu** hardware. Veinte líneas comparando `SHA256.HashData` con `PasswordHasher.HashPassword` a distintos `IterationCount` hacen tangible la diferencia entre un hash rápido y uno lento, y te dan el número real para fijar el coste. Medir con `Stopwatch` en un bucle engaña, por el JIT y por el calentamiento.
 - [Argon2 Calculator](https://argon2.online/) — ejecuta Argon2id en el navegador con los parámetros que le pongas y muestra el hash resultante con su formato `$argon2id$...`. Útil para entender qué significa cada campo antes de configurarlo en código.
 - [Password Storage Cheat Sheet de OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) — la comparativa de PBKDF2, bcrypt y Argon2 con parámetros concretos y actualizados. Es el documento al que apuntar cuando alguien pregunte de dónde sale el número de iteraciones que has puesto.
-- [dotnetfiddle.net](https://dotnetfiddle.net/) — para comprobar en treinta segundos los efectos que sorprenden: ejecuta dos veces `Console.WriteLine("ana@ejemplo.com".GetHashCode())` y verás dos valores distintos con tus propios ojos.
+- [dotnetfiddle.net](https://dotnetfiddle.net/) — para comprobar en treinta segundos los efectos que sorprenden: ejecuta dos veces `Console.WriteLine("ana@ejemplo.com".GetHashCode())` y verás dos valores distintos, sin instalar nada.
 
 ---
 
