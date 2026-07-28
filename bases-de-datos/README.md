@@ -10,7 +10,7 @@ PostgreSQL como base de datos relacional, cómo acceder a una desde una aplicaci
 La base de datos relacional de código abierto: qué la distingue, tipos ricos, `JSONB`, extensiones e índices.
 
 ### [Acceso a datos en .NET](acceso-a-datos-dotnet/README.md)
-El driver de SQL Server y Dapper como micro-ORM.
+Las dos capas que hay debajo de cualquier consulta: el driver oficial de SQL Server (cadena de conexión, cifrado, connection pooling, errores transitorios) y Dapper como micro-ORM para mapear resultados a objetos C#.
 
 ### [Caching](caching/README.md)
 Por qué y cómo cachear datos costosos de obtener: patrones, Redis y estrategias de invalidación.
