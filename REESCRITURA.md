@@ -4,7 +4,7 @@ Documento de trabajo: plan, checklist y estado de la conversión de todas las co
 
 No es una ficha de tutorial. Vive en la raíz porque tiene que estar versionado y ser fácil de encontrar entre sesiones. Cuando la conversión termine, este fichero se puede borrar.
 
-**Última actualización:** 27 de julio de 2026.
+**Última actualización:** 28 de julio de 2026.
 
 ---
 
@@ -18,7 +18,7 @@ Los tres cambios concretos:
 
 | | Antes | Ahora |
 |---|---|---|
-| Extensión | 60-120 líneas | La que pida el tema (en la práctica, 200-350) |
+| Extensión | 60-120 líneas | La que pida el tema (en la práctica, 300-500) |
 | Índice de secciones | Cerrado, sin inventar secciones | Apertura y cierre fijos, desarrollo libre |
 | Ejemplos de código | Snippet suelto | Ejemplo **guiado**: introducción → código → qué hace y qué devuelve |
 
@@ -41,12 +41,17 @@ Esqueleto obligatorio. Apertura y cierre fijos, desarrollo intermedio libre.
 ## <...>                                   ordenadas como progresión de aprendizaje.
 
 ## Buenas prácticas avanzadas           ← FIJA. 3-6 puntos, específicos y accionables.
+## Documentación oficial                ← FIJA desde el 28/07/2026. Fuentes canónicas.
 ## Recursos didácticos                  ← FIJA. Omitible solo si no hay nada que valga la pena.
 
 ---
 
 *En resumen: <una frase memorable>.*  ← FIJA.
 ```
+
+> **`Documentación oficial` es una sección nueva** (28/07/2026), añadida porque los enlaces canónicos quedaban mezclados con los didácticos y pasaban desapercibidos. La división: `Documentación oficial` son las fuentes canónicas (documentación del proyecto, especificación o RFC, *cheat sheet* normativa, repositorio), de 1 a 4 enlaces y cada uno con una línea que diga qué parte merece la pena y cuándo ir ahí; `Recursos didácticos` es todo lo que ayuda a aprender pero no es la fuente. Un enlace no va en las dos.
+>
+> **Decisión explícita: no hay retrofit.** La sección se aplica al contenido escrito de aquí en adelante. Las fichas ya convertidas se quedan sin ella; están listadas en la tabla de la sección 7 y se puede hacer una pasada más adelante si se quiere, pero no es un requisito para cerrar la conversión.
 
 ### Reglas duras
 
@@ -152,12 +157,16 @@ Lo que funciona, aprendido en la primera tanda:
 - **El README lo escribe el hilo principal.** Un agente no ve la colección completa.
 - **Esperar la notificación de fin.** Consultar el tamaño del fichero y deducir que ha acabado produce commits de estados intermedios. Ya pasó una vez y hubo que arreglarlo con dos commits de seguimiento.
 - **Contar con errores 529 del API.** En la primera tanda, 6 de 8 agentes terminaron con `529 Overloaded`, todos en el paso final de recortar longitud, después de haber producido un documento completo y coherente. Ante un fallo: verificar estructura (secciones fijas, delimitadores de código pares, cierre presente) antes de asumir que hay que rehacerlo. Uno de los ocho murió antes de escribir nada y se reescribió a mano.
+- **La extensión se va por encima del rango indicado, y suele estar justificada.** En la segunda tanda se pidieron 250-350 líneas y salieron entre 327 y 519, sin relleno: cuando el brief lista 14-16 bloques de contenido y cada uno pide su snippet o su tabla, la aritmética no da para menos. Dos consecuencias prácticas: **el rango del brief funciona como orientación, no como límite**, y si de verdad quieres una ficha corta hay que recortar la lista de contenido, no repetir el número. No pidas a un agente que recorte al final: es justo donde murieron los de la primera tanda.
+- **Avisar al agente de que verá cambios ajenos en `git status`.** Con varios agentes en paralelo, cada uno ve los ficheros de los demás como modificados y lo reporta como anomalía. No es un problema, pero ensucia el informe final.
 
 ---
 
 ## 7. Estado
 
-**Convertidas: 36 fichas en 7 colecciones. Pendientes: 213 fichas en 27 colecciones.**
+**Convertidas: 65 fichas en 13 colecciones. Pendientes: 198 fichas en 21 colecciones.**
+
+Todas las fichas convertidas salvo `Entity-Framework-Core.md` son anteriores a la sección `Documentación oficial` y no la tienen (ver la nota de la sección 2: no hay retrofit).
 
 ### Hecho
 
@@ -170,6 +179,12 @@ Lo que funciona, aprendido en la primera tanda:
 | `bases-de-datos/mongodb` | 1 | |
 | `bases-de-datos/postgresql` | 1 | |
 | `seguridad/secretos-en-llamadas-salientes` | 1 | |
+| `devops/github-organizaciones` | 5 | Creada ya en formato nuevo, en una sesión aparte. |
+| `ia/ingenieria-con-llms` | 9 | Creada ya en formato nuevo. Le falta README-índice (ver sección 8). |
+| `bases-de-datos/acceso-a-datos-dotnet` | 3 | Al convertir `Dapper.md` se actualizaron las referencias de tono de `SKILL.md`. `Entity-Framework-Core.md` se **movió aquí** desde `desarrollo-web/de-wpf-a-web` el 28/07/2026: es una tecnología de acceso a datos y la colección no estaba completa sin el ORM. Es la única ficha con la sección `Documentación oficial`. |
+| `seguridad/gestion-de-secretos-en-desarrollo` | 3 | |
+| `bases-de-datos/caching` | 4 | |
+| `bases-de-datos/migraciones-de-esquema` | 5 | |
 
 ### Pendiente
 
@@ -177,37 +192,33 @@ Orden propuesto: por valor de uso y por dependencias entre colecciones. Las pequ
 
 | # | Colección | Fichas | Avisos |
 |---:|---|---:|---|
-| 1 | `bases-de-datos/acceso-a-datos-dotnet` | 2 | ⚠️ Contiene `Dapper.md`, que la skill cita como referencia de tono. Al convertirlo, actualizar esa nota en `SKILL.md`. |
-| 2 | `bases-de-datos/caching` | 4 | 5 ficheros con banner 🧭. |
-| 3 | `bases-de-datos/migraciones-de-esquema` | 5 | 6 ficheros con banner 🧭. |
-| 4 | `seguridad/gestion-de-secretos-en-desarrollo` | 3 | Enlazada desde varias fichas ya convertidas. |
-| 5 | `seguridad/algoritmos-de-hash` | 6 | |
-| 6 | `seguridad/autenticacion-y-autorizacion` | 10 | 7 ficheros con banner 🧭. |
-| 7 | `devops/ci-cd` | 12 | Enlazada desde `docker` y `despliegue-en-vps`. |
-| 8 | `devops/git` | 20 | |
-| 9 | `arquitectura-de-software/clean-architecture` | 9 | |
-| 10 | `arquitectura-de-software/patrones-de-diseno` | 11 | 9 ficheros con banner 🧭. Carpeta renombrada de `patrones-de-diseño` el 27/07/2026. |
-| 11 | `arquitectura-de-software/tipos-de-apis` | 13 | |
-| 12 | `arquitectura-de-software/multi-tenancy` | 7 | |
-| 13 | `lenguajes/csharp-dotnet` (+ 2 subcarpetas) | 8 | Tiene subcarpetas con README propio. |
-| 14 | `testing/testing-dotnet` | 9 | Se cruza con `docker/Testcontainers.md`, ya convertida. |
-| 15 | `testing/e2e` | 1 | |
-| 16 | `desarrollo-web/asp-net-core` | 9 | |
-| 17 | `desarrollo-web/de-wpf-a-web` | 16 | |
-| 18 | `desarrollo-web/frontend-react` | 28 | ⚠️ La más grande. La skill cita su `README.md` como modelo de índice y `clsx.md` como ejemplo. |
-| 19 | `redes/redes-y-acceso-remoto` | 11 | `SSH.md` y `VPN.md` se cruzan con `despliegue-en-vps`, ya convertida. |
-| 20 | `odoo/fundamentos` | 4 | |
-| 21 | `odoo/busqueda-y-filtros` | 4 | |
-| 22 | `odoo/pruebas-seguras` | 5 | |
-| 23 | `odoo/configuracion-parametros` | 6 | |
-| 24 | `ia/context-engineering` | 9 | |
-| 25 | `herramientas/correo-transaccional` | 1 | |
+| 1 | `seguridad/algoritmos-de-hash` | 6 | |
+| 2 | `seguridad/autenticacion-y-autorizacion` | 10 | 7 ficheros con banner 🧭. |
+| 3 | `devops/ci-cd` | 12 | Enlazada desde `docker` y `despliegue-en-vps`. |
+| 4 | `devops/git` | 20 | |
+| 5 | `arquitectura-de-software/clean-architecture` | 9 | |
+| 6 | `arquitectura-de-software/patrones-de-diseno` | 11 | 9 ficheros con banner 🧭. Carpeta renombrada de `patrones-de-diseño` el 27/07/2026. |
+| 7 | `arquitectura-de-software/tipos-de-apis` | 13 | |
+| 8 | `arquitectura-de-software/multi-tenancy` | 7 | |
+| 9 | `lenguajes/csharp-dotnet` (+ 2 subcarpetas) | 8 | Tiene subcarpetas con README propio. |
+| 10 | `testing/testing-dotnet` | 9 | Se cruza con `docker/Testcontainers.md`, ya convertida. |
+| 11 | `testing/e2e` | 1 | |
+| 12 | `desarrollo-web/asp-net-core` | 9 | |
+| 13 | `desarrollo-web/de-wpf-a-web` | 15 | `Entity-Framework-Core.md` salió de aquí a `bases-de-datos/acceso-a-datos-dotnet` el 28/07/2026; el README la enlaza en su nueva ubicación. |
+| 14 | `desarrollo-web/frontend-react` | 28 | ⚠️ La más grande. La skill citaba su `README.md` como modelo de índice y `clsx.md` como ejemplo; ya no (ver sección 8). |
+| 15 | `redes/redes-y-acceso-remoto` | 11 | `SSH.md` y `VPN.md` se cruzan con `despliegue-en-vps`, ya convertida. |
+| 16 | `odoo/fundamentos` | 4 | |
+| 17 | `odoo/busqueda-y-filtros` | 4 | |
+| 18 | `odoo/pruebas-seguras` | 5 | |
+| 19 | `odoo/configuracion-parametros` | 6 | |
+| 20 | `ia/context-engineering` | 9 | Revisar solapamiento con `ia/ingenieria-con-llms`, ya en formato nuevo. |
+| 21 | `herramientas/correo-transaccional` | 1 | |
 
 ---
 
 ## 8. Asuntos abiertos
 
-- **`ia/ingenieria-con-llms/` en redacción.** Colección nueva, encargada aparte y escribiéndose en paralelo (9 fichas y creciendo, ya en formato nuevo). **Está sin comitear a propósito** hasta que termine de redactarse. Cuando esté cerrada: darle README-índice, enlazarla desde `ia/README.md`, revisar si se solapa con `ia/context-engineering` y actualizar la descripción de la categoría en el README raíz.
-- **Referencias de tono en la skill.** `SKILL.md` cita `bases-de-datos/acceso-a-datos-dotnet/Dapper.md` como referencia de tono y `desarrollo-web/frontend-react/README.md` como modelo de índice. Ambas están en formato antiguo. Cuando se conviertan, conviene apuntar esas referencias a fichas ya convertidas (por ejemplo `devops/despliegue-en-vps/UFW.md` y su README) y quitar la nota de «calibra el tono, no la extensión».
+- **`ia/ingenieria-con-llms/` ya comiteada** (commit `34709c1`). Queda pendiente: darle README-índice, enlazarla desde `ia/README.md`, revisar si se solapa con `ia/context-engineering` y actualizar la descripción de la categoría en el README raíz.
+- **Referencias de tono en la skill: resueltas** el 28/07/2026. `SKILL.md` cita ahora `devops/despliegue-en-vps/UFW.md` (tono), `bases-de-datos/acceso-a-datos-dotnet/Dapper.md` (guía completa con tablas de decisión y errores frecuentes) y `devops/despliegue-en-vps/README.md` (modelo de índice), las tres en formato nuevo. La nota de «calibra el tono, no la extensión» se sustituyó por un aviso de que en el repositorio aún queda contenido en formato antiguo y no sirve como referencia de profundidad. Ese aviso se puede borrar cuando la conversión termine.
 - **Fin de línea.** El repositorio convierte LF a CRLF al indexar, así que tras comitear los ficheros pueden reaparecer como modificados. Es ruido, no un cambio real: se confirma con `git diff --ignore-all-space`.
 - **Al terminar la conversión**, revisar el README raíz: ya no describe la colección como «guías introductorias», pero conviene una lectura final de coherencia.

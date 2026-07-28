@@ -7,7 +7,7 @@ Fundamentos de seguridad aplicada que toda desarrolladora full-stack debería ma
 ## Contenido
 
 ### [Algoritmos de hash modernos](algoritmos-de-hash/README.md)
-Qué algoritmo de hash usar en cada situación: verificar integridad, guardar contraseñas o proteger tokens de sesión.
+Qué algoritmo de hash usar en cada situación y por qué: las propiedades del hash criptográfico, las familias rápidas (SHA-2, SHA-3, BLAKE) frente a las funciones lentas para contraseñas (PBKDF2, bcrypt, scrypt, Argon2id), la sal y sus homónimos, las herramientas de .NET, y el criterio que lo decide todo — la entropía del secreto.
 
 ### [Autenticación y autorización](autenticacion-y-autorizacion/README.md)
 Quién eres y qué puedes hacer: sesiones y tokens, JWT, OAuth2, OpenID Connect y control de acceso con RBAC, claims y ACL.
