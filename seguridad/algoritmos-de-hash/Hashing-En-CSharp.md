@@ -21,8 +21,6 @@ El ejemplo que recorre la ficha es la API en .NET de una **tienda online**, con 
 
 Esta ficha cubre **la parte de .NET**: qué API, qué paquete, qué licencia. El criterio para elegir entre hash rápido y lento está en [Contraseñas vs tokens de sesión](Contrasenas-Vs-Tokens-De-Sesion.md), la teoría de las KDF en [Funciones de derivación de claves](Funciones-De-Derivacion-De-Claves.md), y qué familia de hash elegir en [Hashes de propósito general](Hashes-De-Proposito-General.md).
 
----
-
 ## Hashes rápidos: los métodos estáticos
 
 Desde .NET 5 existe la forma estática, que no crea ni libera objetos. Es la que hay que usar siempre que tengas los datos completos en memoria:
@@ -344,7 +342,7 @@ Y el que no está en la tabla: **`SHA256` para contraseñas**. Está en la caja,
 - [BenchmarkDotNet](https://benchmarkdotnet.org/articles/guides/getting-started.html) — la forma correcta de medir cuánto tarda un hash en **tu** hardware. Veinte líneas comparando `SHA256.HashData` con `PasswordHasher.HashPassword` a distintos `IterationCount` hacen tangible la diferencia entre un hash rápido y uno lento, y te dan el número real para fijar el coste. Medir con `Stopwatch` en un bucle engaña, por el JIT y por el calentamiento.
 - [Argon2 Calculator](https://argon2.online/) — ejecuta Argon2id en el navegador con los parámetros que le pongas y muestra el hash resultante con su formato `$argon2id$...`. Útil para entender qué significa cada campo antes de configurarlo en código.
 - [Password Storage Cheat Sheet de OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) — la comparativa de PBKDF2, bcrypt y Argon2 con parámetros concretos y actualizados. Es el documento al que apuntar cuando alguien pregunte de dónde sale el número de iteraciones que has puesto.
-- [dotnetfiddle.net](https://dotnetfiddle.net/) — para comprobar en treinta segundos los efectos que sorprenden: ejecuta dos veces `Console.WriteLine("ana@ejemplo.com".GetHashCode())` y verás dos valores distintos, sin instalar nada.
+- [dotnetfiddle.net](https://dotnetfiddle.net/) — sin instalar nada, comprueba en treinta segundos los efectos que sorprenden: ejecuta dos veces `Console.WriteLine("ana@ejemplo.com".GetHashCode())` y verás dos valores distintos. Sirve igual para ver la salida de `Convert.ToHexString` o el formato del hash de bcrypt.
 
 ---
 
