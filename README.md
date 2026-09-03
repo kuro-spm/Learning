@@ -37,4 +37,4 @@ El ERP de código abierto, en cuatro bloques: los fundamentos para entenderlo, c
 Correo transaccional.
 
 ### [IA](ia/README.md)
-Ingeniería con LLMs (programar con agentes de codificación, distribuir sus extensiones con plugins y marketplaces, y construir software con modelos: API, tool use, agentes, MCP, evaluaciones, coste y seguridad) y context engineering: cómo diseñar y gestionar todo lo que recibe un modelo en cada llamada.
+Texto: ingeniería con LLMs (programar con agentes de codificación, distribuir sus extensiones con plugins y marketplaces, y construir software con modelos: API, tool use, agentes, MCP, evaluaciones, coste y seguridad) y context engineering, cómo diseñar y gestionar todo lo que recibe un modelo en cada llamada. Imagen: modelos de difusión y control estructural con ControlNet (preprocesadores, peso y ventana de control, multi-ControlNet).
