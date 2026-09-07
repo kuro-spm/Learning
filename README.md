@@ -31,7 +31,7 @@ Algoritmos de hash modernos, autenticación y autorización (OAuth2, OIDC, JWT),
 Conexiones remotas, carpetas compartidas, NAS, SSH, VPN y compañía.
 
 ### [Odoo](odoo/README.md)
-El ERP de código abierto, en cuatro bloques: los fundamentos para entenderlo, cómo hacer pruebas de forma segura sobre un Odoo en producción, cómo se construyen las búsquedas y los filtros (dominios, *search panel*, filtros dinámicos) y las distintas maneras de configurar parámetros (odoo.conf, parámetros del sistema, ajustes, IDs externos).
+El ERP de código abierto, en cinco bloques: los fundamentos para entenderlo, cómo hacer pruebas de forma segura sobre un Odoo en producción, cómo se construyen las búsquedas y los filtros (dominios, *search panel*, filtros dinámicos), las distintas maneras de configurar parámetros (odoo.conf, parámetros del sistema, ajustes, IDs externos) y los mecanismos de notificación (avisos flotantes, excepciones, chatter y seguidores, plantillas de correo, actividades).
 
 ### [Herramientas y sistemas](herramientas/README.md)
 Correo transaccional.
