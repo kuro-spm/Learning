@@ -13,7 +13,7 @@ Mandar un correo "de verdad" tiene dos partes que la gente confunde:
 
 > Si vienes del mundo web, piensa en SMTP como en HTTP: tener el protocolo no te da un servidor. Igual que necesitas montar (o contratar) un servidor web para responder peticiones HTTP, necesitas un servidor de correo con reputación para que tus emails lleguen.
 
-Por eso surgieron los **proveedores de correo transaccional**: servicios que ya tienen la infraestructura, la reputación de IP y la configuración de entregabilidad resueltas. Tú les pides "envía este correo" y ellos se encargan del resto.
+Por eso surgieron los **proveedores de correo transaccional**: servicios que ya tienen la infraestructura, la reputación de IP y la configuración de entregabilidad resueltas. Tú les pides "envía este correo" y ellos se encargan del resto. MailKit, que es lo que se usa en esta guía para enviar desde .NET, no es uno de estos proveedores: es solo el *cliente* que habla SMTP con ellos, igual que un navegador habla HTTP con un servidor web sin ser él mismo el servidor.
 
 ## ¿Cuándo y para qué se usa?
 
@@ -34,9 +34,7 @@ No conviene asumirlo. Tienes tres escenarios:
 2. **Usar el correo corporativo del cliente** (por ejemplo Microsoft 365 o Google Workspace). Funciona, pero tiene límites de envío y hoy suele exigir autenticación moderna (OAuth2) en lugar de usuario y contraseña.
 3. **Usar un proveedor transaccional** (Amazon SES, SendGrid, Mailgun, Postmark, Brevo, Resend, Azure Communication Services...). Es lo recomendado: te dan credenciales SMTP **o** una API, y resuelven la entregabilidad por ti. La elección suele depender de dónde despliegas (SES si estás en AWS, Azure Communication Services si estás en Azure) y de la capa gratuita.
 
-## Lo mínimo que necesitas saber
-
-**1. No hardcodees la configuración: ponla en `appsettings`**
+## Configuración: nunca hardcodeada
 
 Host, puerto, usuario y contraseña (o API key) van en configuración, nunca en el código. Así cambiar de proveedor es cambiar texto, no recompilar.
 
@@ -56,7 +54,7 @@ Host, puerto, usuario y contraseña (o API key) van en configuración, nunca en 
 
 > La contraseña o API key real **no** debe estar en `appsettings.json` dentro del repositorio. Usa *user secrets* en desarrollo y variables de entorno o un gestor de secretos (Azure Key Vault, AWS Secrets Manager) en producción.
 
-**2. Enviar un correo por SMTP con MailKit**
+## Enviar un correo por SMTP con MailKit
 
 El cliente SMTP recomendado en .NET es **MailKit** (la clase `SmtpClient` antigua de `System.Net.Mail` está desaconsejada por Microsoft). Se instala con `dotnet add package MailKit`.
 
@@ -80,9 +78,7 @@ await cliente.SendAsync(mensaje);
 await cliente.DisconnectAsync(true);
 ```
 
-**3. Encapsula el envío en un servicio inyectable**
-
-No llames a MailKit desde un controlador. Define una interfaz y registra una implementación. Así puedes cambiar de proveedor o simular el envío en los tests.
+No llames a MailKit directamente desde un controlador: encapsula el envío en un servicio inyectable, con una interfaz propia. Así puedes cambiar de proveedor o simular el envío en los tests sin tocar el resto de la app.
 
 ```csharp
 public interface IEmailSender
@@ -110,7 +106,7 @@ public class RecuperarPasswordHandler
 }
 ```
 
-**4. En desarrollo, no mandes correos reales**
+## En desarrollo, no mandes correos reales
 
 Usa un servidor SMTP "de mentira" que captura los correos y te los enseña en una web local, en vez de enviarlos de verdad. Los más comunes son **Mailpit**, **MailHog** o **smtp4dev** (se levantan fácil con Docker). Apuntas tu configuración a ese SMTP local (`localhost`, puerto 1025 normalmente) y revisas los correos en su panel web.
 
@@ -119,35 +115,29 @@ docker run -d -p 1025:1025 -p 8025:8025 axllent/mailpit
 # Configura Host=localhost, Port=1025 y abre http://localhost:8025 para ver los correos
 ```
 
-**5. Verifica el dominio antes de producción**
+## Antes de producción: el dominio importa más que el código
 
-Para que los correos lleguen bien, el cliente necesita un **dominio propio** (`miapp.com`) y configurar en su DNS los registros **SPF**, **DKIM** y **DMARC** que el proveedor te indique. Sin esto, aunque el envío "funcione", muchos correos irán a spam. El remitente debe usar ese dominio (`no-reply@miapp.com`), no un Gmail genérico.
+Para que los correos lleguen bien, el cliente necesita un **dominio propio** (`miapp.com`) y configurar en su DNS los registros **SPF**, **DKIM** y **DMARC** que el proveedor te indique. Sin esto, aunque el envío "funcione" y no salte ningún error, muchos correos irán a spam. El remitente debe usar ese dominio (`no-reply@miapp.com`), no un Gmail genérico.
 
-**6. Envía fuera de la petición web si puedes**
-
-Mandar un correo tarda y puede fallar. No bloquees la respuesta al usuario esperando al SMTP: idealmente encolas el envío (una cola en segundo plano, un *background service*, o el sistema de colas del proveedor) y reintenta si falla. Para empezar puede valer un envío directo, pero tenlo en mente al crecer.
-
-## Lo que NO hace
-
-- **No garantiza la entrega por sí solo** — necesitas dominio verificado y SPF/DKIM/DMARC bien configurados.
-- **No sustituye a una herramienta de marketing** — el correo transaccional es uno-a-uno; las campañas masivas son otra cosa.
-- **MailKit no es un proveedor** — es el *cliente* que habla SMTP; sigue necesitando un servidor (propio o de un proveedor) al que conectarse.
-- **No deberías guardar las credenciales en el repositorio** — van en secretos, nunca en `appsettings.json` versionado.
-- **No bloquees la experiencia del usuario** — un fallo al enviar no debería tumbar el registro o el reset; trátalo aparte.
+Y una vez enviando, no bloquees la respuesta al usuario esperando al SMTP: mandar un correo tarda y puede fallar. Idealmente encolas el envío (una cola en segundo plano, un *background service*, o el sistema de colas del proveedor) y reintenta si falla; para empezar puede valer un envío directo, pero tenlo en mente al crecer.
 
 ## Buenas prácticas avanzadas
 
 - **Envía siempre `multipart/alternative` con versión en texto plano** — un correo solo-HTML puntúa peor en los filtros de spam y se ve roto en clientes que no renderizan HTML. Con MimeKit no montes el `TextPart` a mano: usa `BodyBuilder`, rellena `HtmlBody` **y** `TextBody`, y asigna `bodyBuilder.ToMessageBody()` al mensaje. Es una línea más y mejora la entregabilidad de forma medible.
-
 - **Los reintentos sin idempotencia duplican correos** — si encolas el envío y reintentas ante fallo, tarde o temprano un timeout hará que el correo se envíe dos veces (el SMTP lo aceptó pero tu app no recibió la respuesta). Guarda en base de datos un registro por envío con una clave única (por ejemplo `pedido-1234-confirmacion`) y márcalo como enviado; el patrón *outbox* resuelve esto y además evita el caso inverso: que la transacción de negocio haga rollback pero el correo ya haya salido.
-
 - **Procesa los bounces o tu reputación se hunde sola** — insistir en enviar a direcciones que rebotan (*hard bounces*) o que te han marcado como spam es lo que más rápido degrada la reputación del dominio. Todos los proveedores serios exponen webhooks de *bounce* y *complaint*: escúchalos y mantén tu propia **lista de supresión** para no volver a enviar a esas direcciones, aunque el usuario vuelva a pedir el correo.
-
 - **Usa un subdominio dedicado y entiende el *alignment* de DMARC** — envía el transaccional desde `mail.miapp.com` (o similar), separado del correo corporativo y del marketing: si una campaña quema la reputación, tu email de reset de contraseña no paga los platos rotos. Y un detalle que casi nadie sabe: cuando envías vía proveedor, el SPF suele validar el dominio *del proveedor* (el *envelope from*), no el tuyo, así que lo que de verdad alinea con tu `From` a ojos de DMARC es el **DKIM firmado con tu dominio**. Por eso el paso de "verificar dominio" del proveedor (los registros CNAME/TXT que te pide) no es opcional.
-
 - **El `SmtpClient` de MailKit no es thread-safe, pero sí reutilizable** — en un *background service* que despacha una cola, no conectes y desconectes por cada mensaje: una conexión autenticada admite varios `SendAsync` seguidos y el *handshake* TLS más la autenticación son la parte cara. Eso sí, nunca compartas una instancia entre hilos ni la registres como singleton en el contenedor de dependencias; crea una por lote o por worker.
-
 - **Trata los datos del usuario como hostiles también en el email** — si interpolas el nombre del usuario o el texto de un comentario en la plantilla HTML (como en el ejemplo del blog que avisa de comentarios nuevos), codifícalo con `HtmlEncoder` igual que harías en una vista web. Un atacante que se registra con el nombre `<a href="https://malo.com">Recupera tu cuenta aquí</a>` convierte tus correos legítimos en vehículo de phishing con tu remitente y tu reputación.
+
+## Documentación oficial
+
+- [Documentación de MailKit](https://mimekit.net/docs/html/T_MailKit_Net_Smtp_SmtpClient.htm) — la referencia de la API del cliente SMTP: opciones de conexión, autenticación y los eventos que expone.
+- [dmarc.org](https://dmarc.org/overview/) — la explicación normativa de cómo interactúan SPF, DKIM y DMARC, y del *alignment* que decide si un correo se considera legítimo.
+
+## Recursos didácticos
+
+[mail-tester.com](https://www.mail-tester.com/) te da una puntuación de 1 a 10 sobre un correo real que le envíes: te dice al momento si tu SPF, DKIM o DMARC están mal configurados y por qué probablemente acabarías en spam. Es el ejercicio de dos minutos que convierte "la entregabilidad" en algo medible en vez de abstracto.
 
 ---
 

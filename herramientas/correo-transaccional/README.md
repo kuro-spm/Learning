@@ -1,6 +1,6 @@
 # Correo transaccional — Guía de tecnología
 
-Guía introductoria sobre cómo una aplicación envía correos automáticos (recuperar contraseña, confirmar registro, avisar de un pedido...) y cómo se hace en concreto desde .NET. Pensada para perfiles junior que nunca han montado el envío de email en una app y no saben por dónde empezar.
+Guía sobre cómo una aplicación envía correos automáticos (recuperar contraseña, confirmar registro, avisar de un pedido...) y cómo se hace en concreto desde .NET. Pensada para perfiles junior que nunca han montado el envío de email en una app y no saben por dónde empezar.
 
 Aprenderás qué es el correo transaccional, por qué no basta con "asumir que hay un SMTP", cómo elegir proveedor y cómo enviar un correo desde C# con MailKit de forma sencilla y mantenible.
 

@@ -168,7 +168,7 @@ Lo que funciona, aprendido en la primera tanda:
 
 ## 7. Estado
 
-**Convertidas: 75 fichas en 14 colecciones. Pendientes: 188 fichas en 20 colecciones.**
+**Convertidas: 76 fichas en 15 colecciones. Pendientes: 187 fichas en 19 colecciones.**
 
 Llevan la sección `Documentación oficial` las 7 de `algoritmos-de-hash` y EF Core, más las 10 de `autenticacion-y-autorizacion` (ya completa). El resto son anteriores a esa regla y no la tienen (ver la nota de la sección 2: no hay retrofit).
 
@@ -194,6 +194,7 @@ Las cuatro fichas que quedaban (`JWT-Refresh.md`, `JWT-Refresh-vs-Tokens-Opacos.
 | `bases-de-datos/caching` | 4 | |
 | `bases-de-datos/migraciones-de-esquema` | 5 | |
 | `seguridad/autenticacion-y-autorizacion` | 10 | Cerrada el 14/09/2026. Detalle arriba, en «completa (14/09/2026)». |
+| `herramientas/correo-transaccional` | 1 | Cerrada el 14/09/2026. El contenido ya era bueno (una sola ficha, sin banner): se reorganizó "Lo mínimo que necesitas saber" en secciones `##` propias, se plegó "Lo que NO hace" en la prosa y se añadió `Documentación oficial` ([MailKit](https://mimekit.net/docs/html/T_MailKit_Net_Smtp_SmtpClient.htm), [dmarc.org](https://dmarc.org/overview/)) y `Recursos didácticos` ([mail-tester.com](https://www.mail-tester.com/)). 154 → 144 líneas: la reorganización no necesitó añadir contenido nuevo. |
 
 ### Pendiente
 
@@ -209,7 +210,7 @@ Orden propuesto: por valor de uso y por dependencias entre colecciones. Las pequ
 | 6 | `arquitectura-de-software/multi-tenancy` | 7 | |
 | 7 | `lenguajes/csharp-dotnet` (+ 2 subcarpetas) | 8 | Tiene subcarpetas con README propio. |
 | 8 | `testing/testing-dotnet` | 9 | Se cruza con `docker/Testcontainers.md`, ya convertida. |
-| 9 | `testing/e2e` | 1 | |
+| 9 | `testing/e2e` | 1 | Mismo perfil que `correo-transaccional`: una sola ficha ya sustanciosa (178 líneas), solo necesita la reorganización ligera, no una expansión. |
 | 10 | `desarrollo-web/asp-net-core` | 9 | |
 | 11 | `desarrollo-web/de-wpf-a-web` | 15 | `Entity-Framework-Core.md` salió de aquí a `bases-de-datos/acceso-a-datos-dotnet` el 28/07/2026; el README la enlaza en su nueva ubicación. |
 | 12 | `desarrollo-web/frontend-react` | 28 | ⚠️ La más grande. La skill citaba su `README.md` como modelo de índice y `clsx.md` como ejemplo; ya no (ver sección 8). |
@@ -219,7 +220,6 @@ Orden propuesto: por valor de uso y por dependencias entre colecciones. Las pequ
 | 16 | `odoo/pruebas-seguras` | 5 | |
 | 17 | `odoo/configuracion-parametros` | 6 | |
 | 18 | `ia/context-engineering` | 9 | Revisar solapamiento con `ia/ingenieria-con-llms`, ya en formato nuevo. |
-| 19 | `herramientas/correo-transaccional` | 1 | |
 
 > `odoo/notificaciones` no está en esta lista: se creó directamente en formato nuevo (no es una conversión), y está incompleta a propósito — le faltan 3 fichas propias, detalladas en su README.
 
