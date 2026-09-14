@@ -11,6 +11,7 @@ No repite los fundamentos de SQL: parte de lo que ya sabes y se centra en lo pro
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 1 | [PostgreSQL](PostgreSQL.md) | Qué distingue a Postgres, tipos de datos, `JSONB`, claves foráneas, índices, transacciones, extensiones y buenas prácticas de operación. |
+| 2 | [JSONB con record tipado](JSONB-con-record-tipado.md) | Cómo mapear una columna `jsonb` a un `record` de C# en el backend con Npgsql, en vez de tratarla como texto o un documento sin forma. |
 
 ---
 
