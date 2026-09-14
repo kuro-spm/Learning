@@ -69,8 +69,8 @@ Estos pilares no se negocian:
 2. **Audiencia: perfil backend junior-medio.** El lector programa a diario y puede conocer algunas partes del stack (HTTP, APIs REST, bases de datos, componentes de UI, npm/NuGet, Git...), pero puede ser nuevo en la tecnología concreta que documentas. No le expliques qué es una API o un bucle; sí define los términos propios de la tecnología antes de usarlos y no des por sabidos sus detalles internos.
 3. **Analogías y lenguaje claro.** Explica cada concepto nuevo anclándolo a algo que el lector ya domina. Con este perfil, las comparaciones con tecnologías fullstack comunes (SQL, C#, java, html, css, Docker...) pueden ir en el cuerpo del texto como explicación principal; reserva el blockquote opcional (`> Si ya conoces X, piensa en Y como...`) para analogías con tecnologías menos universales, que nunca deben ser requisito para entender el texto.
 4. **Tutoriales autónomos, no atados a ningún proyecto.** El lector puede ser cualquiera, sin acceso a un código concreto. No menciones proyectos, módulos ni dominios privados. Para ilustrar "para qué se usa", emplea escenarios genéricos y reconocibles (una tienda online, un blog, una app de tareas, un formulario de registro...). La guía debe seguir teniendo sentido fuera de cualquier repositorio.
-5. **Guías completas, con entrada suave.** No son resúmenes ni chuletas: el objetivo es que quien las lea acabe **sabiendo usar la tecnología de verdad**, sin tener que ir a buscar lo importante a otro sitio. La ficha arranca siempre con una **introducción accesible** (qué es, por qué existe, para qué sirve) para que nadie se pierda en el primer minuto, y a partir de ahí desarrolla el tema con la profundidad que pida: casos de uso reales, opciones de configuración relevantes, cómo encaja con lo que ya usa el lector, qué pasa cuando algo falla. La extensión la marca el tema, no una cuota: cubre lo que hay que cubrir y para cuando esté cubierto. Lo que sigue prohibido es el **relleno**: repetir lo ya dicho, parafrasear la documentación oficial o enumerar la API entera sin explicar nada.
-6. **Todo lo que se explica sobre código va acompañado de un ejemplo guiado.** Nunca describas en prosa una sintaxis, una llamada, una opción de configuración o un patrón sin enseñar el código correspondiente. Y el ejemplo no es un bloque suelto: es *guiado*, es decir, va precedido de una frase que dice qué vamos a ver y seguido (o comentado por dentro) de la explicación de qué hace cada parte y qué resultado produce. Cuando ayude, muestra también la **salida esperada** (respuesta JSON, log de consola, error concreto) o el contraste **antes/después** o **mal/bien**. Regla práctica: si un párrafo habla de código y no hay snippet cerca, falta el snippet.
+5. **Guías completas, con entrada suave — pero no exhaustivas.** No son resúmenes ni chuletas: el objetivo es que quien las lea acabe **sabiendo usar la tecnología de verdad**, sin tener que ir a buscar lo esencial a otro sitio. La ficha arranca siempre con una **introducción accesible** (qué es, por qué existe, para qué sirve) para que nadie se pierda en el primer minuto, y a partir de ahí cubre lo que hace falta para usar la tecnología con soltura en el día a día: los casos de uso habituales, las opciones de configuración que de verdad se tocan, cómo encaja con lo que ya usa el lector. Por defecto, prioriza la claridad y la concisión sobre la exhaustividad: cubre lo esencial bien explicado antes que todo lo posible explicado por encima. Casos límite, opciones raras o variantes secundarias se mencionan en una línea o se enlazan a la documentación oficial, sin desarrollarlas. Profundiza más allá de eso solo si el tema concreto lo exige de verdad (por ejemplo, porque un matiz es la causa típica de errores) o si la usuaria pide explícitamente una guía más extensa. Lo que sigue prohibido es el **relleno**: repetir lo ya dicho, parafrasear la documentación oficial o enumerar la API entera sin explicar nada.
+6. **Los patrones centrales van con ejemplo guiado.** El uso habitual de la tecnología —lo que el lector usará de verdad— se enseña con código, no solo en prosa: una frase que dice qué vamos a ver, el snippet, y qué hace y qué devuelve. Cuando ayude, muestra también la **salida esperada** o el contraste **antes/después** o **mal/bien**. Para opciones secundarias, variantes menores o listados de parámetros, basta con explicarlos en prosa o en una tabla breve, sin repetir un snippet por cada uno: reserva el ejemplo guiado para lo que de verdad marca la diferencia al aprender la tecnología.
 7. **Género del lector: preferentemente neutro, y si no, masculino.** Por convención, redacta en **género neutro** siempre que se pueda: fórmulas impersonales, «quien…», «la persona…», segunda persona («tú», «necesitas», «verás») sin marca de género, y reformulaciones que eviten adjetivos o sustantivos con género. Cuando el neutro resulte forzado o artificioso, usa el **masculino genérico** (no el femenino). Mantén el criterio coherente dentro de cada colección. No hace falta reescribir fichas antiguas ya redactadas en otro género: esta preferencia aplica al contenido nuevo.
 
 ## Convención de nombres de archivo
@@ -126,7 +126,7 @@ Justo después conviene (casi siempre) una sección de contexto tipo `## ¿Cuán
 
 ### Desarrollo libre: el cuerpo de la guía
 
-Aquí es donde la ficha deja de ser una introducción. **Elige las secciones `##` que pida la tecnología** y ordénalas como una progresión de aprendizaje: de lo básico a lo avanzado, cada sección apoyándose en la anterior. Usa subsecciones `###` cuando una sección crezca.
+Aquí es donde la ficha deja de ser una introducción. **Elige las secciones `##` que pida la tecnología** y ordénalas como una progresión de aprendizaje: de lo básico a lo avanzado, cada sección apoyándose en la anterior. Usa subsecciones `###` cuando una sección crezca. Por defecto, prefiere **pocas secciones bien elegidas** a cubrir todos los ángulos posibles: entre 3 y 6 secciones intermedias suele bastar salvo que el tema tenga de verdad más partes independientes que aprender.
 
 No hay lista cerrada de secciones. Estas son ideas frecuentes, no una plantilla que rellenar (usa solo las que aporten, y renómbralas para que digan algo concreto del tema):
 
@@ -136,14 +136,14 @@ No hay lista cerrada de secciones. Estas son ideas frecuentes, no una plantilla 
 - Configuración: las opciones que de verdad se tocan, y qué cambia cada una.
 - Cómo encaja con el resto del stack (integraciones, alternativas, con qué se combina).
 - Errores frecuentes y cómo se diagnostican, con el mensaje de error real.
-- Rendimiento, seguridad o límites, si son relevantes en esa tecnología.
-- Un ejemplo completo de cierre que junte varias piezas.
+
+Rendimiento, seguridad, límites o un ejemplo de cierre que junte varias piezas son añadidos válidos, pero no de serie: inclúyelos solo si el tema los hace especialmente relevantes, no como casillas a marcar en cada ficha.
 
 Reglas del desarrollo:
 
 - **Progresión, no catálogo.** Cada sección debe poder leerse sabiendo solo lo anterior. No adelantes conceptos sin definir.
-- **Todo lo que toque código lleva su ejemplo guiado** (principio 6): frase que introduce → snippet → qué hace y qué devuelve. Y cuando aporte, la salida esperada o el contraste mal/bien.
-- **Profundidad sí, relleno no.** Si una sección no enseña nada que el lector no dedujera ya, fuera.
+- **El uso habitual lleva su ejemplo guiado** (principio 6): frase que introduce → snippet → qué hace y qué devuelve. Las variantes y opciones secundarias pueden quedarse en prosa.
+- **Profundidad sí, relleno no.** Si una sección no enseña nada que el lector no dedujera ya, fuera. Ante la duda entre incluir una sección más o dejarla fuera, **déjala fuera**: es más barato que la usuaria pida ampliar algo concreto que recortar relleno ya escrito.
 - **Sin enumerar la API entera.** Para eso está la documentación oficial; enlázala. La guía cubre lo que se usa de verdad y explica *por qué*.
 
 ### Cierre fijo
@@ -239,9 +239,9 @@ Antes de dar por terminado:
 - [ ] Es autónoma: se entiende sin conocer ningún proyecto concreto (sin módulos ni dominios privados).
 - [ ] El género usado para el lector es coherente en toda la colección.
 - [ ] Cada ficha respeta el esqueleto: abre con `## ¿Qué es?` y `## ¿Por qué existe?`, y cierra con «Buenas prácticas avanzadas», «Recursos didácticos» (si hay) y el `*En resumen: ...*`.
-- [ ] Es una **guía completa**, no un resumen: el desarrollo intermedio va a fondo y quien la lea sabe usar la tecnología sin tener que buscar lo importante en otro sitio.
+- [ ] Es una guía útil, no un resumen: cubre lo esencial para usar la tecnología con soltura, sin necesidad de exhaustividad ni de agotar el tema.
 - [ ] Las secciones intermedias forman una progresión de aprendizaje (nada se usa antes de definirse) y ninguna es relleno.
-- [ ] **No hay ningún párrafo que hable de código sin su ejemplo guiado al lado** (frase introductoria → snippet → qué hace y qué devuelve).
+- [ ] **El uso habitual de la tecnología tiene su ejemplo guiado al lado** (frase introductoria → snippet → qué hace y qué devuelve); las opciones secundarias pueden quedarse en prosa.
 - [ ] «Buenas prácticas avanzadas» tiene puntos específicos y accionables, no consejos genéricos.
 - [ ] El código de ejemplo usa nombres genéricos y reconocibles, no `foo`/`bar` ni nombres de un proyecto privado, y son coherentes entre secciones de la misma ficha.
 - [ ] Cada ficha cierra con `---` y la frase `*En resumen: ...*`.
