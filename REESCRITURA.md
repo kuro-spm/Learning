@@ -4,7 +4,7 @@ Documento de trabajo: plan, checklist y estado de la conversión de todas las co
 
 No es una ficha de tutorial. Vive en la raíz porque tiene que estar versionado y ser fácil de encontrar entre sesiones. Cuando la conversión termine, este fichero se puede borrar.
 
-**Última actualización:** 28 de julio de 2026.
+**Última actualización:** 14 de septiembre de 2026.
 
 ---
 
@@ -23,6 +23,8 @@ Los tres cambios concretos:
 | Ejemplos de código | Snippet suelto | Ejemplo **guiado**: introducción → código → qué hace y qué devuelve |
 
 La skill `crear-tutorial` (en `~/.claude/skills/crear-tutorial/SKILL.md`) ya está actualizada con estas reglas y es la referencia normativa. Este documento no la sustituye: organiza su aplicación al contenido que ya existía.
+
+> **Nota del 14/09/2026:** la skill se suavizó para consumir menos tokens: ya no exige que la extensión llegue a 300-500 líneas ni que cada opción secundaria lleve su propio ejemplo guiado (el ejemplo guiado se reserva para el uso habitual; ver el principio 5 y 6 de la skill). El contrato de esta sección sigue siendo válido en lo estructural (esqueleto, reglas duras), pero la cifra de extensión de la tabla de abajo y la exigencia de "todo párrafo con snippet" quedan desde esta fecha por debajo de lo que dicta la skill actual — prevalece la skill.
 
 ---
 
@@ -166,35 +168,13 @@ Lo que funciona, aprendido en la primera tanda:
 
 ## 7. Estado
 
-**Convertidas: 71 fichas en 13 colecciones y media. Pendientes: 192 fichas en 21 colecciones.**
+**Convertidas: 75 fichas en 14 colecciones. Pendientes: 188 fichas en 20 colecciones.**
 
-Llevan la sección `Documentación oficial` las 7 de `algoritmos-de-hash` y EF Core, más las 6 convertidas de `autenticacion-y-autorizacion`. El resto son anteriores a esa regla y no la tienen (ver la nota de la sección 2: no hay retrofit).
+Llevan la sección `Documentación oficial` las 7 de `algoritmos-de-hash` y EF Core, más las 10 de `autenticacion-y-autorizacion` (ya completa). El resto son anteriores a esa regla y no la tienen (ver la nota de la sección 2: no hay retrofit).
 
-### `seguridad/autenticacion-y-autorizacion`: a medio convertir
+### `seguridad/autenticacion-y-autorizacion`: completa (14/09/2026)
 
-La sesión del 28/07/2026 terminó con esta colección **6 de 10**. Es el punto exacto por donde retomar.
-
-| Ficha | Estado | Líneas |
-|---|---|---:|
-| `Autenticacion-vs-Autorizacion.md` | ✅ convertida | 285 |
-| `Sesiones-vs-Tokens.md` | ✅ convertida | 285 |
-| `JWT.md` | ✅ convertida | 355 |
-| `OAuth2.md` | ✅ convertida | 376 |
-| `OpenID-Connect.md` | ✅ convertida | 440 |
-| `Tokens-Opacos.md` | ✅ convertida | 304 |
-| `JWT-Refresh.md` | ⬜ formato antiguo | 94 |
-| `JWT-Refresh-vs-Tokens-Opacos.md` | ⬜ formato antiguo | 78 |
-| `RBAC-y-Claims.md` | ⬜ formato antiguo, con banner 🧭 | 88 |
-| `ACL.md` | ⬜ formato antiguo | 106 |
-| `README.md` | ⬜ sin reescribir, con banner 🧭 | 53 |
-
-Notas para retomarla:
-
-- **El README sigue siendo válido como índice** (los cuatro bloques y el orden de lectura no cambian), así que se dejó intacto a propósito para reescribirlo de una vez cuando cierre la colección. Hay que quitarle el banner 🧭.
-- **El ejemplo conductor de la colección**, ya aplicado en las seis convertidas y que las cuatro restantes deben respetar: tienda online con API en `api.tienda.ejemplo.com` y frontend en `tienda.ejemplo.com`; tablas `Clientes`, `Pedidos`, `Sesiones` (y `RefreshTokens` en la ficha del refresh); pedido **#4711** de la clienta **42**; roles **`Cliente`, `Empleado`, `Administrador`**; endpoints `GET /pedidos/4711`, `DELETE /productos/17`, `GET /admin/informes`. En OAuth2 el tercero es `envios.ejemplo.com` con `scope=pedidos.read`; en OIDC el proveedor es `accounts.proveedor.ejemplo.com` con `client_id=tienda-online`.
-- **`RBAC-y-Claims.md` usa «Administradora» y «Editor» como roles**: hay que alinearlos con `Cliente`/`Empleado`/`Administrador`.
-- **Las fronteras entre fichas son el trabajo delicado de esta colección**, porque cinco de las diez rondan el mismo territorio. Las que quedan: `JWT-Refresh` explica **cómo funciona** el patrón (rotación, familias, dónde guardar cada token), `Tokens-Opacos` ya explica su modelo, y `JWT-Refresh-vs-Tokens-Opacos` es **solo la decisión** entre los dos, a nivel de implementación — mientras que `Sesiones-vs-Tokens` ya cubre la disyuntiva de más alto nivel (con estado frente a sin estado). `RBAC-y-Claims` es el modelo centrado en el sujeto y `ACL` el centrado en el recurso.
-- Las cuatro fichas pendientes tienen «Buenas prácticas avanzadas» **excepcionalmente buenas** ya escritas (las familias de tokens y la «versión de sesión» de `JWT-Refresh`, la `mask` de las POSIX ACL en `ACL`). Hay que conservarlas y afilarlas, no sustituirlas.
+Las cuatro fichas que quedaban (`JWT-Refresh.md`, `JWT-Refresh-vs-Tokens-Opacos.md`, `RBAC-y-Claims.md`, `ACL.md`) y el `README.md` (quitado el banner 🧭) se convirtieron con una pasada ligera en vez de la reescritura completa que llevaron las seis primeras: su contenido ya era bueno (los apartados «Lo mínimo que necesitas saber» y «Lo que NO hace» se reorganizaron en secciones `##` propias y se plegaron en la prosa, respectivamente), así que se ajustó a la skill suavizada del 14/09/2026 en vez de expandir a 300-500 líneas. `RBAC-y-Claims.md` se alineó con el ejemplo conductor (`Administradora`/`Editor` → `Cliente`/`Empleado`/`Administrador`). Todas quedaron entre 75 y 95 líneas, con `Documentación oficial` añadida a las cuatro.
 
 ### Hecho
 
@@ -208,11 +188,12 @@ Notas para retomarla:
 | `bases-de-datos/postgresql` | 1 | |
 | `seguridad/secretos-en-llamadas-salientes` | 1 | |
 | `devops/github-organizaciones` | 5 | Creada ya en formato nuevo, en una sesión aparte. |
-| `ia/ingenieria-con-llms` | 9 | Creada ya en formato nuevo. Le falta README-índice (ver sección 8). |
+| `ia/ingenieria-con-llms` | 10 | Creada ya en formato nuevo. Ya tiene README-índice, enlazado desde `ia/README.md` (ver sección 8). |
 | `bases-de-datos/acceso-a-datos-dotnet` | 3 | Al convertir `Dapper.md` se actualizaron las referencias de tono de `SKILL.md`. `Entity-Framework-Core.md` se **movió aquí** desde `desarrollo-web/de-wpf-a-web` el 28/07/2026: es una tecnología de acceso a datos y la colección no estaba completa sin el ORM. Es la única ficha con la sección `Documentación oficial`. |
 | `seguridad/gestion-de-secretos-en-desarrollo` | 3 | |
 | `bases-de-datos/caching` | 4 | |
 | `bases-de-datos/migraciones-de-esquema` | 5 | |
+| `seguridad/autenticacion-y-autorizacion` | 10 | Cerrada el 14/09/2026. Detalle arriba, en «completa (14/09/2026)». |
 
 ### Pendiente
 
@@ -220,32 +201,33 @@ Orden propuesto: por valor de uso y por dependencias entre colecciones. Las pequ
 
 | # | Colección | Fichas | Avisos |
 |---:|---|---:|---|
-| 1 | `seguridad/autenticacion-y-autorizacion` | 4 + README | **Empezar por aquí: está a medio convertir, 6 de 10 hechas.** Ver el detalle al principio de esta sección. |
-| 2 | `devops/ci-cd` | 12 | Enlazada desde `docker` y `despliegue-en-vps`. |
-| 3 | `devops/git` | 20 | |
-| 4 | `arquitectura-de-software/clean-architecture` | 9 | |
-| 5 | `arquitectura-de-software/patrones-de-diseno` | 11 | 9 ficheros con banner 🧭. Carpeta renombrada de `patrones-de-diseño` el 27/07/2026. |
-| 6 | `arquitectura-de-software/tipos-de-apis` | 13 | |
-| 7 | `arquitectura-de-software/multi-tenancy` | 7 | |
-| 8 | `lenguajes/csharp-dotnet` (+ 2 subcarpetas) | 8 | Tiene subcarpetas con README propio. |
-| 9 | `testing/testing-dotnet` | 9 | Se cruza con `docker/Testcontainers.md`, ya convertida. |
-| 10 | `testing/e2e` | 1 | |
-| 11 | `desarrollo-web/asp-net-core` | 9 | |
-| 12 | `desarrollo-web/de-wpf-a-web` | 15 | `Entity-Framework-Core.md` salió de aquí a `bases-de-datos/acceso-a-datos-dotnet` el 28/07/2026; el README la enlaza en su nueva ubicación. |
-| 13 | `desarrollo-web/frontend-react` | 28 | ⚠️ La más grande. La skill citaba su `README.md` como modelo de índice y `clsx.md` como ejemplo; ya no (ver sección 8). |
-| 14 | `redes/redes-y-acceso-remoto` | 11 | `SSH.md` y `VPN.md` se cruzan con `despliegue-en-vps`, ya convertida. |
-| 15 | `odoo/fundamentos` | 4 | |
-| 16 | `odoo/busqueda-y-filtros` | 4 | |
-| 17 | `odoo/pruebas-seguras` | 5 | |
-| 18 | `odoo/configuracion-parametros` | 6 | |
-| 19 | `ia/context-engineering` | 9 | Revisar solapamiento con `ia/ingenieria-con-llms`, ya en formato nuevo. |
-| 20 | `herramientas/correo-transaccional` | 1 | |
+| 1 | `devops/ci-cd` | 12 | Enlazada desde `docker` y `despliegue-en-vps`. |
+| 2 | `devops/git` | 20 | |
+| 3 | `arquitectura-de-software/clean-architecture` | 9 | |
+| 4 | `arquitectura-de-software/patrones-de-diseno` | 11 | 9 ficheros con banner 🧭. Carpeta renombrada de `patrones-de-diseño` el 27/07/2026. |
+| 5 | `arquitectura-de-software/tipos-de-apis` | 13 | |
+| 6 | `arquitectura-de-software/multi-tenancy` | 7 | |
+| 7 | `lenguajes/csharp-dotnet` (+ 2 subcarpetas) | 8 | Tiene subcarpetas con README propio. |
+| 8 | `testing/testing-dotnet` | 9 | Se cruza con `docker/Testcontainers.md`, ya convertida. |
+| 9 | `testing/e2e` | 1 | |
+| 10 | `desarrollo-web/asp-net-core` | 9 | |
+| 11 | `desarrollo-web/de-wpf-a-web` | 15 | `Entity-Framework-Core.md` salió de aquí a `bases-de-datos/acceso-a-datos-dotnet` el 28/07/2026; el README la enlaza en su nueva ubicación. |
+| 12 | `desarrollo-web/frontend-react` | 28 | ⚠️ La más grande. La skill citaba su `README.md` como modelo de índice y `clsx.md` como ejemplo; ya no (ver sección 8). |
+| 13 | `redes/redes-y-acceso-remoto` | 11 | `SSH.md` y `VPN.md` se cruzan con `despliegue-en-vps`, ya convertida. |
+| 14 | `odoo/fundamentos` | 4 | |
+| 15 | `odoo/busqueda-y-filtros` | 4 | |
+| 16 | `odoo/pruebas-seguras` | 5 | |
+| 17 | `odoo/configuracion-parametros` | 6 | |
+| 18 | `ia/context-engineering` | 9 | Revisar solapamiento con `ia/ingenieria-con-llms`, ya en formato nuevo. |
+| 19 | `herramientas/correo-transaccional` | 1 | |
+
+> `odoo/notificaciones` no está en esta lista: se creó directamente en formato nuevo (no es una conversión), y está incompleta a propósito — le faltan 3 fichas propias, detalladas en su README.
 
 ---
 
 ## 8. Asuntos abiertos
 
-- **`ia/ingenieria-con-llms/` ya comiteada** (commit `34709c1`). Queda pendiente: darle README-índice, enlazarla desde `ia/README.md`, revisar si se solapa con `ia/context-engineering` y actualizar la descripción de la categoría en el README raíz.
+- **`ia/ingenieria-con-llms/`: resuelto.** Tiene README-índice, está enlazada desde `ia/README.md` y la descripción de la categoría IA en el README raíz ya la incluye. Queda revisar si se solapa con `ia/context-engineering` (sigue en la tabla de pendientes, punto 18).
 - **Referencias de tono en la skill: resueltas** el 28/07/2026. `SKILL.md` cita ahora `devops/despliegue-en-vps/UFW.md` (tono), `bases-de-datos/acceso-a-datos-dotnet/Dapper.md` (guía completa con tablas de decisión y errores frecuentes) y `devops/despliegue-en-vps/README.md` (modelo de índice), las tres en formato nuevo. La nota de «calibra el tono, no la extensión» se sustituyó por un aviso de que en el repositorio aún queda contenido en formato antiguo y no sirve como referencia de profundidad. Ese aviso se puede borrar cuando la conversión termine.
 - **Fin de línea.** El repositorio convierte LF a CRLF al indexar, así que tras comitear los ficheros pueden reaparecer como modificados. Es ruido, no un cambio real: se confirma con `git diff --ignore-all-space`.
 - **Al terminar la conversión**, revisar el README raíz: ya no describe la colección como «guías introductorias», pero conviene una lectura final de coherencia.

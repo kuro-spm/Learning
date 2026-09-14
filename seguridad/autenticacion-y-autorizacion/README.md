@@ -1,8 +1,6 @@
-# Autenticación y autorización — Guía introductoria
+# Autenticación y autorización — Guía de tecnologías
 
-> 🧭 Colección añadida como recomendación proactiva, no por una necesidad concreta de ningún proyecto.
-
-Tutorial introductorio sobre los conceptos que sostienen el control de acceso en cualquier aplicación web: quién eres, cómo se recuerda eso entre requests, y qué puedes hacer una vez identificada. Cada ficha explica qué es el concepto, por qué existe, cuándo se usa y lo mínimo que necesitas saber, con ejemplos genéricos que se entienden sin conocer ningún proyecto concreto.
+Colección sobre los conceptos que sostienen el control de acceso en cualquier aplicación web: quién eres, cómo se recuerda eso entre requests, y qué puedes hacer una vez identificada. Cada ficha explica qué es el concepto, por qué existe, cuándo se usa y cómo se implementa en la práctica, con ejemplos genéricos que se entienden sin conocer ningún proyecto concreto.
 
 Sigue el orden: primero la distinción base entre autenticación y autorización, después cómo se mantiene el login entre requests, luego el formato de token más extendido y los estándares que delegan acceso e identidad, a continuación cómo se lleva ese token en la práctica (JWT + refresh, tokens opacos y sus diferencias) y, por último, cómo se afina la autorización una vez sabes quién es la usuaria.
 

@@ -8,7 +8,7 @@ Una **ACL** (*Access Control List*, lista de control de acceso) es una lista de 
 
 Es la forma más directa de responder a la pregunta "¿quién puede tocar **este** recurso?": pegar la respuesta al recurso mismo. Un fichero, una carpeta, un objeto de un bucket o una fila de la base de datos llevan adosada su propia lista de "estas personas sí, estas no, y con qué permisos".
 
-Es justo lo contrario del enfoque de [RBAC](RBAC-y-Claims.md). RBAC parte del **sujeto**: agrupa permisos en roles y asigna roles a las personas ("es Administradora, luego puede hacer X en todo el sistema"). ACL parte del **recurso**: cada recurso mantiene su propia lista de quién entra. Uno organiza por función; el otro, por objeto.
+Es justo lo contrario del enfoque de [RBAC](RBAC-y-Claims.md). RBAC parte del **sujeto**: agrupa permisos en roles y asigna roles a las personas ("es Administrador, luego puede hacer X en todo el sistema"). ACL parte del **recurso**: cada recurso mantiene su propia lista de quién entra. Uno organiza por función; el otro, por objeto. Y son complementarios, no excluyentes: ACL responde barato a "¿quién puede tocar este recurso?" (miras su lista) pero caro a "¿qué puede tocar esta persona?" (tendrías que recorrer **todos** los recursos); RBAC es justo al revés. Por eso lo normal es combinarlos: RBAC para lo grueso por función, ACL para el "compartido con estas personas concretas".
 
 > Piensa en el panel de "Compartir" de un documento en la nube: añades personas concretas una a una y a cada una le das "puede ver" o "puede editar". Esa lista de nombres pegada al documento **es** su ACL, y cada fila que añades es una ACE.
 
@@ -19,13 +19,11 @@ ACL brilla cuando los permisos son **por instancia** y se comparten de forma ad 
 - **Un sistema de ficheros**: cada carpeta y cada archivo llevan su propia lista de quién puede leer, escribir o ejecutar (las ACL de NTFS en Windows, o las POSIX en Linux).
 - **Un documento compartido**: un informe que solo ven las tres personas a las que se lo has compartido explícitamente, cada una con su nivel (ver / comentar / editar).
 - **Un bucket de almacenamiento en la nube**: cada objeto puede tener una ACL que dice qué cuentas concretas lo descargan.
-- **Un álbum de fotos**: se comparte con una lista concreta de contactos, no con "todos los que tengan el rol amigo".
+- **La ficha de un producto en el catálogo de una tienda online**: normalmente la gestiona cualquier `Empleado` por rol, pero si además necesitas dar acceso puntual a una persona externa (un proveedor que solo debe editar la ficha de sus propios productos), eso ya no lo expresa un rol: es una ACE sobre ese recurso concreto.
 
 La señal de que quieres ACL y no roles: cuando el permiso depende del **recurso en sí** ("estas personas concretas sobre este documento concreto"), no de la función que alguien ocupa en la organización.
 
-## Lo mínimo que necesitas saber
-
-**1. La unidad es la ACE: sujeto + permiso + tipo**
+## La unidad es la ACE: sujeto + permiso + tipo
 
 Cada entrada de la lista responde tres cosas: *quién*, *qué puede hacer* y *si es un permiso o una prohibición*.
 
@@ -38,7 +36,7 @@ Cada entrada de la lista responde tres cosas: *quién*, *qué puede hacer* y *si
 }
 ```
 
-**2. La ACL es la lista completa pegada a un recurso**
+Y la ACL es la lista completa de esas entradas, pegada a un recurso:
 
 ```jsonc
 // ACL del recurso /informes/ventas-2026.pdf
@@ -52,11 +50,9 @@ Cada entrada de la lista responde tres cosas: *quién*, *qué puede hacer* y *si
 }
 ```
 
-**3. Allow, deny y el orden de evaluación**
+Muchas ACL admiten entradas de **denegación** explícita, no solo de permiso. La regla habitual (por ejemplo en NTFS) es que **un `deny` explícito gana** a cualquier `allow`, y que si ningún ACE coincide con el sujeto, el resultado por defecto es **denegar**. El orden y la prioridad exactos dependen de cada sistema: no los des por supuestos, ya que cómo se resuelven `allow` frente a `deny`, y cómo se hereda una ACL entre carpetas, cambia entre NTFS, POSIX y los buckets de la nube.
 
-Muchas ACL admiten entradas de **denegación** explícita, no solo de permiso. La regla habitual (por ejemplo en NTFS) es que **un `deny` explícito gana** a cualquier `allow`, y que si ningún ACE coincide con el sujeto, el resultado por defecto es **denegar**. El orden y la prioridad exactos dependen de cada sistema: no los des por supuestos.
-
-**4. Un caso real en Linux: POSIX ACL**
+## Un caso real en Linux: POSIX ACL
 
 Más allá del clásico dueño/grupo/otros, Linux permite dar permisos a usuarios y grupos nombrados con `setfacl`, y consultarlos con `getfacl`:
 
@@ -73,20 +69,7 @@ getfacl informe.pdf
 # other::---
 ```
 
-**5. ACL vs RBAC, en una frase**
-
-ACL responde barato a "¿quién puede tocar este recurso?" (miras su lista) pero caro a "¿qué puede tocar esta persona?" (tendrías que recorrer **todos** los recursos). RBAC es justo al revés. Por eso lo normal es combinarlos: RBAC para lo grueso por función, ACL para el "compartido con estas personas concretas".
-
-**6. ACL es la cara visible del modelo DAC**
-
 Las ACL son la implementación clásica del control de acceso **discrecional** (*DAC*): quien posee el recurso decide, a su discreción, a quién se lo abre. Se opone al control **obligatorio** (*MAC*), donde las reglas las fija el sistema y el dueño no puede saltárselas (típico de entornos militares o de alta seguridad).
-
-## Lo que NO hace
-
-- **No autentica** — igual que RBAC, la ACL asume que ya sabes quién es el sujeto; solo decide qué puede hacer una identidad ya verificada.
-- **No escala bien "por persona"** — responder "¿a qué tiene acceso esta cuenta?" obliga a recorrer la ACL de cada recurso; no hay un sitio único que lo resuma.
-- **No agrupa permisos por función** — sin roles, replicar el mismo conjunto de permisos en cien recursos es manual y tiende a divergir con el tiempo (justo el problema que RBAC vino a resolver).
-- **No define un orden de evaluación universal** — cómo se resuelven `allow` frente a `deny`, y cómo se hereda, cambia entre NTFS, POSIX y los buckets de la nube. Lo que es cierto en un sistema no lo es en otro.
 
 ## Buenas prácticas avanzadas
 
@@ -95,6 +78,11 @@ Las ACL son la implementación clásica del control de acceso **discrecional** (
 - **Cuidado con la `mask` de las POSIX ACL** — `setfacl` mantiene una máscara que acota el máximo de permisos efectivos de los usuarios y grupos nombrados. Puedes dar `rwx` a alguien en una ACE y que la máscara lo recorte a `r--` sin que salte ningún error: el permiso "está", pero no surte efecto.
 - **Nunca uses el sujeto comodín por comodidad** — conceder a `Everyone` (NTFS), a `other` (POSIX) o a `AllUsers` (buckets de la nube) es la causa número uno de fugas de datos en almacenamiento en la nube. Concede siempre a sujetos nombrados, aunque sea más trabajo.
 - **Traza una frontera clara entre ACL y RBAC** — deja que RBAC decida lo estructural por función y que la ACL decida solo el "compartido con estas personas concretas". Si los dos modelos deciden sobre lo mismo, acabarás con permisos contradictorios imposibles de depurar ("el rol le deja, pero la ACL del recurso se lo niega... ¿o al revés?").
+
+## Documentación oficial
+
+- [`acl(5)` — man page de Linux](https://man7.org/linux/man-pages/man5/acl.5.html) — la especificación formal de las ACL POSIX: cómo se calculan los permisos efectivos y cómo funciona exactamente la `mask`.
+- [`icacls` en Windows](https://learn.microsoft.com/windows-server/administration/windows-commands/icacls) — la referencia de la herramienta de línea de comandos para leer y modificar ACL de NTFS, con la sintaxis de cada modificador.
 
 ## Recursos didácticos
 

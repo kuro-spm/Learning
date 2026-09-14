@@ -6,9 +6,9 @@ Es el patrón más extendido para mantener viva una sesión basada en tokens sin
 
 ## ¿Por qué existe?
 
-Un JWT tiene una debilidad de raíz: una vez emitido, es válido hasta que expira, y el servidor no tiene forma sencilla de "apagarlo" antes (ver [JWT](JWT.md) → *Lo que NO hace*). La defensa natural es darle una vida muy corta —minutos— para que, si se filtra, la ventana de uso indebido sea pequeña. Pero un token que caduca cada 15 minutos significaría pedir usuario y contraseña cada 15 minutos: inaceptable.
+Un JWT tiene una debilidad de raíz: una vez emitido, es válido hasta que expira, y el servidor no tiene forma sencilla de "apagarlo" antes (ver [JWT](JWT.md)). La defensa natural es darle una vida muy corta —minutos— para que, si se filtra, la ventana de uso indebido sea pequeña. Pero un token que caduca cada 15 minutos significaría pedir usuario y contraseña cada 15 minutos: inaceptable.
 
-El refresh token resuelve esa tensión repartiendo el trabajo. El access token es de usar y tirar, viaja en cada request y caduca enseguida. El refresh token se usa rara vez (solo para renovar), se guarda de forma más protegida y sí se registra en el servidor, así que **sí se puede revocar**. Con eso obtienes lo mejor de dos mundos: requests rápidas y sin estado, pero con un punto de control para cortar el acceso.
+El refresh token resuelve esa tensión repartiendo el trabajo. El access token es de usar y tirar, viaja en cada request y caduca enseguida. El refresh token se usa rara vez (solo para renovar), se guarda de forma más protegida y sí se registra en el servidor, así que **sí se puede revocar**. Con eso obtienes lo mejor de dos mundos: requests rápidas y sin estado, pero con un punto de control para cortar el acceso. La contrapartida está en lo que este par **no** resuelve: el access token sigue siendo irrevocable hasta que expira, y en cuanto guardas refresh tokens para poder revocarlos, el modelo deja de ser "puramente sin estado" (ver [Sesiones vs Tokens](Sesiones-vs-Tokens.md)).
 
 > Piensa en el access token como la tarjeta magnética de un hotel, que caduca cada pocas horas, y en el refresh token como tu DNI en recepción: no lo enseñas para abrir cada puerta, solo para que te regeneren la tarjeta cuando expira, y recepción puede negarse si te han dado de baja.
 
@@ -18,9 +18,7 @@ El refresh token resuelve esa tensión repartiendo el trabajo. El access token e
 - **Apps móviles**: una app de una tienda online que mantiene la sesión durante semanas sin volver a pedir contraseña, apoyándose en un refresh token guardado en el almacén seguro del dispositivo.
 - **OAuth2**: el flujo *Authorization Code* devuelve exactamente este par (access + refresh); es el modelo de "iniciar sesión con..." que verás en la ficha de [OAuth2](OAuth2.md).
 
-## Lo mínimo que necesitas saber
-
-**1. Dos tokens, dos papeles**
+## Dos tokens, dos papeles
 
 | | Access token | Refresh token |
 |---|---|---|
@@ -29,9 +27,9 @@ El refresh token resuelve esa tensión repartiendo el trabajo. El access token e
 | Viaja en | Cada request (`Authorization`) | Solo al renovar |
 | ¿Revocable? | No (hasta que expira) | Sí (registrado en el servidor) |
 
-**2. El ciclo de vida**
+## El ciclo de vida y el endpoint de renovación
 
-Al hacer login, el servidor entrega ambos. A partir de ahí, el cliente usa el access token hasta que una request devuelve `401` porque ha caducado; entonces llama al endpoint de refresh, obtiene un access token nuevo y reintenta.
+Al hacer login, el servidor entrega ambos tokens. A partir de ahí, el cliente usa el access token hasta que una request devuelve `401` porque ha caducado; entonces llama al endpoint de refresh, obtiene un access token nuevo y reintenta:
 
 ```ts
 // Interceptor de cliente: renueva de forma transparente ante un 401
@@ -45,7 +43,7 @@ async function fetchConAuth(url: string) {
 }
 ```
 
-**3. El endpoint de renovación**
+El endpoint de renovación busca el refresh token recibido, comprueba que sigue vivo y no ha sido ya canjeado, y responde con un par nuevo:
 
 ```csharp
 [HttpPost("/auth/refresh")]
@@ -62,32 +60,28 @@ public async Task<IActionResult> Refresh(string refreshToken)
 }
 ```
 
-**4. Rotación y detección de reuso**
+La práctica moderna es que cada refresh token sea **de un solo uso**: al canjearlo, se invalida y se entrega uno nuevo (*rotación*, como hace el código de arriba). Si alguien intenta volver a usar un refresh token ya canjeado, es señal de robo: se revoca toda la **familia** de tokens de esa sesión y se fuerza un login nuevo. Nótese que esto no protege por sí solo frente a XSS: si un atacante ejecuta JavaScript en la página, puede usar el access token en memoria mientras la usuaria esté activa; el modelo acota el daño, no lo impide.
 
-La práctica moderna es que cada refresh token sea **de un solo uso**: al canjearlo, se invalida y se entrega uno nuevo (*rotación*). Si alguien intenta volver a usar un refresh token ya canjeado, es señal de robo: se revoca toda la *familia* de tokens de esa sesión y se fuerza un login nuevo.
-
-**5. Dónde guardar cada token**
+## Dónde guardar cada token
 
 El refresh token es el activo valioso (dura mucho y renueva el acceso), así que va donde JavaScript no pueda leerlo: una cookie `HttpOnly` + `Secure` + `SameSite` (idealmente con el `Path` acotado al endpoint de refresh, para que ni siquiera viaje en las demás requests), o el almacén seguro del sistema en móvil. El access token, al ser efímero, suele vivir solo en memoria del cliente. **Guardar el refresh token en `localStorage` es un error común**: queda expuesto a cualquier XSS.
-
-## Lo que NO hace
-
-- **No convierte los JWT en revocables** — el access token sigue siendo válido hasta que expira; lo único revocable es el refresh. Si necesitas cortar el acceso al instante, la vida corta del access token es tu única garantía real.
-- **No elimina el estado del servidor** — en cuanto guardas refresh tokens para poder revocarlos, ya tienes estado que mantener; el modelo "puramente stateless" desaparece (ver [Sesiones vs Tokens](Sesiones-vs-Tokens.md)).
-- **No protege por sí solo frente a XSS** — si un atacante ejecuta JavaScript en tu página, puede usar el access token en memoria mientras la usuaria esté activa; el modelo acota el daño, no lo impide.
 
 ## Buenas prácticas avanzadas
 
 - **Rotación con detección de reuso mediante familias de tokens** — asocia todos los refresh tokens de una misma sesión a un identificador de familia. Cuando detectes que se reusa uno ya canjeado, revoca la familia entera, no solo ese token: es la señal de que alguien tiene una copia robada, y así expulsas también al ladrón.
 - **Combina expiración deslizante con una absoluta** — que el refresh se renueve con el uso está bien, pero fija además un tope absoluto (p. ej. 30 días desde el login) tras el cual toca reautenticarse sí o sí. Sin ese tope, una sesión activa se perpetúa indefinidamente y nunca fuerza una revalidación de credenciales.
 - **Guarda solo el hash del refresh token, no el token en claro** — trátalo como una contraseña: si te roban la base de datos de sesiones, un hash no es utilizable, el token en claro sí. Basta un hash rápido (SHA-256) porque el token ya tiene entropía alta; no necesita bcrypt.
-- **Vincula el refresh a un contexto y valida `iss`/`aud` del access** — atar el refresh a la sesión (device, IP aproximada) permite detectar canjes desde ubicaciones imposibles. Y no olvides validar audiencia y emisor del access token, no solo la firma (ver [JWT](JWT.md) → *Buenas prácticas*).
+- **Vincula el refresh a un contexto y valida `iss`/`aud` del access** — atar el refresh a la sesión (device, IP aproximada) permite detectar canjes desde ubicaciones imposibles. Y no olvides validar audiencia y emisor del access token, no solo la firma (ver [JWT](JWT.md)).
 - **Para revocar el access sin tirar el stateless por la borda, usa una "versión de sesión"** — guarda un contador por usuaria en la base de datos e inclúyelo como claim en el JWT (p. ej. `sv: 7`); al validar, comparas el claim con el valor actual. Cambiar la contraseña, banear o forzar un logout global se reduce a incrementar ese contador, y todos los access tokens anteriores dejan de cuadrar al instante. Es el punto intermedio entre el JWT puro y una denylist entrada por entrada: una sola lectura (y cacheable) en lugar de renunciar del todo a la revocación.
 - **Para acceso sensible, plantéate tokens ligados al portador (DPoP o mTLS)** — un *bearer token* vale para cualquiera que lo tenga: si se filtra, se reutiliza sin más. Los esquemas *sender-constrained* como DPoP (OAuth2) o mTLS atan el token a una clave que solo el cliente legítimo posee, de modo que robar el token ya no basta —hay que robar también la clave—. Es la diferencia entre una llave y una llave que solo funciona en tu mano.
 
+## Documentación oficial
+
+- [OAuth 2.0 Security Best Current Practice](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics) — la referencia normativa de la rotación de refresh tokens y la detección de reuso; consúltala para el detalle exacto de cuándo revocar una familia entera.
+
 ## Recursos didácticos
 
-El [OAuth 2.0 Security Best Current Practice](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics) del IETF dedica una sección entera a la rotación de refresh tokens y la detección de reuso; y en [jwt.io](https://jwt.io) puedes decodificar el access token para ver su `exp` corto en acción.
+En [jwt.io](https://jwt.io) puedes decodificar el access token emitido por tu propio endpoint de login y ver su `exp` corto en acción: pide un par de tokens, copia el access y observa cuántos minutos le quedan de vida.
 
 ---
 
