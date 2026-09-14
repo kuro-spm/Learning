@@ -1,8 +1,8 @@
 # Testing end-to-end (E2E) — Guía de tecnologías
 
-Guía introductoria de los tests **end-to-end**: los que arrancan la aplicación entera y la manejan a través de un navegador real, como lo haría un usuario. Van en la cima de la pirámide de tests, por encima de los unitarios y los de integración, y protegen los flujos que no te puedes permitir romper.
+Guía de los tests **end-to-end**: los que arrancan la aplicación entera y la manejan a través de un navegador real, como lo haría un usuario. Van en la cima de la pirámide de tests, por encima de los unitarios y los de integración, y protegen los flujos que no te puedes permitir romper.
 
-Cada ficha explica qué es la herramienta, por qué existe, cuándo se usa y lo mínimo para no perderte — sin depender de ningún proyecto concreto.
+Cada ficha explica qué es la herramienta, por qué existe, cuándo se usa y cómo se implementa en la práctica — sin depender de ningún proyecto concreto.
 
 ---
 
