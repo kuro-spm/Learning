@@ -1,6 +1,6 @@
 # Odoo — Guía de tecnología
 
-Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en cinco subcolecciones: los **fundamentos** para entender qué es y cómo está montado, las **pruebas seguras** para tocar un sistema en producción sin romperlo, el **desarrollo de búsquedas y filtros** que ve el usuario, las **maneras de configurar parámetros** para no dejar valores clavados en el código y los **mecanismos de notificación** con los que el sistema avisa a las personas. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
+Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en ocho subcolecciones: los **fundamentos** para entender qué es y cómo está montado, las **pruebas seguras** para tocar un sistema en producción sin romperlo, el **desarrollo de búsquedas y filtros** que ve el usuario, las **maneras de configurar parámetros** para no dejar valores clavados en el código, los **mecanismos de notificación** con los que el sistema avisa a las personas, los **botones de acción** con los que una vista dispara código propio sobre un registro concreto, el **systray** con el que se añade un icono propio a la barra de navegación y el **bus de eventos de OWL** con el que dos partes de la interfaz que no se conocen se avisan de un cambio. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
 
 Cada subcolección tiene su propio índice con orden de lectura. Si empiezas de cero, recórrelas en el orden de abajo.
 
@@ -67,6 +67,30 @@ Cómo avisa Odoo a las personas: el aviso flotante, el diálogo que bloquea, el 
 | 23 | [Chatter, mensajes y seguidores](notificaciones/Chatter-y-Seguidores.md) | El historial del registro: `message_post`, subtipos, seguidores y rastreo de campos. |
 | 24 | [Plantillas de correo](notificaciones/Plantillas-de-Correo.md) | `mail.template`: renderizado, cola de envío, adjuntos e idioma del destinatario. |
 | 25 | [Actividades](notificaciones/Actividades.md) | El aviso que además es trabajo: `activity_schedule`, tipos, cierre y cadenas. |
+
+### 6. [Botones de acción](botones-de-accion/README.md)
+
+De vuelta a las vistas: cómo se añade un botón que ejecuta código propio sobre un registro, y cómo se hereda la vista que lo aloja.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 26 | [Botones de acción en Kanban](botones-de-accion/Botones-de-Accion-en-Kanban.md) | `type="object"`, herencia de vistas con `xpath`, y qué hace Odoo con lo que el método devuelve. |
+
+### 7. [Systray](systray/README.md)
+
+Ya en clave de cliente web: cómo se añade un icono propio a la barra de navegación superior, con su propio componente Owl.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 27 | [Systray](systray/Systray.md) | El registro `systray`, el componente Owl, de dónde salen los datos y cómo se declara en el manifest. |
+
+### 8. [Bus de eventos de OWL](bus-de-eventos-owl/README.md)
+
+Cómo dos componentes que no se conocen entre sí —por ejemplo, un botón de una vista y un icono del systray— se avisan de un cambio dentro de la misma pestaña del navegador.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 28 | [El bus de eventos de OWL (env.bus)](bus-de-eventos-owl/Bus-de-Eventos-OWL.md) | `trigger`, `useBus`, `patch()` y `record.load()`, con ejemplo guiado de principio a fin. |
 
 ---
 
