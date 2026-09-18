@@ -1,6 +1,6 @@
 # Mensajería Asíncrona — Guía de tecnologías
 
-Cómo desacoplar servicios con colas y eventos en lugar de llamadas directas: por qué hacerlo, qué se gana y qué se pierde, cómo funcionan los dos brokers más habituales y qué piezas hacen falta para que el sistema sea fiable de verdad.
+Cómo desacoplar servicios con colas y eventos en lugar de llamadas directas: por qué hacerlo, qué se gana y qué se pierde, cómo funcionan los brokers más habituales —incluido MQTT, pensado para IoT y dispositivos con recursos limitados— y qué piezas hacen falta para que el sistema sea fiable de verdad.
 
 Está escrita para perfiles backend junior-medio con experiencia en APIs REST pero sin experiencia previa en sistemas de mensajería. No presupone nada sobre brokers: cada concepto se explica desde el problema que resuelve, con código ejecutable y la salida que devuelve.
 
@@ -22,12 +22,14 @@ Entiende la idea antes de mirar herramientas. Esta ficha define el vocabulario q
 
 ### 2. Los brokers concretos
 
-Las plataformas que implementan esas ideas. Lee al menos una de las dos, según lo que uses.
+Las plataformas que implementan esas ideas. Lee la que uses: RabbitMQ o Service Bus para mensajería entre servicios backend, MQTT y Mosquitto si el escenario es IoT o dispositivos con conectividad limitada.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 2 | [RabbitMQ](RabbitMQ.md) | El broker autogestionado más extendido. Su rasgo propio es el enrutado: exchanges, bindings y routing keys. |
 | 3 | [Azure Service Bus](Azure-Service-Bus.md) | El equivalente gestionado en Azure. Mismas ideas, más sesiones, filtros y dead-lettering de serie. |
+| 4 | [MQTT](MQTT.md) | El protocolo ligero de publish/subscribe para IoT: topics jerárquicos, niveles de QoS, mensajes retenidos y el testamento de conexión. |
+| 5 | [Mosquitto](Mosquitto.md) | La implementación de referencia de MQTT: instalación, autenticación, control de acceso por topic y TLS. |
 
 ### 3. Piezas para que sea fiable
 
@@ -35,8 +37,8 @@ Conceptos transversales, sea cual sea el broker. Sin ellos, un sistema de mensaj
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 4 | [Outbox Pattern](Outbox-Pattern.md) | Cómo garantizar que el evento se publica siempre, sin quedar a medias con el dato que lo origina. |
-| 5 | [Dead Letter Queues](Dead-Letter-Queues.md) | Qué hacer con los mensajes que no se pueden procesar, para que uno solo no bloquee la cola entera. |
+| 6 | [Outbox Pattern](Outbox-Pattern.md) | Cómo garantizar que el evento se publica siempre, sin quedar a medias con el dato que lo origina. |
+| 7 | [Dead Letter Queues](Dead-Letter-Queues.md) | Qué hacer con los mensajes que no se pueden procesar, para que uno solo no bloquee la cola entera. |
 
 ---
 
@@ -51,6 +53,8 @@ Conceptos transversales, sea cual sea el broker. Sin ellos, un sistema de mensaj
 **Brokers**
 - [RabbitMQ](RabbitMQ.md)
 - [Azure Service Bus](Azure-Service-Bus.md)
+- [MQTT](MQTT.md)
+- [Mosquitto](Mosquitto.md)
 
 **Fiabilidad**
 - [Outbox Pattern](Outbox-Pattern.md)
