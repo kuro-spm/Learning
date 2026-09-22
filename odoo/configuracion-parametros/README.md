@@ -17,7 +17,7 @@ De la capa más externa (el servidor) a la más interna (referencias entre regis
 | 3 | [Ajustes (res.config.settings)](Ajustes.md) | La pantalla amable que expone esos parámetros al usuario de negocio. |
 | 4 | [Configuración por compañía](Configuracion-por-Compania.md) | El mismo parámetro con un valor distinto en cada empresa (multi-compañía). |
 | 5 | [Valores por defecto](Valores-por-Defecto.md) | Qué se precarga en un campo al crear un registro, y desde dónde definirlo. |
-| 6 | [Referencias por ID externo (XML ID)](Referencias-por-ID-Externo.md) | Cómo apuntar a un registro concreto sin clavar su ID numérico, que cambia entre bases de datos. |
+| 6 | [Referencias por ID externo (XML ID)](Referencias-por-ID-Externo.md) | Cómo apuntar a un registro concreto sin clavar su ID numérico, definir datos de módulo en XML, y adoptar sin duplicar un registro que ya existía a mano. |
 
 ---
 

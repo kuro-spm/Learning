@@ -53,7 +53,7 @@ Las distintas maneras de guardar un valor configurable en Odoo, para no dejarlo 
 | 16 | [Ajustes (res.config.settings)](configuracion-parametros/Ajustes.md) | La pantalla amable que expone esos parámetros al usuario de negocio. |
 | 17 | [Configuración por compañía](configuracion-parametros/Configuracion-por-Compania.md) | El mismo parámetro con un valor distinto en cada empresa. |
 | 18 | [Valores por defecto](configuracion-parametros/Valores-por-Defecto.md) | Qué se precarga en un campo al crear un registro, y desde dónde definirlo. |
-| 19 | [Referencias por ID externo (XML ID)](configuracion-parametros/Referencias-por-ID-Externo.md) | Apuntar a un registro concreto sin clavar su ID numérico. |
+| 19 | [Referencias por ID externo (XML ID)](configuracion-parametros/Referencias-por-ID-Externo.md) | Apuntar a un registro concreto sin clavar su ID numérico, y cómo adoptar sin duplicar uno que ya existía a mano. |
 
 ### 5. [Notificaciones](notificaciones/README.md)
 
