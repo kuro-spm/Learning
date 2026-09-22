@@ -101,6 +101,29 @@ def _adopt_existing_stage(env, module, xml_id, stage_name):
 
 Buscar por nombre (`stage_name`) es exactamente lo que se desaconseja como forma habitual de referenciar un registro (ver más abajo) — pero aquí es distinto: este código no se ejecuta en cada petición, sino **una sola vez**, en un momento controlado, con el único propósito de tender el puente hacia el ID externo. A partir de ahí, todo el resto del módulo usa `env.ref("mi_modulo.stage_done")` con normalidad.
 
+### Un antipatrón fácil de escribir por error
+
+La lógica anterior se confunde a menudo con esta otra, que parece razonable y no lo es:
+
+```python
+def _adopt_existing_stage_MAL(env, module, xml_id, stage_name):
+    etapa = env.ref(f"{module}.{xml_id}", raise_if_not_found=False)
+    if not etapa:
+        env["project.task.type"].create({"name": stage_name})
+```
+
+La pregunta que hace este código es "¿ya existe un registro con este ID externo?", y si la
+respuesta es no, **crea uno nuevo**. El problema es que, en el caso que nos ocupa, esa pregunta
+siempre responde que no —el ID externo nunca ha existido, es precisamente lo que falta crear—,
+así que esta función crea una etapa "Hecho" nueva cada vez que se ejecuta, sin tocar nunca la
+etapa real que las tareas ya llevan usando. Y como tampoco registra el ID externo del registro
+que acaba de crear, ni siquiera es idempotente: una segunda ejecución crea una tercera etapa
+"Hecho".
+
+La pregunta correcta no es "¿existe ya el puente?" sino "¿existe ya el registro que quiero
+adoptar?" — por eso la versión de arriba busca la etapa **por nombre**, no por su (inexistente)
+ID externo, y es ella la que decide si hay que crear la fila de `ir.model.data` o no.
+
 ## Hooks de instalación y migraciones de actualización
 
 Falta decidir **cuándo** se ejecuta ese código de adopción, y la respuesta depende de si el módulo es nuevo o ya estaba instalado:

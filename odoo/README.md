@@ -1,6 +1,6 @@
 # Odoo — Guía de tecnología
 
-Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en ocho subcolecciones: los **fundamentos** para entender qué es y cómo está montado, las **pruebas seguras** para tocar un sistema en producción sin romperlo, el **desarrollo de búsquedas y filtros** que ve el usuario, las **maneras de configurar parámetros** para no dejar valores clavados en el código, los **mecanismos de notificación** con los que el sistema avisa a las personas, los **botones de acción** con los que una vista dispara código propio sobre un registro concreto, el **systray** con el que se añade un icono propio a la barra de navegación y el **bus de eventos de OWL** con el que dos partes de la interfaz que no se conocen se avisan de un cambio. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
+Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en ocho subcolecciones: los **fundamentos** para entender qué es y cómo está montado (incluida la estructura de datos del ORM, el recordset), las **pruebas seguras** para tocar un sistema en producción sin romperlo, el **desarrollo de búsquedas y filtros** que ve el usuario, las **maneras de configurar parámetros** para no dejar valores clavados en el código, los **mecanismos de notificación** con los que el sistema avisa a las personas, los **botones de acción** con los que una vista dispara código propio sobre un registro concreto, el **systray** con el que se añade un icono propio a la barra de navegación y el **bus de eventos de OWL** con el que dos partes de la interfaz que no se conocen se avisan de un cambio. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
 
 Cada subcolección tiene su propio índice con orden de lectura. Si empiezas de cero, recórrelas en el orden de abajo.
 
@@ -18,6 +18,7 @@ Qué es Odoo y cómo está montado por dentro. Necesario para que todo lo demás
 | 2 | [Módulos y Apps](fundamentos/Modulos-y-Apps.md) | Cómo se añade funcionalidad; por qué instalar un módulo es un cambio serio. |
 | 3 | [Partner, Usuario y Empleado](fundamentos/Partner-Usuario-y-Empleado.md) | Los tres modelos de "persona" de Odoo y por qué no son lo mismo: contacto vs. login vs. ficha laboral. |
 | 4 | [Modo desarrollador](fundamentos/Modo-Desarrollador.md) | El interruptor que revela la capa técnica y por qué hay que usarlo con cuidado. |
+| 5 | [Recordsets](fundamentos/Recordsets.md) | La estructura de datos que devuelve cualquier consulta del ORM, y la trampa de compararla contra un id plano. |
 
 ### 2. [Pruebas seguras](pruebas-seguras/README.md)
 
@@ -25,11 +26,11 @@ El corazón de la guía: dónde probar, cómo aislar los datos reales y cómo te
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 5 | [Entornos: desarrollo, staging y producción](pruebas-seguras/Entornos-dev-staging-produccion.md) | La idea base: separar entornos para tener un sitio donde equivocarte. |
-| 6 | [Duplicar la base de datos](pruebas-seguras/Duplicar-Base-de-Datos.md) | El primer paso: una copia realista de producción para probar sobre datos de verdad. |
-| 7 | [Neutralizar la base de datos](pruebas-seguras/Neutralizar-Base-de-Datos.md) | El paso imprescindible: apagar en la copia todo lo que puede escaparse al mundo real. |
-| 8 | [Backups y restauración](pruebas-seguras/Backups-y-Restauracion.md) | Tu red de seguridad: cómo volver atrás cuando algo sale mal. |
-| 9 | [Pruebas seguras sobre un Odoo en producción](pruebas-seguras/Pruebas-Seguras-en-Produccion.md) | La síntesis: el checklist de buenas prácticas que reúne todo lo anterior. |
+| 6 | [Entornos: desarrollo, staging y producción](pruebas-seguras/Entornos-dev-staging-produccion.md) | La idea base: separar entornos para tener un sitio donde equivocarte. |
+| 7 | [Duplicar la base de datos](pruebas-seguras/Duplicar-Base-de-Datos.md) | El primer paso: una copia realista de producción para probar sobre datos de verdad. |
+| 8 | [Neutralizar la base de datos](pruebas-seguras/Neutralizar-Base-de-Datos.md) | El paso imprescindible: apagar en la copia todo lo que puede escaparse al mundo real. |
+| 9 | [Backups y restauración](pruebas-seguras/Backups-y-Restauracion.md) | Tu red de seguridad: cómo volver atrás cuando algo sale mal. |
+| 10 | [Pruebas seguras sobre un Odoo en producción](pruebas-seguras/Pruebas-Seguras-en-Produccion.md) | La síntesis: el checklist de buenas prácticas que reúne todo lo anterior. |
 
 ### 3. [Búsqueda y filtros](busqueda-y-filtros/README.md)
 
@@ -37,10 +38,10 @@ Ya en clave de desarrollo, cómo se construyen las herramientas de búsqueda y f
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 10 | [Dominios](busqueda-y-filtros/Dominios.md) | El cimiento: el lenguaje con el que Odoo expresa cualquier filtro. |
-| 11 | [Vista de búsqueda](busqueda-y-filtros/Vista-de-Busqueda.md) | Dónde se declaran los filtros, agrupaciones y campos buscables de un listado. |
-| 12 | [Search Panel](busqueda-y-filtros/Search-Panel.md) | El panel lateral de filtrado por facetas: el tema estrella y el más visual. |
-| 13 | [Dominios dinámicos](busqueda-y-filtros/Dominios-Dinamicos.md) | Filtros que se calculan según el contexto: otro campo, el usuario o una lógica en Python. |
+| 11 | [Dominios](busqueda-y-filtros/Dominios.md) | El cimiento: el lenguaje con el que Odoo expresa cualquier filtro. |
+| 12 | [Vista de búsqueda](busqueda-y-filtros/Vista-de-Busqueda.md) | Dónde se declaran los filtros, agrupaciones y campos buscables de un listado. |
+| 13 | [Search Panel](busqueda-y-filtros/Search-Panel.md) | El panel lateral de filtrado por facetas: el tema estrella y el más visual. |
+| 14 | [Dominios dinámicos](busqueda-y-filtros/Dominios-Dinamicos.md) | Filtros que se calculan según el contexto: otro campo, el usuario o una lógica en Python. |
 
 ### 4. [Configuración de parámetros](configuracion-parametros/README.md)
 
@@ -48,12 +49,12 @@ Las distintas maneras de guardar un valor configurable en Odoo, para no dejarlo 
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 14 | [El fichero odoo.conf](configuracion-parametros/El-Fichero-odoo-conf.md) | La capa de infraestructura: lo que el servidor necesita para arrancar. |
-| 15 | [Parámetros del sistema (ir.config_parameter)](configuracion-parametros/Parametros-del-Sistema.md) | El almacén global clave-valor de la base de datos, editable en caliente. |
-| 16 | [Ajustes (res.config.settings)](configuracion-parametros/Ajustes.md) | La pantalla amable que expone esos parámetros al usuario de negocio. |
-| 17 | [Configuración por compañía](configuracion-parametros/Configuracion-por-Compania.md) | El mismo parámetro con un valor distinto en cada empresa. |
-| 18 | [Valores por defecto](configuracion-parametros/Valores-por-Defecto.md) | Qué se precarga en un campo al crear un registro, y desde dónde definirlo. |
-| 19 | [Referencias por ID externo (XML ID)](configuracion-parametros/Referencias-por-ID-Externo.md) | Apuntar a un registro concreto sin clavar su ID numérico, y cómo adoptar sin duplicar uno que ya existía a mano. |
+| 15 | [El fichero odoo.conf](configuracion-parametros/El-Fichero-odoo-conf.md) | La capa de infraestructura: lo que el servidor necesita para arrancar. |
+| 16 | [Parámetros del sistema (ir.config_parameter)](configuracion-parametros/Parametros-del-Sistema.md) | El almacén global clave-valor de la base de datos, editable en caliente. |
+| 17 | [Ajustes (res.config.settings)](configuracion-parametros/Ajustes.md) | La pantalla amable que expone esos parámetros al usuario de negocio. |
+| 18 | [Configuración por compañía](configuracion-parametros/Configuracion-por-Compania.md) | El mismo parámetro con un valor distinto en cada empresa. |
+| 19 | [Valores por defecto](configuracion-parametros/Valores-por-Defecto.md) | Qué se precarga en un campo al crear un registro, y desde dónde definirlo. |
+| 20 | [Referencias por ID externo (XML ID)](configuracion-parametros/Referencias-por-ID-Externo.md) | Apuntar a un registro concreto sin clavar su ID numérico, y cómo adoptar sin duplicar uno que ya existía a mano. |
 
 ### 5. [Notificaciones](notificaciones/README.md)
 
@@ -61,12 +62,12 @@ Cómo avisa Odoo a las personas: el aviso flotante, el diálogo que bloquea, el 
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 20 | [Tipos de notificación](notificaciones/Tipos-de-Notificacion.md) | El mapa: los diez mecanismos, los cuatro ejes que los separan y la tabla de decisión. |
-| 21 | [Notificaciones de interfaz](notificaciones/Notificaciones-de-Interfaz.md) | El aviso flotante: `display_notification` desde Python y el servicio `notification` desde JavaScript. |
-| 22 | [Errores y avisos bloqueantes](notificaciones/Errores-y-Avisos.md) | Las excepciones que el cliente sabe presentar, y por qué un `raise` deshace la transacción entera. |
-| 23 | [Chatter, mensajes y seguidores](notificaciones/Chatter-y-Seguidores.md) | El historial del registro: `message_post`, subtipos, seguidores y rastreo de campos. |
-| 24 | [Plantillas de correo](notificaciones/Plantillas-de-Correo.md) | `mail.template`: renderizado, cola de envío, adjuntos e idioma del destinatario. |
-| 25 | [Actividades](notificaciones/Actividades.md) | El aviso que además es trabajo: `activity_schedule`, tipos, cierre y cadenas. |
+| 21 | [Tipos de notificación](notificaciones/Tipos-de-Notificacion.md) | El mapa: los diez mecanismos, los cuatro ejes que los separan y la tabla de decisión. |
+| 22 | [Notificaciones de interfaz](notificaciones/Notificaciones-de-Interfaz.md) | El aviso flotante: `display_notification` desde Python y el servicio `notification` desde JavaScript. |
+| 23 | [Errores y avisos bloqueantes](notificaciones/Errores-y-Avisos.md) | Las excepciones que el cliente sabe presentar, y por qué un `raise` deshace la transacción entera. |
+| 24 | [Chatter, mensajes y seguidores](notificaciones/Chatter-y-Seguidores.md) | El historial del registro: `message_post`, subtipos, seguidores y rastreo de campos. |
+| 25 | [Plantillas de correo](notificaciones/Plantillas-de-Correo.md) | `mail.template`: renderizado, cola de envío, adjuntos e idioma del destinatario. |
+| 26 | [Actividades](notificaciones/Actividades.md) | El aviso que además es trabajo: `activity_schedule`, tipos, cierre y cadenas. |
 
 ### 6. [Botones de acción](botones-de-accion/README.md)
 
@@ -74,7 +75,7 @@ De vuelta a las vistas: cómo se añade un botón que ejecuta código propio sob
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 26 | [Botones de acción en Kanban](botones-de-accion/Botones-de-Accion-en-Kanban.md) | `type="object"`, herencia de vistas con `xpath`, y qué hace Odoo con lo que el método devuelve. |
+| 27 | [Botones de acción en Kanban](botones-de-accion/Botones-de-Accion-en-Kanban.md) | `type="object"`, herencia de vistas con `xpath`, y qué hace Odoo con lo que el método devuelve. |
 
 ### 7. [Systray](systray/README.md)
 
@@ -82,7 +83,7 @@ Ya en clave de cliente web: cómo se añade un icono propio a la barra de navega
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 27 | [Systray](systray/Systray.md) | El registro `systray`, el componente Owl, de dónde salen los datos y cómo se declara en el manifest. |
+| 28 | [Systray](systray/Systray.md) | El registro `systray`, el componente Owl, de dónde salen los datos y cómo se declara en el manifest. |
 
 ### 8. [Bus de eventos de OWL](bus-de-eventos-owl/README.md)
 
@@ -90,7 +91,7 @@ Cómo dos componentes que no se conocen entre sí —por ejemplo, un botón de u
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 28 | [El bus de eventos de OWL (env.bus)](bus-de-eventos-owl/Bus-de-Eventos-OWL.md) | `trigger`, `useBus`, `patch()` y `record.load()`, con ejemplo guiado de principio a fin. |
+| 29 | [El bus de eventos de OWL (env.bus)](bus-de-eventos-owl/Bus-de-Eventos-OWL.md) | `trigger`, `useBus`, `patch()` y `record.load()`, con ejemplo guiado de principio a fin. |
 
 ---
 
