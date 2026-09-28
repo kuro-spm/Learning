@@ -45,6 +45,7 @@ Compartir tu trabajo y recibir el de los demás.
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 10 | [Remotos](Remotos.md) | Sincronizar con un servidor (`push`, `pull`, `fetch`) para colaborar. |
+| 11 | [Tokens de acceso en remotos](Tokens-de-Acceso-en-Remotos.md) | La credencial que autentica ese `push`/`pull` por HTTPS, y cómo renovarla cuando caduca o se revoca. |
 
 ### 5. Deshacer cambios
 
@@ -52,7 +53,7 @@ Corregir errores según en qué punto estén.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 11 | [Deshacer cambios](Deshacer-cambios.md) | `restore`, `revert` y `reset`: la herramienta correcta para cada error. |
+| 12 | [Deshacer cambios](Deshacer-cambios.md) | `restore`, `revert` y `reset`: la herramienta correcta para cada error. |
 
 ### 6. Técnicas avanzadas
 
@@ -60,12 +61,12 @@ Cuando ya dominas el flujo básico y quieres más control sobre el historial.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 12 | [Rebase](Rebase.md) | Reescribir el historial para dejarlo recto y limpio. Alternativa a `merge`. |
-| 13 | [Stash](Stash.md) | Apartar trabajo a medias para cambiar de tarea sin hacer un commit. |
-| 14 | [Cherry-pick](Cherry-pick.md) | Llevar un commit suelto de una rama a otra. |
-| 15 | [Tags y versiones](Tags-y-versiones.md) | Marcar puntos del historial como versiones publicadas (`v1.0.0`). |
-| 16 | [Submódulos](Submodulos.md) | Incluir un repositorio dentro de otro, fijado a una versión concreta. |
-| 17 | [git bisect](git-bisect.md) | Encontrar automáticamente el commit que introdujo un error. |
+| 13 | [Rebase](Rebase.md) | Reescribir el historial para dejarlo recto y limpio. Alternativa a `merge`. |
+| 14 | [Stash](Stash.md) | Apartar trabajo a medias para cambiar de tarea sin hacer un commit. |
+| 15 | [Cherry-pick](Cherry-pick.md) | Llevar un commit suelto de una rama a otra. |
+| 16 | [Tags y versiones](Tags-y-versiones.md) | Marcar puntos del historial como versiones publicadas (`v1.0.0`). |
+| 17 | [Submódulos](Submodulos.md) | Incluir un repositorio dentro de otro, fijado a una versión concreta. |
+| 18 | [git bisect](git-bisect.md) | Encontrar automáticamente el commit que introdujo un error. |
 
 ### 7. Colaboración y automatización
 
@@ -73,9 +74,9 @@ Cómo se usa Git en equipo y cómo se automatizan las comprobaciones.
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 18 | [Git Flow](Git-Flow.md) | Un modelo de ramas con roles fijos para ordenar el trabajo en equipo. |
-| 19 | [Pull requests](Pull-requests.md) | Proponer y revisar cambios antes de fusionarlos. El corazón del trabajo en equipo. |
-| 20 | [GitHub Actions](GitHub-Actions.md) | Automatizar tests y despliegues con cada cambio (CI/CD). |
+| 19 | [Git Flow](Git-Flow.md) | Un modelo de ramas con roles fijos para ordenar el trabajo en equipo. |
+| 20 | [Pull requests](Pull-requests.md) | Proponer y revisar cambios antes de fusionarlos. El corazón del trabajo en equipo. |
+| 21 | [GitHub Actions](GitHub-Actions.md) | Automatizar tests y despliegues con cada cambio (CI/CD). |
 
 ---
 
@@ -101,6 +102,7 @@ Cómo se usa Git en equipo y cómo se automatizan las comprobaciones.
 
 **Trabajar con remotos**
 - [Remotos](Remotos.md)
+- [Tokens de acceso en remotos](Tokens-de-Acceso-en-Remotos.md)
 
 **Deshacer cambios**
 - [Deshacer cambios](Deshacer-cambios.md)
