@@ -1,6 +1,6 @@
 # Odoo — Guía de tecnología
 
-Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en ocho subcolecciones: los **fundamentos** para entender qué es y cómo está montado (incluida la estructura de datos del ORM, el recordset), las **pruebas seguras** para tocar un sistema en producción sin romperlo, el **desarrollo de búsquedas y filtros** que ve el usuario, las **maneras de configurar parámetros** para no dejar valores clavados en el código, los **mecanismos de notificación** con los que el sistema avisa a las personas, los **botones de acción** con los que una vista dispara código propio sobre un registro concreto, el **systray** con el que se añade un icono propio a la barra de navegación y el **bus de eventos de OWL** con el que dos partes de la interfaz que no se conocen se avisan de un cambio. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
+Colección introductoria sobre **Odoo** (el ERP de código abierto), organizada en nueve subcolecciones: los **fundamentos** para entender qué es y cómo está montado (incluida la estructura de datos del ORM, el recordset), las **pruebas seguras** para tocar un sistema en producción sin romperlo, el **desarrollo de búsquedas y filtros** que ve el usuario, las **maneras de configurar parámetros** para no dejar valores clavados en el código, los **mecanismos de notificación** con los que el sistema avisa a las personas, los **botones de acción** con los que una vista dispara código propio sobre un registro concreto, el **systray** con el que se añade un icono propio a la barra de navegación, el **bus de eventos de OWL** con el que dos partes de la interfaz que no se conocen se avisan de un cambio, y cómo **contribuir un fix a Odoo o a la OCA** cuando el bug no está en código propio. Está escrita para perfiles junior, sin dar por supuesta experiencia previa con Odoo ni con sistemas de gestión.
 
 Cada subcolección tiene su propio índice con orden de lectura. Si empiezas de cero, recórrelas en el orden de abajo.
 
@@ -92,6 +92,15 @@ Cómo dos componentes que no se conocen entre sí —por ejemplo, un botón de u
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 29 | [El bus de eventos de OWL (env.bus)](bus-de-eventos-owl/Bus-de-Eventos-OWL.md) | `trigger`, `useBus`, `patch()` y `record.load()`, con ejemplo guiado de principio a fin. |
+
+### 9. [Contribuir un fix a Odoo y a la OCA](contribucion-a-odoo-y-oca/README.md)
+
+Qué hacer cuando el bug no está en código propio: cómo se propone y se acepta una corrección en el núcleo de Odoo o en un módulo de la comunidad (OCA), y qué hacer mientras esa corrección todavía no ha llegado a una instalación real.
+
+| # | Archivo | Por qué leerlo aquí |
+|---|---|---|
+| 30 | [Contribuir un fix al núcleo de Odoo](contribucion-a-odoo-y-oca/Contribuir-un-Fix-al-Nucleo-de-Odoo.md) | El caso más estricto: el fabricante revisa cada cambio y exige firmar un acuerdo de contribución. |
+| 31 | [Contribuir un fix a un módulo de la OCA](contribucion-a-odoo-y-oca/Contribuir-un-Fix-a-un-Modulo-OCA.md) | El caso más abierto: revisión por mantenedores de la comunidad, con linters automáticos más exigentes que compensan la ausencia de un único fabricante. |
 
 ---
 
