@@ -26,3 +26,6 @@ Los tres pilares para entender qué pasa dentro de un sistema en producción: lo
 
 ### [Mensajería asíncrona](mensajeria-asincrona/README.md)
 Cómo desacoplar servicios con colas y eventos en vez de llamadas directas: colas frente a topics, garantías de entrega e idempotencia, RabbitMQ, Azure Service Bus y MQTT/Mosquitto como piezas concretas, y los patrones (outbox, dead-letter queues) que hacen que no se pierda ni se duplique trabajo.
+
+### [Cloudflare R2](cloudflare-r2/README.md)
+Almacenamiento de objetos compatible con S3 y sin coste de tráfico de salida: buckets, credenciales, uso desde código, URLs prefirmadas, dominios personalizados, CORS, costes y ciclo de vida.
