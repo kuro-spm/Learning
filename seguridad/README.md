@@ -15,5 +15,8 @@ Quién eres y qué puedes hacer: sesiones y tokens, JWT, OAuth2, OpenID Connect 
 ### [Gestión de secretos en desarrollo](gestion-de-secretos-en-desarrollo/README.md)
 Cómo manejar claves de API, contraseñas y claves de cifrado sin que acaben en git: por qué se separan del código, qué hacer cuando una ya tocó un commit, user-secrets de .NET y el orden de precedencia de la configuración, y el cifrado en reposo de credenciales con AES-GCM y su clave maestra.
 
+### [Protección del login](proteccion-del-login/README.md)
+Cómo frenar la fuerza bruta y el DoS contra un endpoint de login en ASP.NET Core: límite de intentos por IP y por cuenta con backoff, el diccionario en memoria que crece sin cota, y cómo obtener la IP real del cliente detrás de un reverse proxy sin abrir un bypass.
+
 ### [Secretos en llamadas salientes](secretos-en-llamadas-salientes/README.md)
 El complemento en runtime: cómo evitar filtrar una credencial al usarla para llamar a una API externa (logs, redirects, URLs de terceros, TLS).
