@@ -11,6 +11,7 @@ Cada ficha explica qué es la herramienta, por qué existe, cuándo se usa y có
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
 | 1 | [Playwright](Playwright.md) | La herramienta E2E de referencia: automatiza un navegador real para probar login, checkout y demás flujos críticos de punta a punta. |
+| 2 | [Playwright para documentación visual](Playwright-Documentacion-Visual.md) | El mismo Playwright puesto a otro uso: generar capturas reproducibles para un manual, con los matices propios de ese caso (idioma, tráfico real vs mockeado, toggles, rutas en ESM). |
 
 ---
 
