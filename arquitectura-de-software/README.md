@@ -1,6 +1,6 @@
 # Arquitectura de software — Guías
 
-Cómo organizar el código de una aplicación y cómo diseñar la comunicación entre sistemas: patrones de arquitectura, aislamiento multi-cliente y los distintos estilos de API.
+Cómo organizar el código de una aplicación y cómo diseñar la comunicación entre sistemas: patrones de arquitectura, aislamiento multi-cliente, los distintos estilos de API y cómo mantener su contrato.
 
 ---
 
@@ -17,3 +17,6 @@ Cómo una sola aplicación da servicio a muchos clientes (*tenants*) manteniendo
 
 ### [Tipos de APIs](tipos-de-apis/README.md)
 Los distintos estilos para construir una API (REST, GraphQL, gRPC, SOAP, WebSockets, webhooks, eventos...) y cuándo elegir cada uno.
+
+### [Contratos de API](contratos-de-api/README.md)
+Cómo escribir, versionar y mantener el contrato OpenAPI de una API: contrato primero, qué cuenta como ruptura, modelado de errores, descripciones y ejemplos fieles, y el gobierno de los cambios.
