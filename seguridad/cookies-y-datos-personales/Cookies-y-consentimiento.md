@@ -99,6 +99,8 @@ Basta con informar de ellas, de forma genérica, en la política de cookies o en
 2. Un botón para **rechazarlas**, similar al anterior: si hay un botón de aceptar, tiene que haber uno de rechazar.
 3. Un botón o enlace claramente visible para **configurar**, que lleva a un panel donde elegir por finalidad. No tiene por qué ser igual de destacado que los otros dos.
 
+El panel de configuración tiene sentido cuando hay **más de una finalidad** entre las que elegir. La guía considera buena práctica no incluirlo si solo se usan cookies para una finalidad (por ejemplo, solo análisis), porque la persona solo puede aceptar o rechazar esa. Aun así, admite mantenerlo para no tener que cambiar el aviso cada vez que se añade una finalidad nueva.
+
 Y además:
 
 - **Nada de cookies no exceptuadas antes de la decisión.** El consentimiento es previo.
