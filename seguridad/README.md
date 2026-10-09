@@ -12,6 +12,9 @@ Qué algoritmo de hash usar en cada situación y por qué: las propiedades del h
 ### [Autenticación y autorización](autenticacion-y-autorizacion/README.md)
 Quién eres y qué puedes hacer: sesiones y tokens, JWT, OAuth2, OpenID Connect y control de acceso con RBAC, claims y ACL.
 
+### [Cookies y datos personales](cookies-y-datos-personales/README.md)
+Qué puede guardar una web en el navegador y qué datos puede recoger sobre las personas: los atributos de una cookie, cuáles necesitan consentimiento y cómo debe ser el aviso, y el RGPD aplicado a formularios, registros del servidor y proveedores externos (qué es un dato personal, base legal, derechos y plazos).
+
 ### [Gestión de secretos en desarrollo](gestion-de-secretos-en-desarrollo/README.md)
 Cómo manejar claves de API, contraseñas y claves de cifrado sin que acaben en git: por qué se separan del código, qué hacer cuando una ya tocó un commit, user-secrets de .NET y el orden de precedencia de la configuración, y el cifrado en reposo de credenciales con AES-GCM y su clave maestra.
 
