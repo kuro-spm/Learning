@@ -78,16 +78,20 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 });
 ```
 
-Con esto se acepta la cabecera venga de donde venga. Es el bypass de manual: quien ataca llama a la API directamente (o a través del proxy, que conserva su cabecera) y rota el valor en cada intento:
+Con esto se acepta la cabecera venga de donde venga. Es el bypass de manual: quien ataca alcanza la API **sin pasar por el proxy** (un puerto publicado en el host, otro contenedor de la misma red) y rota el valor en cada intento:
 
 ```bash
-curl -X POST https://tienda.ejemplo.com/api/auth/login \
-  -H "X-Forwarded-For: 10.20.30.1" -d '{"email":"ana@ejemplo.com","password":"intento-1"}'
-curl -X POST https://tienda.ejemplo.com/api/auth/login \
-  -H "X-Forwarded-For: 10.20.30.2" -d '{"email":"ana@ejemplo.com","password":"intento-2"}'
+curl -X POST http://servidor.ejemplo.com:8080/api/auth/login \
+  -H "Content-Type: application/json" -H "X-Forwarded-For: 10.20.30.1" \
+  -d '{"email":"ana@ejemplo.com","password":"intento-1"}'
+curl -X POST http://servidor.ejemplo.com:8080/api/auth/login \
+  -H "Content-Type: application/json" -H "X-Forwarded-For: 10.20.30.2" \
+  -d '{"email":"ana@ejemplo.com","password":"intento-2"}'
 ```
 
-Cada petición parece venir de una IP distinta, así que cada una cae en un cubo nuevo del limitador y el límite no se alcanza nunca. Un control de seguridad que se esquiva cambiando un número de una cabecera no es un control.
+A través del proxy la rotación no funciona: nginx añade la IP real al final de la cabecera y, con `ForwardLimit = 1`, es la única entrada que se lee. El bypass exige que la API sea alcanzable directamente.
+
+Cada petición directa parece venir de una IP distinta, así que cada una cae en un cubo nuevo del limitador y el límite no se alcanza nunca. Un control de seguridad que se esquiva cambiando un número de una cabecera no es un control.
 
 ### La versión segura
 
