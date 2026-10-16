@@ -21,5 +21,8 @@ WCAG, el estándar que define cuándo una web es accesible: sus cuatro principio
 ### [Webs multiidioma](webs-multiidioma/README.md)
 Buenas prácticas para ofrecer una web en varios idiomas: el idioma en la URL, `lang` y `hreflang` para navegadores y buscadores, textos con claves y plurales, estructura de carpetas de las traducciones, formatos de fecha, número y moneda con `Intl`, maquetación (textos largos y RTL) y traducciones en base de datos.
 
+### [SEO web](seo-web/README.md)
+Cómo hacer que un buscador encuentre y entienda las páginas de una web: rastreo e indexación (códigos de estado, `robots.txt`, `noindex`, sitemap, contenido en el HTML), títulos y URLs, datos estructurados con JSON-LD, Core Web Vitals y diagnóstico con Search Console.
+
 ### [Manual de usuario dentro de una app web](manual-de-usuario-en-la-app/README.md)
 Cómo integrar el manual de usuario en una app React: Markdown convertido a HTML en build-time, `dangerouslySetInnerHTML` y XSS, i18n con claves, índice con scroll-spy, modal con zoom y arrastre, capturas automáticas con Playwright y exportación a Word con `python-docx`.
