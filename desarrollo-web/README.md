@@ -18,5 +18,8 @@ Stack React + Vite + TypeScript, con analogías al mundo C#/.NET: componentes, e
 ### [Accesibilidad web](accesibilidad-web/README.md)
 WCAG, el estándar que define cuándo una web es accesible: sus cuatro principios, los niveles A, AA y AAA, las versiones 2.0, 2.1 y 2.2, los fallos más frecuentes con su arreglo en código y cómo se comprueba con herramientas, teclado y lector de pantalla.
 
+### [Webs multiidioma](webs-multiidioma/README.md)
+Buenas prácticas para ofrecer una web en varios idiomas: el idioma en la URL, `lang` y `hreflang` para navegadores y buscadores, textos con claves y plurales, formatos de fecha, número y moneda con `Intl`, maquetación (textos largos y RTL) y traducciones en base de datos.
+
 ### [Manual de usuario dentro de una app web](manual-de-usuario-en-la-app/README.md)
 Cómo integrar el manual de usuario en una app React: Markdown convertido a HTML en build-time, `dangerouslySetInnerHTML` y XSS, i18n con claves, índice con scroll-spy, modal con zoom y arrastre, capturas automáticas con Playwright y exportación a Word con `python-docx`.
