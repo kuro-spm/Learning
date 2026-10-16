@@ -10,7 +10,7 @@ Está pensada para perfiles backend que programan a diario pero no han tenido qu
 
 | # | Archivo | Por qué leerlo aquí |
 |---|---|---|
-| 1 | [Webs multiidioma](Webs-multiidioma.md) | Las decisiones de diseño de una web en varios idiomas: URLs, `lang` y `hreflang`, textos y plurales, formatos, maquetación y datos traducidos. |
+| 1 | [Webs multiidioma](Webs-multiidioma.md) | Las decisiones de diseño de una web en varios idiomas: URLs, `lang` y `hreflang`, textos y plurales, estructura de carpetas de las traducciones, formatos, maquetación y datos traducidos. |
 
 ---
 

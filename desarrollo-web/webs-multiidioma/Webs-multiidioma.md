@@ -165,6 +165,51 @@ La librería de textos escoge `one` u `other` (o las categorías que necesite ca
 
 Decide el comportamiento de antemano. Lo razonable es **caer al idioma por defecto** (que se vea un texto en castellano en medio de la página en catalán) y **registrar la clave que falta**, en lugar de mostrar la clave en crudo (`cart.summary`) o dejar un hueco vacío. Un test o un paso de CI que compare las claves de todos los idiomas con las del idioma base detecta los huecos antes de que lleguen a producción.
 
+## Estructura de carpetas para los textos
+
+Los ficheros de traducción se organizan por **idioma** en el primer nivel y por **área funcional** en el segundo:
+
+```
+src/
+└── locales/
+    ├── es/
+    │   ├── common.json     ← botones, menú, errores genéricos
+    │   ├── auth.json
+    │   ├── cart.json
+    │   └── products.json
+    ├── ca/
+    │   ├── common.json
+    │   ├── auth.json
+    │   ├── cart.json
+    │   └── products.json
+    └── en/
+        └── (los mismos ficheros)
+```
+
+Cada elección tiene su razón:
+
+- **El idioma como carpeta de primer nivel** permite entregar `ca/` entera a quien traduce, y añadir un idioma consiste en copiar una carpeta.
+- **Los mismos nombres de fichero y las mismas claves en todos los idiomas** permiten comparar cada idioma con el base y detectar claves que faltan (el paso de CI de la sección anterior).
+- **Un fichero por área, no uno gigante**, evita conflictos de git cuando varias personas tocan textos a la vez y permite cargar solo los textos de la pantalla que se abre (*lazy loading*), en lugar de todos los de la web.
+- **Las claves llevan el área como prefijo** (`cart.summary`): son únicas y se sabe dónde se usan. `common.json` queda para lo que aparece en todas partes.
+
+Lo mismo en ASP.NET Core, donde los textos son ficheros de recursos (`.resx`) y el nombre del idioma va en el fichero, junto a la clase o área a la que pertenecen:
+
+```
+Resources/
+├── Cart.resx           ← idioma por defecto (es)
+├── Cart.ca.resx
+├── Cart.en.resx
+├── Auth.resx
+├── Auth.ca.resx
+└── Auth.en.resx
+```
+
+Dos estructuras que conviene evitar:
+
+- **Duplicar el árbol de páginas por idioma** (`pages/es/...`, `pages/en/...`). Cada cambio de diseño se repite en cada idioma y las versiones se desincronizan. La página es una sola; lo que cambia es el diccionario y el prefijo `/es/` de la ruta, que se resuelve como un segmento de ruta y no como una carpeta.
+- **Mezclar en el mismo fichero los textos de interfaz y los contenidos editables.** Si quien edita los contenidos no es parte del equipo de desarrollo, esos datos pertenecen a la base de datos (sección «Contenido que vive en la base de datos»), no a un fichero del repositorio que exige despliegue para cambiarse.
+
 ## Formatos y maquetación
 
 ### Fechas, números y monedas se formatean, no se escriben
